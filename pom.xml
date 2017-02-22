@@ -9,17 +9,21 @@
     </parent>
 
     <groupId>io.bootique.shiro</groupId>
-    <artifactId>bootique-shiro</artifactId>
+    <artifactId>bootique-shiro-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-    <name>bootique-shiro: Apache Shiro Integration with Bootique</name>
-    <description>Provides Apache Shiro integration with Bootique</description>
+    <name>bootique-shiro-parent: Apache Shiro Integration with Bootique</name>
+    <description>Parent POM of Apache Shiro / Bootique integration modules.</description>
 
     <properties>
         <bootique-version>0.22-SNAPSHOT</bootique-version>
         <shiro-version>1.4.0-RC2</shiro-version>
     </properties>
+
+    <modules>
+        <module>bootique-shiro</module>
+    </modules>
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/bootique/bootique-shiro</developerConnection>
@@ -59,42 +63,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <!-- Compile dependencies -->
-        <dependency>
-            <groupId>io.bootique</groupId>
-            <artifactId>bootique</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-core</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- Unit test dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.bootique</groupId>
-            <artifactId>bootique-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <!-- Optional profile used to sign artifacts -->
     <profiles>

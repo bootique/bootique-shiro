@@ -12,9 +12,5 @@ public class ShiroModule extends ConfigModule {
         return new ThreadLocalSubjectManager();
     }
 
-    @Provides
-    @Singleton
-    SecurityManager provideSecurityManager() {
-
-    }
+   
 }
