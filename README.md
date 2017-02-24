@@ -52,9 +52,7 @@ Include ```bootique-shiro```:
 </dependency>
 ```
 
-_TODO: config example... Use `-H` flag to run your app to see built-in documentation._
-
-In your own module map ShiroFilter (or your own subclass) to all or parts of your application URL space:
+Install `ShiroFilter` (or your own subclass) in Jetty to intercept all or parts of your application URL space:
 
 ```java
 @Provides
@@ -69,4 +67,8 @@ public void contribute(Binder binder) {
     JettyModule.extend(binder).addMappedFilter(tl);
 }
 ```
+
+Configure your app.
+
+_TODO: config example... Use `-H` flag to run your app to see built-in documentation._
 
