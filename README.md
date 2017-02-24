@@ -15,13 +15,14 @@ does not provide any guideance as to how to apply Shiro in your app.
 More interesting is `bootique-shiro-web`. In addition to injectable realms, it provides `ShiroFilter` servlet filter 
 that can be contributed to a webapp to intercept requests and run Shiro 
 ["chains"](https://shiro.apache.org/web.html#Web-%7B%7B%5Curls%5C%7D%7D), authenticating and authorizing requests.
-Instead of .ini, 
+Instead of .ini, the chains are configured via via Bootique configuration (such as YAML files), as described below.
 
 ## Configuration
 
-`bootique-shiro` does not use .ini configuration typical in Shiro apps. Instead it assumes that objects that comprise 
-the Shiro stack (SecurityManager, SessionManager, etc) are provided via dependency injection. Ini sections such as 
-`[urls]`, `[users]` and `[roles]` are supplied via Bootique configuration (such as YAML files).
+As mentioned above, `bootique-shiro` does not use .ini configuration typical in Shiro apps. Instead it assumes that 
+objects that comprise the Shiro stack (SecurityManager, SessionManager, etc) are provided via dependency injection. So
+if you are porting an existing app, `[main]` .ini section should be converted to DI. Configuration corresponding to
+ other sections, such as `[urls]`, `[users]` and `[roles]`, is laoded via Bootique (e.g. from YAML files).
 
 ## Usage
 
@@ -51,7 +52,7 @@ Include ```bootique-shiro```:
 </dependency>
 ```
 
-_TODO: config example_
+_TODO: config example... Use `-H` flag to run your app to see built-in documentation._
 
 In your own module map ShiroFilter (or your own subclass) to all or parts of your application URL space:
 
