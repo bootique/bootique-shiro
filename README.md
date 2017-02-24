@@ -9,7 +9,8 @@ Integration of Apache Shiro security engine with Bootique. Consists of 2 modules
 `bootique-shiro-web`. `bootique-shiro` provides injectable Shiro 
 [SecurityManager](https://github.com/apache/shiro/blob/master/core/src/main/java/org/apache/shiro/mgt/SecurityManager.java) 
 built on top of a set of injectable Shiro 
-[Realms](https://github.com/apache/shiro/blob/master/core/src/main/java/org/apache/shiro/realm/Realm.java). 
+[Realms](https://github.com/apache/shiro/blob/master/core/src/main/java/org/apache/shiro/realm/Realm.java), but otherwise
+does not provide any guideance as to how to apply Shiro in your app.
 
 More interesting is `bootique-shiro-web`. In addition to injectable realms, it provides `ShiroFilter` servlet filter 
 that can be contributed to a webapp to intercept requests and run Shiro 
