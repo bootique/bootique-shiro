@@ -7,9 +7,11 @@ import com.google.inject.Singleton;
 import io.bootique.config.ConfigurationFactory;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
 import javax.servlet.Filter;
 import java.util.Map;
@@ -30,8 +32,16 @@ public class ShiroWebModule implements Module {
 
     @Singleton
     @Provides
-    WebSecurityManager provideWebSecurityManager(Set<Realm> realms) {
-        return new DefaultWebSecurityManager(realms);
+    WebSecurityManager provideWebSecurityManager(SessionManager sessionManager, Set<Realm> realms) {
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms);
+        securityManager.setSessionManager(sessionManager);
+        return securityManager;
+    }
+
+    @Provides
+    @Singleton
+    SessionManager provideSessionManager() {
+        return new ServletContainerSessionManager();
     }
 
     @Singleton

@@ -52,7 +52,8 @@ Include ```bootique-shiro```:
 </dependency>
 ```
 
-Install `ShiroFilter` (or your own subclass) in Jetty to intercept all or parts of your application URL space:
+Install `ShiroFilter` (or your own subclass) in Jetty to intercept all or parts of your application URL space, 
+contribute realms:
 
 ```java
 @Provides
@@ -62,7 +63,12 @@ MappedFilter<ShiroFilter> mapShiroFilter(ShiroFilter filter) {
 }
 
 @Override
-public void contribute(Binder binder) {
+public void configure(Binder binder) {
+    
+    // contribute realms
+    ShiroModule.extend(binder).addRealm(MyRealm.class);
+    
+    // install ShiroFilter
     TypeLiteral<MappedFilter<ShiroFilter>> tl = new TypeLiteral<MappedFilter<ShiroFilter>>() {};
     JettyModule.extend(binder).addMappedFilter(tl);
 }

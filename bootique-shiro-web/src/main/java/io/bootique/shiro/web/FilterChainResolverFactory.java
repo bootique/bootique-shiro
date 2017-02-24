@@ -18,7 +18,8 @@ public class FilterChainResolverFactory {
 
     private Map<String, String> urls;
 
-    @BQConfigProperty("A map of Shiro filter chains names against chain definitions.")
+    @BQConfigProperty("A map of Shiro filter chains names against chain definitions. Keys must correspond to" +
+            " Shiro filter names mapped via DI.")
     public void setUrls(Map<String, String> urls) {
         this.urls = urls;
     }

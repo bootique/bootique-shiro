@@ -31,8 +31,6 @@ public class ShiroWebModuleProvider implements BQModuleProvider {
 
     @Override
     public Map<String, Type> configs() {
-        // TODO: config prefix is hardcoded. Refactor away from ConfigModule, and make provider
-        // generate config prefix, reusing it in metadata...
-        return Collections.singletonMap("shiro", FilterChainResolverFactory.class);
+        return Collections.singletonMap(ShiroWebModule.CONFIG_PREFIX, FilterChainResolverFactory.class);
     }
 }
