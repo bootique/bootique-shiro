@@ -8,6 +8,9 @@ import org.apache.shiro.subject.Subject;
  */
 public class ThreadLocalSubjectManager implements SubjectManager {
 
+    public ThreadLocalSubjectManager() {
+    }
+
     @Override
     public Subject subject() {
         return SecurityUtils.getSubject();

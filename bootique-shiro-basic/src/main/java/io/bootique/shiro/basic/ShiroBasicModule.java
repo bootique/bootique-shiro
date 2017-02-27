@@ -16,7 +16,6 @@ public class ShiroBasicModule implements Module {
 
     @Override
     public void configure(Binder binder) {
-
     }
 
     @Provides
