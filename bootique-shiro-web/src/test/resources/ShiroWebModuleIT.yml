@@ -1,0 +1,4 @@
+shiroweb:
+  urls:
+    "/anonymous" : anon
+    "/admin" : admin, perms["admin"]
