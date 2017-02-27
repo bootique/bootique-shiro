@@ -15,6 +15,7 @@ public class ShiroModuleProvider implements BQModuleProvider {
     public BQModule.Builder moduleBuilder() {
         return BQModuleProvider.super
                 .moduleBuilder()
-                .description("Provides integration with Apache Shiro.");
+                .description("Provides integration of Apache Shiro realms. Serves as a foundation for " +
+                        "other environment-specific Shiro modules.");
     }
 }

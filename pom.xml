@@ -23,6 +23,7 @@
 
     <modules>
         <module>bootique-shiro</module>
+        <module>bootique-shiro-basic</module>
         <module>bootique-shiro-web</module>
     </modules>
 

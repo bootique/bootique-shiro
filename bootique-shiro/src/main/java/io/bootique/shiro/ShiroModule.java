@@ -4,14 +4,11 @@ import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.bootique.ConfigModule;
-import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.session.mgt.SessionManager;
 
-import java.util.Set;
-
+/**
+ * A foundation module to start an Apache Shiro stack. Defines configurable Shiro realms and a {@link SubjectManager}.
+ * {@link org.apache.shiro.mgt.SecurityManager}, filters, etc. are defined in other environment-specific modules.
+ */
 public class ShiroModule extends ConfigModule {
 
     public static ShiroModuleExtender extend(Binder binder) {
@@ -29,17 +26,4 @@ public class ShiroModule extends ConfigModule {
         return new ThreadLocalSubjectManager();
     }
 
-    @Provides
-    @Singleton
-    SecurityManager provideSecurityManager(SessionManager sessionManager, Set<Realm> realms) {
-        DefaultSecurityManager manager = new DefaultSecurityManager(realms);
-        manager.setSessionManager(sessionManager);
-        return manager;
-    }
-
-    @Provides
-    @Singleton
-    SessionManager provideSessionManager() {
-        return new DefaultSessionManager();
-    }
 }
