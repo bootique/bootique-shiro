@@ -22,7 +22,7 @@ Instead of .ini, the chains are configured via via Bootique configuration (such 
 As mentioned above, `bootique-shiro` does not use .ini configuration typical in Shiro apps. Instead it assumes that 
 objects that comprise the Shiro stack (SecurityManager, SessionManager, etc) are provided via dependency injection. So
 if you are porting an existing app, `[main]` .ini section should be converted to DI. Configuration corresponding to
- other sections, such as `[urls]`, `[users]` and `[roles]`, is laoded via Bootique (e.g. from YAML files).
+ other sections, such as `[urls]`, `[users]` and `[roles]`, is loaded via Bootique (e.g. from YAML files).
 
 ## Usage
 

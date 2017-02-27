@@ -30,6 +30,6 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
     }
 
     protected Multibinder<Realm> contributeRealms() {
-        return realms != null ? realms : (realms = Multibinder.newSetBinder(binder, Realm.class));
+        return realms != null ? realms : (realms = newSet(Realm.class));
     }
 }

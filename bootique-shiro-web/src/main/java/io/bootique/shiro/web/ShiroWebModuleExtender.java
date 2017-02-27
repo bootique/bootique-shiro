@@ -18,7 +18,17 @@ public class ShiroWebModuleExtender extends ModuleExtender<ShiroWebModuleExtende
         return this;
     }
 
+    public ShiroWebModuleExtender setFilter(String name, Filter filter) {
+        contributeFilters().addBinding(name).toInstance(filter);
+        return this;
+    }
+
+    public ShiroWebModuleExtender setFilter(String name, Class<? extends Filter> filterType) {
+        contributeFilters().addBinding(name).to(filterType);
+        return this;
+    }
+
     protected MapBinder<String, Filter> contributeFilters() {
-        return MapBinder.newMapBinder(binder, String.class, Filter.class, ShiroFilterBinding.class);
+        return newMap(String.class, Filter.class, ShiroFilterBinding.class);
     }
 }

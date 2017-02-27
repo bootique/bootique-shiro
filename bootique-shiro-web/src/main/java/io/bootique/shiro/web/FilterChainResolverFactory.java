@@ -11,30 +11,29 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.Filter;
 import java.util.Map;
 
-@BQConfig("Configures Shiro servlet environment.")
+@BQConfig("Configures Shiro in a servlet environment.")
 public class FilterChainResolverFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterChainResolverFactory.class);
 
     private Map<String, String> urls;
 
-    @BQConfigProperty("A map of Shiro filter chains names against chain definitions. Keys must correspond to" +
-            " Shiro filter names mapped via DI.")
+    @BQConfigProperty("A map of URL patterns to Shiro filter chain definitions. Names in the definitions must correspond"
+            + " to the Shiro filter names mapped via DI. Corresponds to the [url] section in a traditional Shiro config.")
     public void setUrls(Map<String, String> urls) {
         this.urls = urls;
     }
 
-    public FilterChainResolver createFilterChainResolver(@ShiroFilterBinding Map<String, Filter> shiroFilters) {
+    public FilterChainResolver createFilterChainResolver(Map<String, Filter> shiroFilters) {
 
         DefaultFilterChainManager chainManager = new DefaultFilterChainManager();
 
         // load filters
         shiroFilters.forEach((name, filter) -> chainManager.addFilter(name, filter));
 
-        // init chains based on the "[urls]" section of the .ini
-        urls.forEach((name, value) -> {
-            LOGGER.info("Loading url chain {} -> {}", name, value);
-            chainManager.createChain(name, value);
+        urls.forEach((url, value) -> {
+            LOGGER.info("Loading url chain {} -> {}", url, value);
+            chainManager.createChain(url, value);
         });
 
         PathMatchingFilterChainResolver resolver = new PathMatchingFilterChainResolver();
