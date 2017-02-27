@@ -18,7 +18,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 
-public class FilterChainResolverFactoryTest {
+public class MappedShiroFilterFactoryTes {
 
     private Filter mockFilter1;
     private Filter mockFilter2;
@@ -38,10 +38,10 @@ public class FilterChainResolverFactoryTest {
         filters.put("f1", mockFilter1);
         filters.put("f2", mockFilter2);
 
-        FilterChainResolverFactory factory = new FilterChainResolverFactory();
+        MappedShiroFilterFactory factory = new MappedShiroFilterFactory();
         factory.setUrls(urls);
 
-        this.resolver = factory.createFilterChainResolver(filters);
+        this.resolver = factory.createChainResolver(filters);
         assertNotNull(resolver);
     }
 

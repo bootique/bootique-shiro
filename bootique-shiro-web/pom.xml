@@ -31,12 +31,10 @@
             <artifactId>slf4j-api</artifactId>
             <scope>compile</scope>
         </dependency>
-
-        <!-- Provided dependencies -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
+            <groupId>io.bootique.jetty</groupId>
+            <artifactId>bootique-jetty</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Unit test dependencies -->

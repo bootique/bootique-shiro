@@ -17,7 +17,6 @@ public class ThreadLocalSubjectManagerTest {
     @Test
     public void testSubject() {
 
-        ThreadLocalSubjectManager sm = new ThreadLocalSubjectManager();
 
         Subject mockSubject = mock(Subject.class);
         SecurityManager mockSM = mock(SecurityManager.class);
@@ -25,6 +24,7 @@ public class ThreadLocalSubjectManagerTest {
 
         SecurityUtils.setSecurityManager(mockSM);
 
+        ThreadLocalSubjectManager sm = new ThreadLocalSubjectManager();
         assertSame(mockSubject, sm.subject());
     }
 

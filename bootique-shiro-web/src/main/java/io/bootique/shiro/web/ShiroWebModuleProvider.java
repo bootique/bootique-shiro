@@ -24,6 +24,6 @@ public class ShiroWebModuleProvider implements BQModuleProvider {
 
     @Override
     public Map<String, Type> configs() {
-        return Collections.singletonMap(ShiroWebModule.CONFIG_PREFIX, FilterChainResolverFactory.class);
+        return Collections.singletonMap("shiroweb", MappedShiroFilterFactory.class);
     }
 }

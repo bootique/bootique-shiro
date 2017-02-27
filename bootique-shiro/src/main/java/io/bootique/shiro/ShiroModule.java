@@ -25,5 +25,4 @@ public class ShiroModule extends ConfigModule {
     SubjectManager provideSubjectManager() {
         return new ThreadLocalSubjectManager();
     }
-
 }
