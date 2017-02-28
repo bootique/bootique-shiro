@@ -3,30 +3,28 @@
 
 # bootique-shiro
 
+_since Bootique 0.22_
+
 ## Overview
 
-Integration of Apache Shiro security engine with Bootique. Consists of 2 modules - `bootique-shiro` and 
-`bootique-shiro-web`. `bootique-shiro` provides injectable Shiro 
-[SecurityManager](https://github.com/apache/shiro/blob/master/core/src/main/java/org/apache/shiro/mgt/SecurityManager.java) 
-built on top of a set of injectable Shiro 
-[Realms](https://github.com/apache/shiro/blob/master/core/src/main/java/org/apache/shiro/realm/Realm.java), but otherwise
-does not provide any guideance as to how to apply Shiro in your app.
+This is a set of modules that help to integrate [Apache Shiro](http://shiro.apache.org/) security engine in Bootique apps. 
+Quick description of the provided modules:
 
-More interesting is `bootique-shiro-web`. In addition to injectable realms, it provides `ShiroFilter` servlet filter 
-that can be contributed to a webapp to intercept requests and run Shiro 
-["chains"](https://shiro.apache.org/web.html#Web-%7B%7B%5Curls%5C%7D%7D), authenticating and authorizing requests.
-Instead of .ini, the chains are configured via via Bootique configuration (such as YAML files), as described below.
+* `bootique-shiro` - a basic module that helps to configure a set of security Realms (available as injectable 
+[Realms](https://github.com/bootique/bootique-shiro/blob/master/bootique-shiro/src/main/java/io/bootique/shiro/realm/Realms.java))
+object). While it can be used standalone, it normally serves as a basis for environment-specific Shiro integrations described
+below.
 
-## Configuration
+* `bootique-shiro-static` - a module that stands up Shiro stack and stores it in Shiro-provided static singletons. This 
+allows the app to use `ShiroUtils` without extra setup. The obvious shortcoming of this approach is that the framework 
+is no longer embeddable (there can only eb one Shiro stack), which is quite appropriate for many apps.
 
-As mentioned above, `bootique-shiro` does not use .ini configuration typical in Shiro apps. Instead it assumes that 
-objects that comprise the Shiro stack (SecurityManager, SessionManager, etc) are provided via dependency injection. So
-if you are porting an existing app, `[main]` .ini section should be converted to DI. Configuration corresponding to
- other sections, such as `[urls]`, `[users]` and `[roles]`, is loaded via Bootique (e.g. from YAML files).
+* `bootique-shiro-web` - a module that stands up the Shiro stack and attaches it to a special servlet Filter. Supports
+a powerful Shiro feature - [path matching with filters](https://shiro.apache.org/web.html#urls-).
 
 ## Usage
 
-Include ```bootique-shiro```:
+Here is a web configuration example. Include ```bootique-shiro-web```:
 ```xml
 <dependencyManagement>
     <dependencies>
@@ -44,37 +42,31 @@ Include ```bootique-shiro```:
 
 <dependency>
 	<groupId>io.bootique.shiro</groupId>
-	<artifactId>bootique-shiro</artifactId>
-</dependency>
-<dependency>
-	<groupId>io.bootique.shiro</groupId>
 	<artifactId>bootique-shiro-web</artifactId>
 </dependency>
 ```
+This will start Shiro and install Shiro filter to match all URLs. Now you will need to configure your realms and 
+security filters. You might create a `.yml` file similar to this:
 
-Install `ShiroFilter` (or your own subclass) in Jetty to intercept all or parts of your application URL space, 
-contribute realms:
+```yaml
+shiro:
 
-```java
-@Provides
-@Singleton
-MappedFilter<ShiroFilter> mapShiroFilter(ShiroFilter filter) {
-    return new MappedFilter(filter, Collections.singleton("/*"), 0);
-}
-
-@Override
-public void configure(Binder binder) {
+shiroweb:
+  urls:
+    "/admin" : perms[\"admin\"]
+    "/pub"   : anon
     
-    // contribute realms
-    ShiroModule.extend(binder).addRealm(MyRealm.class);
-    
-    // install ShiroFilter
-    TypeLiteral<MappedFilter<ShiroFilter>> tl = new TypeLiteral<MappedFilter<ShiroFilter>>() {};
-    JettyModule.extend(binder).addMappedFilter(tl);
-}
+shiro:
+  realms:
+    - users:
+        adminuser: "password, admin, user"
+        user: "password, user"
+      roles:
+        admin: "admin"
 ```
 
-Configure your app.
+_Hint: use `-H` flag to run your app to see configuration docs in details._
 
-_TODO: config example... Use `-H` flag to run your app to see built-in documentation._
-
+`bootique-shiro` replaces `.ini` files with real dependency injection plus Bootique configuration system. If you 
+have used Apache Shiro outside Bootique, you may recognize some of the configs above that replace Shiro's `[users]`,
+`[roles]` and `[urls]` sections. 
