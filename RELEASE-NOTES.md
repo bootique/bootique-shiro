@@ -4,3 +4,4 @@
 * #2 Configurable JDBC Realm
 * #3 Generic mechanism for loading Realms from configuration and DI
 * #4 IniRealmFactory
+* #5 Configurable ActiveDriectoryRealm

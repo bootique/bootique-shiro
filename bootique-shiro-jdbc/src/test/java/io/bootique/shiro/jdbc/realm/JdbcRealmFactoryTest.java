@@ -2,6 +2,7 @@ package io.bootique.shiro.jdbc.realm;
 
 import com.google.inject.Injector;
 import io.bootique.jdbc.DataSourceFactory;
+import io.bootique.shiro.realm.ActiveDirectoryRealmFactory;
 import io.bootique.shiro.realm.IniRealmFactory;
 import io.bootique.shiro.realm.RealmFactory;
 import io.bootique.test.junit.PolymorphicConfigurationChecker;
@@ -24,6 +25,7 @@ public class JdbcRealmFactoryTest {
     public void testMapping() {
         PolymorphicConfigurationChecker.test(RealmFactory.class,
                 IniRealmFactory.class,
+                ActiveDirectoryRealmFactory.class,
                 JdbcRealmFactory.class);
     }
 
@@ -48,7 +50,6 @@ public class JdbcRealmFactoryTest {
 
         Field dsField = JdbcRealm.class.getDeclaredField("dataSource");
         dsField.setAccessible(true);
-
         assertSame(ds, dsField.get(realm));
     }
 }
