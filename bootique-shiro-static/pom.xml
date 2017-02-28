@@ -8,11 +8,11 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bootique-shiro-basic</artifactId>
+    <artifactId>bootique-shiro-static</artifactId>
     <packaging>jar</packaging>
 
-    <name>bootique-shiro-basic: A basic Shiro setup.</name>
-    <description>Provides basic Apache Shiro stack based on DefaultSecurityManager.</description>
+    <name>bootique-shiro-static: Bootique / Shiro Stack with Static SecurityManager</name>
+    <description>Provides Apache Shiro stack based on DefaultSecurityManager set as a static singleton in SecurityUtils.</description>
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>

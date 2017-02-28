@@ -13,7 +13,7 @@ import org.apache.shiro.realm.Realm;
 import java.util.Set;
 
 /**
- * A foundation module to start an Apache Shiro stack. Defines configurable Shiro realms and a {@link SubjectManager}.
+ * A foundation module to start an Apache Shiro stack. Defines configurable Shiro realms. {@link SubjectManager},
  * {@link org.apache.shiro.mgt.SecurityManager}, filters, etc. are defined in other environment-specific modules.
  */
 public class ShiroModule extends ConfigModule {
@@ -27,11 +27,6 @@ public class ShiroModule extends ConfigModule {
         extend(binder).initAllExtensions();
     }
 
-    @Provides
-    @Singleton
-    SubjectManager provideSubjectManager() {
-        return new ThreadLocalSubjectManager();
-    }
 
     @Provides
     @Singleton

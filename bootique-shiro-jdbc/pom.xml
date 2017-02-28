@@ -11,8 +11,8 @@
     <artifactId>bootique-shiro-jdbc</artifactId>
     <packaging>jar</packaging>
 
-    <name>bootique-shiro-web: Servlet parts of Apache Shiro</name>
-    <description>Provides Apache Shiro integration with Bootique</description>
+    <name>bootique-shiro-jdbc: Bootique / Shiro JDBCRealm Factory</name>
+    <description>Provides a factory for Shiro JDBCRealm.</description>
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>

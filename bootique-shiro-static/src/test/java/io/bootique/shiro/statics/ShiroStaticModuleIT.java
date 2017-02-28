@@ -1,4 +1,4 @@
-package io.bootique.shiro.basic;
+package io.bootique.shiro.statics;
 
 import io.bootique.BQRuntime;
 import io.bootique.shiro.ShiroModule;
@@ -9,7 +9,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.junit.After;
@@ -22,7 +21,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ShiroBasicModuleIT {
+public class ShiroStaticModuleIT {
 
     @Rule
     public BQTestFactory testFactory = new BQTestFactory();
@@ -63,10 +62,6 @@ public class ShiroBasicModuleIT {
                 .autoLoadModules()
                 .createRuntime()
                 .getRuntime();
-
-
-        // setup static vars before we can run Shiro assertions
-        SecurityUtils.setSecurityManager(runtime.getInstance(SecurityManager.class));
 
         SubjectManager subjectManager = runtime.getInstance(SubjectManager.class);
         Subject subject = subjectManager.subject();

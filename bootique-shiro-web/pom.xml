@@ -11,8 +11,8 @@
     <artifactId>bootique-shiro-web</artifactId>
     <packaging>jar</packaging>
 
-    <name>bootique-shiro-web: Servlet parts of Apache Shiro</name>
-    <description>Provides Apache Shiro integration with Bootique</description>
+    <name>bootique-shiro-web: Bootique / Shiro Web Stack</name>
+    <description>Provides Apache Shiro integration with Bootique in servlet environment.</description>
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>

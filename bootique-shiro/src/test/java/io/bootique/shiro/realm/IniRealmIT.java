@@ -5,7 +5,6 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.bootique.BQRuntime;
-import io.bootique.shiro.SubjectManager;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -45,10 +44,9 @@ public class IniRealmIT {
                 .createRuntime()
                 .getRuntime();
 
-        SubjectManager subjectManager = bqRuntime.getInstance(SubjectManager.class);
         SecurityUtils.setSecurityManager(bqRuntime.getInstance(SecurityManager.class));
 
-        Subject subject = subjectManager.subject();
+        Subject subject = SecurityUtils.getSubject();
 
         subject.login(new UsernamePasswordToken("u11", "u11p"));
         Assert.assertTrue(subject.hasRole("admin"));

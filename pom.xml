@@ -14,7 +14,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>bootique-shiro-parent: Apache Shiro Integration with Bootique</name>
+    <name>bootique-shiro-parent: Parent of bootique-shiro* Modules.</name>
     <description>Parent POM of Apache Shiro / Bootique integration modules.</description>
 
     <properties>
@@ -28,8 +28,8 @@
 
     <modules>
         <module>bootique-shiro</module>
-        <module>bootique-shiro-basic</module>
         <module>bootique-shiro-jdbc</module>
+        <module>bootique-shiro-static</module>
         <module>bootique-shiro-web</module>
     </modules>
 

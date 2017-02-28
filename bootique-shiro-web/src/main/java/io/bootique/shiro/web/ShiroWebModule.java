@@ -8,6 +8,8 @@ import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
+import io.bootique.shiro.SubjectManager;
+import io.bootique.shiro.ThreadLocalSubjectManager;
 import io.bootique.shiro.realm.Realms;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -59,5 +61,11 @@ public class ShiroWebModule extends ConfigModule {
         return configFactory
                 .config(MappedShiroFilterFactory.class, configPrefix)
                 .createShiroFilter(securityManager, chainFilters);
+    }
+
+    @Provides
+    @Singleton
+    SubjectManager provideSubjectManager() {
+        return new ThreadLocalSubjectManager();
     }
 }
