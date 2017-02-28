@@ -8,8 +8,8 @@ import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
+import io.bootique.shiro.realm.Realms;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
@@ -17,7 +17,6 @@ import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
 import javax.servlet.Filter;
 import java.util.Map;
-import java.util.Set;
 
 public class ShiroWebModule extends ConfigModule {
 
@@ -34,8 +33,8 @@ public class ShiroWebModule extends ConfigModule {
 
     @Singleton
     @Provides
-    WebSecurityManager provideWebSecurityManager(SessionManager sessionManager, Set<Realm> realms) {
-        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms);
+    WebSecurityManager provideWebSecurityManager(SessionManager sessionManager, Realms realms) {
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms.getRealms());
         securityManager.setSessionManager(sessionManager);
         return securityManager;
     }

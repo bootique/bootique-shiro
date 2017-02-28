@@ -4,13 +4,11 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import io.bootique.shiro.realm.Realms;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
-
-import java.util.Set;
 
 public class ShiroBasicModule implements Module {
 
@@ -20,8 +18,8 @@ public class ShiroBasicModule implements Module {
 
     @Provides
     @Singleton
-    SecurityManager provideSecurityManager(SessionManager sessionManager, Set<Realm> realms) {
-        DefaultSecurityManager manager = new DefaultSecurityManager(realms);
+    SecurityManager provideSecurityManager(SessionManager sessionManager, Realms realms) {
+        DefaultSecurityManager manager = new DefaultSecurityManager(realms.getRealms());
         manager.setSessionManager(sessionManager);
         return manager;
     }

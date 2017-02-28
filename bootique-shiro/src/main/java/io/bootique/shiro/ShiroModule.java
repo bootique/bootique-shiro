@@ -1,9 +1,16 @@
 package io.bootique.shiro;
 
 import com.google.inject.Binder;
+import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.bootique.ConfigModule;
+import io.bootique.config.ConfigurationFactory;
+import io.bootique.shiro.realm.Realms;
+import io.bootique.shiro.realm.RealmsFactory;
+import org.apache.shiro.realm.Realm;
+
+import java.util.Set;
 
 /**
  * A foundation module to start an Apache Shiro stack. Defines configurable Shiro realms and a {@link SubjectManager}.
@@ -24,5 +31,13 @@ public class ShiroModule extends ConfigModule {
     @Singleton
     SubjectManager provideSubjectManager() {
         return new ThreadLocalSubjectManager();
+    }
+
+    @Provides
+    @Singleton
+    Realms provideRealms(Injector injector, ConfigurationFactory configurationFactory, Set<Realm> diRealms) {
+        return configurationFactory
+                .config(RealmsFactory.class, configPrefix)
+                .createRealms(injector, diRealms);
     }
 }
