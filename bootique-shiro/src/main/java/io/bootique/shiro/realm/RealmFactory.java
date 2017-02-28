@@ -8,7 +8,7 @@ import io.bootique.config.PolymorphicConfiguration;
 import org.apache.shiro.realm.Realm;
 
 @BQConfig
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = IniRealmFactory.class)
 public abstract class RealmFactory implements PolymorphicConfiguration {
 
     private String name;

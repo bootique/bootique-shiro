@@ -1,0 +1,13 @@
+shiro:
+  realms:
+    - name: ini1
+      users:
+        u11: "u11p, admin, user"
+        u12: "u12p, user"
+      roles:
+        admin: "do1, do2"
+        user: "do3"
+    - name: ini2
+      type: ini
+      users:
+        u21: "u21p"

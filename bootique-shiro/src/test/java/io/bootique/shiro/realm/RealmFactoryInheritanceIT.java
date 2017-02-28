@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.inject.Injector;
 import io.bootique.BQRuntime;
 import io.bootique.test.junit.BQTestFactory;
+import io.bootique.test.junit.PolymorphicConfigurationChecker;
 import org.apache.shiro.realm.Realm;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +30,14 @@ public class RealmFactoryInheritanceIT {
         assertEquals("Created by RealmFactory2", names[0]);
         assertEquals("Created by RealmFactory1", names[1]);
         assertEquals("Created by RealmFactory2", names[2]);
+    }
+
+    @Test
+    public void testMapping() {
+        PolymorphicConfigurationChecker.test(RealmFactory.class,
+                IniRealmFactory.class,
+                RealmFactory1.class,
+                RealmFactory2.class);
     }
 
     @JsonTypeName("f1")
