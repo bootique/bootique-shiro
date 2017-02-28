@@ -59,19 +59,17 @@ So you might create a `.yml` file similar to this ()you may recognize some of th
 
 ```yaml
 shiro:
-
-shiroweb:
-  urls:
-    "/admin" : perms[\"admin\"]
-    "/pub"   : anon
-    
-shiro:
   realms:
     - users:
         adminuser: "password, admin, user"
         user: "password, user"
       roles:
         admin: "admin"
+        
+shiroweb:
+  urls:
+    "/admin" : perms[\"admin\"]
+    "/pub"   : anon
 ```
 
 _Hint: use `-H` flag to run your app to see configuration docs in details._
