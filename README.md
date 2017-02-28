@@ -13,7 +13,8 @@ Quick description of the provided modules:
 * `bootique-shiro` - a basic module that helps to configure a set of security Realms (available as injectable 
 [Realms](https://github.com/bootique/bootique-shiro/blob/master/bootique-shiro/src/main/java/io/bootique/shiro/realm/Realms.java))
 object). While it can be used standalone, it normally serves as a basis for environment-specific Shiro integrations described
-below. Also includes factories for "Ini" and ActiveDirectory realms.
+below. Also includes factories for "Ini" realm (that supports in-place definition of user accounts) and ActiveDirectory 
+realm.
 
 * `bootique-shiro-static` - a module that stands up Shiro stack and stores it in Shiro-provided static singletons. This 
 allows the app to use `ShiroUtils` without extra setup. The obvious shortcoming of this approach is that the framework 
