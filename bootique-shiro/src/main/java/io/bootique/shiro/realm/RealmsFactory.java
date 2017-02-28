@@ -1,6 +1,8 @@
 package io.bootique.shiro.realm;
 
 import com.google.inject.Injector;
+import io.bootique.annotation.BQConfig;
+import io.bootique.annotation.BQConfigProperty;
 import org.apache.shiro.realm.Realm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +13,14 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
 
+@BQConfig
 public class RealmsFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RealmsFactory.class);
 
     private List<RealmFactory> realms;
 
+    @BQConfigProperty
     public void setRealms(List<RealmFactory> realms) {
         this.realms = realms;
     }

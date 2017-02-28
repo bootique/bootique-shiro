@@ -1,12 +1,16 @@
 package io.bootique.shiro.realm;
 
 import com.google.inject.Injector;
+import io.bootique.annotation.BQConfig;
+import io.bootique.annotation.BQConfigProperty;
 import org.apache.shiro.realm.Realm;
 
+@BQConfig
 public abstract class RealmFactory {
 
     private String name;
 
+    @BQConfigProperty
     public void setName(String name) {
         this.name = name;
     }
