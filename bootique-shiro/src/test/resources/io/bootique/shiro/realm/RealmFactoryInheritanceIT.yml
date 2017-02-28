@@ -1,0 +1,5 @@
+shiro:
+  realms:
+    - type: f2
+    - type: f1
+    - type: f2

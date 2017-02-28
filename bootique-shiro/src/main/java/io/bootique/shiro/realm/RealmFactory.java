@@ -1,12 +1,15 @@
 package io.bootique.shiro.realm;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.inject.Injector;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.config.PolymorphicConfiguration;
 import org.apache.shiro.realm.Realm;
 
 @BQConfig
-public abstract class RealmFactory {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+public abstract class RealmFactory implements PolymorphicConfiguration {
 
     private String name;
 

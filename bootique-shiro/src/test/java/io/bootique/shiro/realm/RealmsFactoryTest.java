@@ -1,13 +1,11 @@
-package io.bootique.shiro.realms;
+package io.bootique.shiro.realm;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.bootique.shiro.realm.RealmFactory;
-import io.bootique.shiro.realm.Realms;
-import io.bootique.shiro.realm.RealmsFactory;
 import org.apache.shiro.realm.Realm;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,16 +15,14 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class RealmsFactoryTest {
 
     @Test
     public void testCreateRealms_NoConfig() {
 
-        Realm r1 = mock(Realm.class);
-        Realm r2 = mock(Realm.class);
+        Realm r1 = Mockito.mock(Realm.class);
+        Realm r2 = Mockito.mock(Realm.class);
 
         Set<Realm> diRealms = new HashSet<>(asList(r1, r2));
 
@@ -43,14 +39,14 @@ public class RealmsFactoryTest {
     public void testCreateRealms_NoDi() {
         Injector injector = Guice.createInjector();
 
-        Realm r1 = mock(Realm.class);
-        Realm r2 = mock(Realm.class);
+        Realm r1 = Mockito.mock(Realm.class);
+        Realm r2 = Mockito.mock(Realm.class);
 
-        RealmFactory rf1 = mock(RealmFactory.class);
-        when(rf1.createRealm(injector)).thenReturn(r1);
+        RealmFactory rf1 = Mockito.mock(RealmFactory.class);
+        Mockito.when(rf1.createRealm(injector)).thenReturn(r1);
 
-        RealmFactory rf2 = mock(RealmFactory.class);
-        when(rf2.createRealm(injector)).thenReturn(r2);
+        RealmFactory rf2 = Mockito.mock(RealmFactory.class);
+        Mockito.when(rf2.createRealm(injector)).thenReturn(r2);
 
         List<RealmFactory> configFactories = asList(rf1, rf2);
 
@@ -68,19 +64,19 @@ public class RealmsFactoryTest {
     public void testCreateRealms_DiAndConfig() {
         Injector injector = Guice.createInjector();
 
-        Realm rdi1 = mock(Realm.class);
-        Realm rdi2 = mock(Realm.class);
+        Realm rdi1 = Mockito.mock(Realm.class);
+        Realm rdi2 = Mockito.mock(Realm.class);
 
         Set<Realm> diRealms = new HashSet<>(asList(rdi1, rdi2));
 
-        Realm r1 = mock(Realm.class);
-        Realm r2 = mock(Realm.class);
+        Realm r1 = Mockito.mock(Realm.class);
+        Realm r2 = Mockito.mock(Realm.class);
 
-        RealmFactory rf1 = mock(RealmFactory.class);
-        when(rf1.createRealm(injector)).thenReturn(r1);
+        RealmFactory rf1 = Mockito.mock(RealmFactory.class);
+        Mockito.when(rf1.createRealm(injector)).thenReturn(r1);
 
-        RealmFactory rf2 = mock(RealmFactory.class);
-        when(rf2.createRealm(injector)).thenReturn(r2);
+        RealmFactory rf2 = Mockito.mock(RealmFactory.class);
+        Mockito.when(rf2.createRealm(injector)).thenReturn(r2);
 
         List<RealmFactory> configFactories = asList(rf1, rf2);
 
