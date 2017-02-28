@@ -10,6 +10,9 @@ import org.apache.shiro.realm.text.IniRealm;
 
 import java.util.Map;
 
+/**
+ * Creates an {@link IniRealm} from user accounts and roles specified in configuration.
+ */
 @BQConfig("Creates a Realm from user accounts and roles specified in configuration.")
 @JsonTypeName("ini")
 public class IniRealmFactory extends RealmFactory {
@@ -43,6 +46,13 @@ public class IniRealmFactory extends RealmFactory {
             ini.addSection("roles").putAll(roles);
         }
 
-        return new IniRealm(ini);
+        IniRealm realm = new IniRealm(ini);
+        realm.setIni(ini);
+
+        if (name != null) {
+            realm.setName(name);
+        }
+
+        return realm;
     }
 }

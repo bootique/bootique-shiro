@@ -11,7 +11,7 @@ import org.apache.shiro.realm.Realm;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = IniRealmFactory.class)
 public abstract class RealmFactory implements PolymorphicConfiguration {
 
-    private String name;
+    protected String name;
 
     @BQConfigProperty
     public void setName(String name) {
