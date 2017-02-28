@@ -21,6 +21,7 @@
         <bootique-version>0.22-SNAPSHOT</bootique-version>
         <bootique-jetty-version>0.20-SNAPSHOT</bootique-jetty-version>
         <bootique-jersey-version>0.21-SNAPSHOT</bootique-jersey-version>
+        <bootique-jdbc-version>0.14-SNAPSHOT</bootique-jdbc-version>
         <shiro-version>1.4.0-RC2</shiro-version>
         <jersey-version>2.21</jersey-version>
     </properties>
@@ -28,6 +29,7 @@
     <modules>
         <module>bootique-shiro</module>
         <module>bootique-shiro-basic</module>
+        <module>bootique-shiro-jdbc</module>
         <module>bootique-shiro-web</module>
     </modules>
 
@@ -66,6 +68,11 @@
                 <groupId>io.bootique.jetty</groupId>
                 <artifactId>bootique-jetty-test</artifactId>
                 <version>${bootique-jetty-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.bootique.jdbc</groupId>
+                <artifactId>bootique-jdbc</artifactId>
+                <version>${bootique-jdbc-version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique.jersey</groupId>

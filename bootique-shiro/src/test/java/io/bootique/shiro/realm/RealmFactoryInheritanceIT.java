@@ -36,6 +36,7 @@ public class RealmFactoryInheritanceIT {
     public void testMapping() {
         PolymorphicConfigurationChecker.test(RealmFactory.class,
                 IniRealmFactory.class,
+                // factories introduced by unit tests. Won't exist in production, still need to account for them here
                 RealmFactory1.class,
                 RealmFactory2.class);
     }
