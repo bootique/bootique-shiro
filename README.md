@@ -49,7 +49,13 @@ Here is a web configuration example. Include ```bootique-shiro-web```:
 </dependency>
 ```
 This will start Shiro and install Shiro filter to match all URLs. Now you will need to configure your realms and 
-security filters. You might create a `.yml` file similar to this:
+security filters.  A few words on configuration. If you have used Apache Shiro outside Bootique,  you may be familiar 
+with its `.ini` file-based configuration mechanism. We have ported it to a much more flexible Bootique approach that 
+manages some parts of the stack (like SecurityManager) via dependency injection, and others (realms, filters, etc.)
+via unified Bootique config mechanism (YAML and friends).
+ 
+So you might create a `.yml` file similar to this ()you may recognize some of the configs below that replaced Shiro's 
+`[users]`, `[roles]` and `[urls]` sections) :
 
 ```yaml
 shiro:
@@ -69,7 +75,3 @@ shiro:
 ```
 
 _Hint: use `-H` flag to run your app to see configuration docs in details._
-
-`bootique-shiro` replaces `.ini` files with real dependency injection plus Bootique configuration system. If you 
-have used Apache Shiro outside Bootique, you may recognize some of the configs above that replace Shiro's `[users]`,
-`[roles]` and `[urls]` sections. 
