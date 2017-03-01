@@ -20,9 +20,7 @@ public class ShiroModuleProvider implements BQModuleProvider {
     public BQModule.Builder moduleBuilder() {
         return BQModuleProvider.super
                 .moduleBuilder()
-                .description("Provides injectable Shiro SecurityManager with custom Realms. In a standalone form can be " +
-                        "used in conjunction with Shiro SecurityUtils. Also serves as a foundation for " +
-                        "environment-specific Shiro modules like bootique-shiro-web and bootique-shiro-static.");
+                .description("Provides injectable Shiro stack with custom Realms.");
     }
 
     @Override

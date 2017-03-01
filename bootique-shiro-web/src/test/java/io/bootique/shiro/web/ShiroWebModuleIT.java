@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import io.bootique.jersey.JerseyModule;
 import io.bootique.jetty.test.junit.JettyTestFactory;
 import io.bootique.shiro.ShiroModule;
-import io.bootique.shiro.SubjectManager;
+import io.bootique.shiro.subject.SubjectManager;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;

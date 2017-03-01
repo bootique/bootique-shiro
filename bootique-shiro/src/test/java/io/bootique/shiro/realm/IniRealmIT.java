@@ -1,15 +1,9 @@
 package io.bootique.shiro.realm;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import io.bootique.BQRuntime;
+import io.bootique.shiro.subject.SubjectManager;
 import io.bootique.test.junit.BQTestFactory;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -24,29 +18,14 @@ public class IniRealmIT {
 
     @Test
     public void testSubject() {
-        Module smModule = new Module() {
-
-            @Override
-            public void configure(Binder binder) {
-            }
-
-            @Provides
-            @Singleton
-            SecurityManager provideSecurityManager(Realms realms) {
-                return new DefaultSecurityManager(realms.getRealms());
-            }
-        };
 
         BQRuntime bqRuntime = testFactory
                 .app("-c", "classpath:io/bootique/shiro/realm/IniRealmIT.yml")
-                .module(smModule)
                 .autoLoadModules()
                 .createRuntime()
                 .getRuntime();
 
-        SecurityUtils.setSecurityManager(bqRuntime.getInstance(SecurityManager.class));
-
-        Subject subject = SecurityUtils.getSubject();
+        Subject subject = bqRuntime.getInstance(SubjectManager.class).subject();
 
         subject.login(new UsernamePasswordToken("u11", "u11p"));
         Assert.assertTrue(subject.hasRole("admin"));

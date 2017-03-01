@@ -1,11 +1,10 @@
-package io.bootique.shiro;
+package io.bootique.shiro.subject;
 
 import org.apache.shiro.subject.Subject;
 
 /**
  * An injectable facade for accessing Shiro {@link Subject}. It allows to avoid the deopendency on Shiro ThreadLocals
- * or statics in the app code. Implementations may still rely on Shiro {@link org.apache.shiro.SecurityUtils} behind the
- * scenes.
+ * or statics in the app code.
  */
 public interface SubjectManager {
 

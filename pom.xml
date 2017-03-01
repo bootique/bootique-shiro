@@ -29,7 +29,6 @@
     <modules>
         <module>bootique-shiro</module>
         <module>bootique-shiro-jdbc</module>
-        <module>bootique-shiro-static</module>
         <module>bootique-shiro-web</module>
     </modules>
 

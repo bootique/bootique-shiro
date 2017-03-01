@@ -1,17 +1,14 @@
-package io.bootique.shiro.statics;
+package io.bootique.shiro;
 
 import io.bootique.BQRuntime;
-import io.bootique.shiro.ShiroModule;
-import io.bootique.shiro.SubjectManager;
+import io.bootique.shiro.subject.SubjectManager;
 import io.bootique.test.junit.BQTestFactory;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,7 +18,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ShiroStaticModuleIT {
+public class ShiroModuleIT {
 
     @Rule
     public BQTestFactory testFactory = new BQTestFactory();
@@ -45,11 +42,6 @@ public class ShiroStaticModuleIT {
         });
 
         return mockRealm;
-    }
-
-    @After
-    public void after() {
-        SecurityUtils.setSecurityManager(null);
     }
 
     @Test
