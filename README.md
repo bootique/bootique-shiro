@@ -10,24 +10,18 @@ _since Bootique 0.22_
 This is a set of modules that help to integrate [Apache Shiro](http://shiro.apache.org/) security engine in Bootique apps. 
 Quick description of the provided modules:
 
-* `bootique-shiro` - a basic module that helps to configure a set of security Realms (available as injectable 
-[Realms](https://github.com/bootique/bootique-shiro/blob/master/bootique-shiro/src/main/java/io/bootique/shiro/realm/Realms.java))
-object). While it can be used standalone, it normally serves as a basis for environment-specific Shiro integrations described
-below. Also includes factories for "Ini" realm (that supports in-place definition of user accounts) and ActiveDirectory 
-realm.
-
-* `bootique-shiro-static` - a module that stands up Shiro stack and stores it in Shiro-provided static singletons. This 
-allows the app to use `ShiroUtils` without extra setup. The obvious shortcoming of this approach is that the framework 
-is no longer embeddable (there can only eb one Shiro stack), which is quite appropriate for many apps.
+* `bootique-shiro` - creates a standalone Shiro stack with user-configured security Realms. Includes factories for 
+"Ini" realm (that supports in-place definition of user accounts) and ActiveDirectory realm. Provides injectable 
+`SubjectManager` service for creating new Subjects, that are not thread-bound by default. 
 
 * `bootique-shiro-web` - a module that stands up the Shiro stack and attaches it to a special servlet Filter. Supports
 a powerful Shiro feature - [path matching with filters](https://shiro.apache.org/web.html#urls-).
 
-* `bootique-shiro-jdbc` - Provides configurable JDBC realm. Can be used with any of the modules above.
+* `bootique-shiro-jdbc` - Provides configurable JDBC realm. Can be used with any of the above modules.
 
 ## Usage
 
-Here is a web configuration example. Include ```bootique-shiro-web```:
+Here is a `bootique-shiro-web` configuration example. First you need to include the module:
 ```xml
 <dependencyManagement>
     <dependencies>
