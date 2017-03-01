@@ -39,7 +39,7 @@ Include Bootique BOM and `bootique-shiro` module:
 
 <dependency>
 	<groupId>io.bootique.shiro</groupId>
-	<artifactId>bootique-shiro-web</artifactId>
+	<artifactId>bootique-shiro</artifactId>
 </dependency>
 ```
 Now you will need to configure your realms. If you have used Apache Shiro outside Bootique, you may be familiar with 
