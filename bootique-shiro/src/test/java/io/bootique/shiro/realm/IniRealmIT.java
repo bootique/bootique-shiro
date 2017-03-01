@@ -1,9 +1,9 @@
 package io.bootique.shiro.realm;
 
 import io.bootique.BQRuntime;
-import io.bootique.shiro.subject.SubjectManager;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -25,7 +25,7 @@ public class IniRealmIT {
                 .createRuntime()
                 .getRuntime();
 
-        Subject subject = bqRuntime.getInstance(SubjectManager.class).subject();
+        Subject subject = new Subject.Builder(bqRuntime.getInstance(SecurityManager.class)).buildSubject();
 
         subject.login(new UsernamePasswordToken("u11", "u11p"));
         Assert.assertTrue(subject.hasRole("admin"));

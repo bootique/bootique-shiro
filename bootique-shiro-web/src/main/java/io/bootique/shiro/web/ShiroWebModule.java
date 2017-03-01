@@ -9,8 +9,6 @@ import io.bootique.config.ConfigurationFactory;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.realm.Realms;
-import io.bootique.shiro.subject.SubjectManager;
-import io.bootique.shiro.web.subject.DefaultWebSubjectManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -31,12 +29,6 @@ public class ShiroWebModule extends ConfigModule {
         extend(binder).initAllExtensions();
         JettyModule.extend(binder).addMappedFilter(new TypeLiteral<MappedFilter<ShiroFilter>>() {
         });
-    }
-    
-    @Provides
-    @Singleton
-    SubjectManager provideSubjectManager() {
-        return new DefaultWebSubjectManager();
     }
 
     @Singleton

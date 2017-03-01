@@ -8,8 +8,6 @@ import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.shiro.realm.Realms;
 import io.bootique.shiro.realm.RealmsFactory;
-import io.bootique.shiro.subject.SubjectManager;
-import io.bootique.shiro.subject.DefaultSubjectManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
@@ -38,12 +36,6 @@ public class ShiroModule extends ConfigModule {
         return configurationFactory
                 .config(RealmsFactory.class, configPrefix)
                 .createRealms(injector, diRealms);
-    }
-
-    @Provides
-    @Singleton
-    SubjectManager provideSubjectManager(SecurityManager securityManager) {
-        return new DefaultSubjectManager(securityManager);
     }
 
     @Provides

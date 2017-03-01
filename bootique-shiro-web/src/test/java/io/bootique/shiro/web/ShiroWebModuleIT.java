@@ -1,10 +1,9 @@
 package io.bootique.shiro.web;
 
-import com.google.inject.Inject;
 import io.bootique.jersey.JerseyModule;
 import io.bootique.jetty.test.junit.JettyTestFactory;
 import io.bootique.shiro.ShiroModule;
-import io.bootique.shiro.subject.SubjectManager;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -81,9 +80,6 @@ public class ShiroWebModuleIT {
     @Path("/")
     public static class Api {
 
-        @Inject
-        private SubjectManager subjectManager;
-
         @GET
         @Path("public")
         public String getPublic() {
@@ -93,14 +89,14 @@ public class ShiroWebModuleIT {
         @GET
         @Path("anonymous")
         public String getAnonymous() {
-            Subject subject = subjectManager.subject();
+            Subject subject = SecurityUtils.getSubject();
             return "anon_string_" + subject.getPrincipal();
         }
 
         @GET
         @Path("login_on_demand")
         public String getAdmin_Login() {
-            Subject subject = subjectManager.subject();
+            Subject subject = SecurityUtils.getSubject();
             subject.login(new UsernamePasswordToken("myuser", "password"));
             subject.checkPermission("admin");
 
@@ -110,7 +106,7 @@ public class ShiroWebModuleIT {
         @GET
         @Path("admin")
         public String getAdminNoLogin() {
-            Subject subject = subjectManager.subject();
+            Subject subject = SecurityUtils.getSubject();
             throw new IllegalStateException("Should have been filtered: " + subject.getPrincipal());
         }
     }

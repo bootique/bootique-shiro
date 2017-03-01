@@ -1,14 +1,16 @@
 package io.bootique.shiro;
 
 import io.bootique.BQRuntime;
-import io.bootique.shiro.subject.SubjectManager;
 import io.bootique.test.junit.BQTestFactory;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,9 +57,7 @@ public class ShiroModuleIT {
                 .createRuntime()
                 .getRuntime();
 
-        SubjectManager subjectManager = runtime.getInstance(SubjectManager.class);
-        Subject subject = subjectManager.subject();
-        assertNotNull(subject);
+        Subject subject = new Subject.Builder(runtime.getInstance(SecurityManager.class)).buildSubject();
         assertFalse(subject.isAuthenticated());
 
         // try bad login
@@ -72,5 +72,25 @@ public class ShiroModuleIT {
         subject.login(new UsernamePasswordToken("uname", "password"));
 
         assertTrue(subject.isAuthenticated());
+    }
+
+    @Test
+    public void testFullStack_SecurityUtils() {
+        Realm mockRealm = mockRealm();
+
+        BQRuntime runtime = testFactory.app()
+                .module(b -> ShiroModule.extend(b).addRealm(mockRealm))
+                .autoLoadModules()
+                .createRuntime()
+                .getRuntime();
+
+        Subject subject = new Subject.Builder(runtime.getInstance(SecurityManager.class)).buildSubject();
+
+        assertNull(ThreadContext.getSubject());
+
+        // testing Shiro idiom of wrapping lambda in a subject...
+        subject.execute(() -> {
+            assertSame("Unexpected subject, thread state is disturbed", subject, SecurityUtils.getSubject());
+        });
     }
 }
