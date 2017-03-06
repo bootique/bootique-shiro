@@ -57,10 +57,12 @@ public class MappedShiroFilterFactory {
         // load filters
         chainFilters.forEach((name, filter) -> chainManager.addFilter(name, filter));
 
-        urls.forEach((url, value) -> {
-            LOGGER.info("Loading url chain {} -> {}", url, value);
-            chainManager.createChain(url, value);
-        });
+        if (urls != null) {
+            urls.forEach((url, value) -> {
+                LOGGER.info("Loading url chain {} -> {}", url, value);
+                chainManager.createChain(url, value);
+            });
+        }
 
         PathMatchingFilterChainResolver resolver = new PathMatchingFilterChainResolver();
         resolver.setFilterChainManager(chainManager);

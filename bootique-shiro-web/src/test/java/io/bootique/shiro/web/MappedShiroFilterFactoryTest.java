@@ -18,7 +18,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 
-public class MappedShiroFilterFactoryTes {
+public class MappedShiroFilterFactoryTest {
 
     private Filter mockFilter1;
     private Filter mockFilter2;
