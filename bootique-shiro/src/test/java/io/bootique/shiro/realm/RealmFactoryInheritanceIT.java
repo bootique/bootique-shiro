@@ -22,8 +22,7 @@ public class RealmFactoryInheritanceIT {
         BQRuntime bqRuntime = testFactory
                 .app("-c", "classpath:io/bootique/shiro/realm/RealmFactoryInheritanceIT.yml")
                 .autoLoadModules()
-                .createRuntime()
-                .getRuntime();
+                .createRuntime();
 
         Object[] names = bqRuntime.getInstance(Realms.class).getRealms().stream().map(Realm::getName).toArray();
         assertEquals(3, names.length);

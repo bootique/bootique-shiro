@@ -22,8 +22,7 @@ public class IniRealmIT {
         BQRuntime bqRuntime = testFactory
                 .app("-c", "classpath:io/bootique/shiro/realm/IniRealmIT.yml")
                 .autoLoadModules()
-                .createRuntime()
-                .getRuntime();
+                .createRuntime();
 
         Subject subject = new Subject.Builder(bqRuntime.getInstance(SecurityManager.class)).buildSubject();
 

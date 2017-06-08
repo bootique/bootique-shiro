@@ -54,8 +54,7 @@ public class ShiroModuleIT {
         BQRuntime runtime = testFactory.app()
                 .module(b -> ShiroModule.extend(b).addRealm(mockRealm))
                 .autoLoadModules()
-                .createRuntime()
-                .getRuntime();
+                .createRuntime();
 
         Subject subject = new Subject.Builder(runtime.getInstance(SecurityManager.class)).buildSubject();
         assertFalse(subject.isAuthenticated());
@@ -81,8 +80,7 @@ public class ShiroModuleIT {
         BQRuntime runtime = testFactory.app()
                 .module(b -> ShiroModule.extend(b).addRealm(mockRealm))
                 .autoLoadModules()
-                .createRuntime()
-                .getRuntime();
+                .createRuntime();
 
         Subject subject = new Subject.Builder(runtime.getInstance(SecurityManager.class)).buildSubject();
 

@@ -1,3 +1,7 @@
+## 0.2
+
+* #8 Upgrade to Bootique 0.23 to fix module overrides problem
+
 ## 0.1
 
 * #1 Basic implementation
