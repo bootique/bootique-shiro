@@ -1,6 +1,7 @@
 ## 0.2
 
 * #8 Upgrade to Bootique 0.23 to fix module overrides problem
+* #9 Polymorphic MappedShiroFilterFactory for custom Shiro filters
 
 ## 0.1
 

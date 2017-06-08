@@ -1,7 +1,9 @@
 package io.bootique.shiro.web;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.config.PolymorphicConfiguration;
 import io.bootique.jetty.MappedFilter;
 import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
@@ -16,7 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 @BQConfig("Configures Shiro in a servlet environment.")
-public class MappedShiroFilterFactory {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = MappedShiroFilterFactory.class)
+public class MappedShiroFilterFactory implements PolymorphicConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MappedShiroFilterFactory.class);
 
