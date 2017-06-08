@@ -1,6 +1,7 @@
 package io.bootique.shiro.web;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.inject.Injector;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.config.PolymorphicConfiguration;
@@ -38,7 +39,11 @@ public class MappedShiroFilterFactory implements PolymorphicConfiguration {
         this.urlPatterns = urlPatterns;
     }
 
-    public MappedFilter<ShiroFilter> createShiroFilter(WebSecurityManager securityManager, Map<String, Filter> chainFilters) {
+    // passing injector for the sake of subclasses
+    public MappedFilter<ShiroFilter> createShiroFilter(
+            Injector injector,
+            WebSecurityManager securityManager,
+            Map<String, Filter> chainFilters) {
 
         FilterChainResolver chainResolver = createChainResolver(chainFilters);
         ShiroFilter shiroFilter = createShiroFilter(securityManager, chainResolver);

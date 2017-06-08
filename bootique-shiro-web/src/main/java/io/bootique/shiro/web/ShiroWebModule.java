@@ -1,6 +1,7 @@
 package io.bootique.shiro.web;
 
 import com.google.inject.Binder;
+import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
@@ -54,10 +55,11 @@ public class ShiroWebModule extends ConfigModule {
     @Singleton
     @Provides
     MappedFilter<ShiroFilter> provideMappedShiroFilter(ConfigurationFactory configFactory,
+                                                       Injector injector,
                                                        WebSecurityManager securityManager,
                                                        @ShiroFilterBinding Map<String, Filter> chainFilters) {
         return configFactory
                 .config(MappedShiroFilterFactory.class, configPrefix)
-                .createShiroFilter(securityManager, chainFilters);
+                .createShiroFilter(injector, securityManager, chainFilters);
     }
 }
