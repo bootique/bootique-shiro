@@ -21,7 +21,7 @@
         <bootique-jetty-version>0.21-SNAPSHOT</bootique-jetty-version>
         <bootique-jersey-version>0.22-SNAPSHOT</bootique-jersey-version>
         <bootique-jdbc-version>0.15-SNAPSHOT</bootique-jdbc-version>
-        <shiro-version>1.4.0-RC2</shiro-version>
+        <shiro-version>1.4.0</shiro-version>
         <jersey-version>2.21</jersey-version>
     </properties>
 
