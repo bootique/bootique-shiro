@@ -27,6 +27,16 @@
             <artifactId>shiro-core</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- Unit test dependencies -->
         <dependency>
