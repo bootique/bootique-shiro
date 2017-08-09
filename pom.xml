@@ -17,10 +17,10 @@
     <description>Parent POM of Apache Shiro / Bootique integration modules.</description>
 
     <properties>
-        <bootique-version>0.23</bootique-version>
-        <bootique-jetty-version>0.21</bootique-jetty-version>
-        <bootique-jersey-version>0.22</bootique-jersey-version>
-        <bootique-jdbc-version>0.15</bootique-jdbc-version>
+        <bootique-version>${project.version}</bootique-version>
+        <bootique-jetty-version>${project.version}</bootique-jetty-version>
+        <bootique-jersey-version>${project.version}</bootique-jersey-version>
+        <bootique-jdbc-version>${project.version}</bootique-jdbc-version>
         <shiro-version>1.4.0</shiro-version>
         <jersey-version>2.21</jersey-version>
     </properties>
