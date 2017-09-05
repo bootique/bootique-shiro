@@ -6,9 +6,11 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
+import io.bootique.shiro.mgt.NoRememberMeManager;
 import io.bootique.shiro.realm.Realms;
 import io.bootique.shiro.realm.RealmsFactory;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
@@ -38,11 +40,22 @@ public class ShiroModule extends ConfigModule {
                 .createRealms(injector, diRealms);
     }
 
+    @Singleton
+    @Provides
+    RememberMeManager provideRememberMeManager() {
+        return new NoRememberMeManager();
+    }
+
     @Provides
     @Singleton
-    SecurityManager provideSecurityManager(SessionManager sessionManager, Realms realms) {
+    SecurityManager provideSecurityManager(
+            SessionManager sessionManager,
+            RememberMeManager rememberMeManager,
+            Realms realms) {
+        
         DefaultSecurityManager manager = new DefaultSecurityManager(realms.getRealms());
         manager.setSessionManager(sessionManager);
+        manager.setRememberMeManager(rememberMeManager);
 
         return manager;
     }

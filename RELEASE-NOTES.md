@@ -1,3 +1,7 @@
+## 0.24
+
+* #13 Expose RememberMeManager as an injectable service
+
 ## 0.2
 
 * #8 Upgrade to Bootique 0.23 to fix module overrides problem
