@@ -1,5 +1,6 @@
 ## 0.25
 
+* #14 Support for SLF4J MDC for principal
 * #15 Support for registering authentication listeners
 
 ## 0.24

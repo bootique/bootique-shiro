@@ -6,6 +6,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
+import io.bootique.shiro.mdc.PrincipalMDC;
 import io.bootique.shiro.mgt.NoRememberMeManager;
 import io.bootique.shiro.realm.Realms;
 import io.bootique.shiro.realm.RealmsFactory;
@@ -56,6 +57,7 @@ public class ShiroModule extends ConfigModule {
             Realms realms,
             Set<AuthenticationListener> authListeners) {
 
+
         DefaultSecurityManager manager = new DefaultSecurityManager(realms.getRealms());
         ((AbstractAuthenticator) manager.getAuthenticator()).setAuthenticationListeners(authListeners);
         manager.setSessionManager(sessionManager);
@@ -68,5 +70,11 @@ public class ShiroModule extends ConfigModule {
     @Singleton
     SessionManager provideSessionManager() {
         return new DefaultSessionManager();
+    }
+
+    @Provides
+    @Singleton
+    PrincipalMDC providePrincipalMDC() {
+        return new PrincipalMDC();
     }
 }
