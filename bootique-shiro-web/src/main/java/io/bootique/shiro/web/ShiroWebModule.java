@@ -10,6 +10,8 @@ import io.bootique.config.ConfigurationFactory;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.realm.Realms;
+import org.apache.shiro.authc.AbstractAuthenticator;
+import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -20,6 +22,7 @@ import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
 import javax.servlet.Filter;
 import java.util.Map;
+import java.util.Set;
 
 public class ShiroWebModule extends ConfigModule {
 
@@ -45,8 +48,12 @@ public class ShiroWebModule extends ConfigModule {
     WebSecurityManager provideWebSecurityManager(
             SessionManager sessionManager,
             RememberMeManager rememberMeManager,
-            Realms realms) {
+            Realms realms,
+            Set<AuthenticationListener> authListeners) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms.getRealms());
+
+        // TODO: from here the code is copied from ShiroModule ... error prone... use factory or something
+        ((AbstractAuthenticator) securityManager.getAuthenticator()).setAuthenticationListeners(authListeners);
         securityManager.setSessionManager(sessionManager);
         securityManager.setRememberMeManager(rememberMeManager);
         return securityManager;

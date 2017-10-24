@@ -11,6 +11,7 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.Assert;
@@ -126,5 +127,64 @@ public class ShiroModuleIT {
         // try good login
         subject.login(new UsernamePasswordToken("uname", "password"));
         verify(mockListener).onSuccess(any(AuthenticationToken.class), any(AuthenticationInfo.class));
+    }
+
+    @Test
+    public void testFullStack_AuthListenerType() {
+
+        TestAuthListener.reset();
+
+        Realm mockRealm = mockRealm();
+
+        BQRuntime runtime = testFactory.app()
+                .module(b -> ShiroModule
+                        .extend(b)
+                        .addRealm(mockRealm)
+                        .addAuthListener(TestAuthListener.class))
+                .autoLoadModules()
+                .createRuntime();
+
+        Subject subject = new Subject.Builder(runtime.getInstance(SecurityManager.class)).buildSubject();
+        assertFalse(subject.isAuthenticated());
+
+        // try bad login
+        try {
+            subject.login(new UsernamePasswordToken("uname", "badpassword"));
+            Assert.fail("Should have thrown on bad auth");
+        } catch (AuthenticationException authEx) {
+            assertTrue(TestAuthListener.onFailure);
+        }
+
+        // try good login
+        subject.login(new UsernamePasswordToken("uname", "password"));
+        assertTrue(TestAuthListener.onSuccess);
+    }
+
+    public static class TestAuthListener implements AuthenticationListener {
+
+        static boolean onSuccess;
+        static boolean onFailure;
+        static boolean onLogout;
+
+        public static void reset() {
+            onSuccess = false;
+            onLogout = false;
+            onFailure = false;
+        }
+
+        @Override
+        public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
+            onSuccess = true;
+        }
+
+        @Override
+        public void onFailure(AuthenticationToken token, AuthenticationException ae) {
+            onFailure = true;
+        }
+
+        @Override
+        public void onLogout(PrincipalCollection principals) {
+            onLogout = true;
+        }
     }
 }
