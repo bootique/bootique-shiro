@@ -4,6 +4,8 @@ import io.bootique.BQRuntime;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -15,9 +17,13 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ShiroModuleIT {
@@ -90,5 +96,35 @@ public class ShiroModuleIT {
         subject.execute(() -> {
             assertSame("Unexpected subject, thread state is disturbed", subject, SecurityUtils.getSubject());
         });
+    }
+
+    @Test
+    public void testFullStack_AuthListener() {
+
+        Realm mockRealm = mockRealm();
+        AuthenticationListener mockListener = mock(AuthenticationListener.class);
+
+        BQRuntime runtime = testFactory.app()
+                .module(b -> ShiroModule
+                        .extend(b)
+                        .addRealm(mockRealm)
+                        .addAuthListener(mockListener))
+                .autoLoadModules()
+                .createRuntime();
+
+        Subject subject = new Subject.Builder(runtime.getInstance(SecurityManager.class)).buildSubject();
+        assertFalse(subject.isAuthenticated());
+
+        // try bad login
+        try {
+            subject.login(new UsernamePasswordToken("uname", "badpassword"));
+            Assert.fail("Should have thrown on bad auth");
+        } catch (AuthenticationException authEx) {
+            verify(mockListener).onFailure(any(AuthenticationToken.class), any(AuthenticationException.class));
+        }
+
+        // try good login
+        subject.login(new UsernamePasswordToken("uname", "password"));
+        verify(mockListener).onSuccess(any(AuthenticationToken.class), any(AuthenticationInfo.class));
     }
 }

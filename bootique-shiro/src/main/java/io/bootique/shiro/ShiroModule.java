@@ -9,6 +9,8 @@ import io.bootique.config.ConfigurationFactory;
 import io.bootique.shiro.mgt.NoRememberMeManager;
 import io.bootique.shiro.realm.Realms;
 import io.bootique.shiro.realm.RealmsFactory;
+import org.apache.shiro.authc.AbstractAuthenticator;
+import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -51,9 +53,11 @@ public class ShiroModule extends ConfigModule {
     SecurityManager provideSecurityManager(
             SessionManager sessionManager,
             RememberMeManager rememberMeManager,
-            Realms realms) {
-        
+            Realms realms,
+            Set<AuthenticationListener> authListeners) {
+
         DefaultSecurityManager manager = new DefaultSecurityManager(realms.getRealms());
+        ((AbstractAuthenticator) manager.getAuthenticator()).setAuthenticationListeners(authListeners);
         manager.setSessionManager(sessionManager);
         manager.setRememberMeManager(rememberMeManager);
 

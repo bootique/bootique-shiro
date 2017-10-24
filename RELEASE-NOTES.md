@@ -1,3 +1,7 @@
+## 0.25
+
+* #15 Support for registering authentication listeners
+
 ## 0.24
 
 * #13 Expose RememberMeManager as an injectable service

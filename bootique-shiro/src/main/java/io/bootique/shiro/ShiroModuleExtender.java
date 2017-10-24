@@ -3,11 +3,13 @@ package io.bootique.shiro;
 import com.google.inject.Binder;
 import com.google.inject.multibindings.Multibinder;
 import io.bootique.ModuleExtender;
+import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.realm.Realm;
 
 public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
 
     private Multibinder<Realm> realms;
+    private Multibinder<AuthenticationListener> listeners;
 
     public ShiroModuleExtender(Binder binder) {
         super(binder);
@@ -16,6 +18,27 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
     @Override
     public ShiroModuleExtender initAllExtensions() {
         contributeRealms();
+        contributeListeners();
+        return this;
+    }
+
+    /**
+     * @param listener a listener instance.
+     * @return this extender instance.
+     * @since 0.25
+     */
+    public ShiroModuleExtender addAuthListener(AuthenticationListener listener) {
+        contributeListeners().addBinding().toInstance(listener);
+        return this;
+    }
+
+    /**
+     * @param listenerType a class of the auth listener
+     * @return this extender instance.
+     * @since 0.25
+     */
+    public ShiroModuleExtender addAuthListener(Class<? extends AuthenticationListener> listenerType) {
+        contributeListeners().addBinding().to(listenerType);
         return this;
     }
 
@@ -47,4 +70,9 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
     protected Multibinder<Realm> contributeRealms() {
         return realms != null ? realms : (realms = newSet(Realm.class));
     }
+
+    protected Multibinder<AuthenticationListener> contributeListeners() {
+        return listeners != null ? listeners : (listeners = newSet(AuthenticationListener.class));
+    }
+
 }
