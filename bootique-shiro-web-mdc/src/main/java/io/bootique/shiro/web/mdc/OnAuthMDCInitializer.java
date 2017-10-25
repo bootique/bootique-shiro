@@ -8,18 +8,21 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.PrincipalCollection;
 
 /**
+ * Initializes MDC state after user authentication.
+ *
  * @since 0.25
  */
-public class PrincipalMDCInitializer implements AuthenticationListener {
+public class OnAuthMDCInitializer implements AuthenticationListener {
 
     PrincipalMDC principalMDC;
 
-    public PrincipalMDCInitializer(PrincipalMDC principalMDC) {
+    public OnAuthMDCInitializer(PrincipalMDC principalMDC) {
         this.principalMDC = principalMDC;
     }
 
     @Override
     public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
+
         // TODO: will this mess things up if authentication happens outside of a web request? Should we set some request
         // attribute or a ThreadLocal from within PrincipalMDCCleaner.requestInitialized(..) and check it here?
 

@@ -6,13 +6,15 @@ import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 
 /**
+ * Resets principal MDC information at the end of the web request.
+ *
  * @since 0.25
  */
-public class PrincipalMDCCleaner implements ServletRequestListener {
+public class MDCCleaner implements ServletRequestListener {
 
     PrincipalMDC principalMDC;
 
-    public PrincipalMDCCleaner(PrincipalMDC principalMDC) {
+    public MDCCleaner(PrincipalMDC principalMDC) {
         this.principalMDC = principalMDC;
     }
 

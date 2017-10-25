@@ -23,8 +23,8 @@ public class ShiroWebMDCModuleIT {
     @Test
     public void testContainerState() {
         BQRuntime runtime = testFactory.app().autoLoadModules().createRuntime();
-        PrincipalMDCCleaner cleaner = runtime.getInstance(PrincipalMDCCleaner.class);
-        PrincipalMDCInitializer initializer = runtime.getInstance(PrincipalMDCInitializer.class);
+        MDCCleaner cleaner = runtime.getInstance(MDCCleaner.class);
+        OnAuthMDCInitializer initializer = runtime.getInstance(OnAuthMDCInitializer.class);
         assertSame(cleaner.principalMDC, initializer.principalMDC);
     }
 
@@ -39,6 +39,6 @@ public class ShiroWebMDCModuleIT {
         DefaultSecurityManager securityManager = (DefaultSecurityManager) runtime.getInstance(SecurityManager.class);
         AbstractAuthenticator authenticator = (AbstractAuthenticator) securityManager.getAuthenticator();
         assertEquals(1, authenticator.getAuthenticationListeners().size());
-        assertTrue(authenticator.getAuthenticationListeners().iterator().next() instanceof PrincipalMDCInitializer);
+        assertTrue(authenticator.getAuthenticationListeners().iterator().next() instanceof OnAuthMDCInitializer);
     }
 }
