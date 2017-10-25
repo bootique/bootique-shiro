@@ -148,23 +148,18 @@ log:
     - logFormat: '%t %X{principal:-?} %-5p %c{1}: %m%n%ex'
 ```
 
-Now you need to initialize (and cleanup) the MDC for a set of logs.  `bootique-shiro` provides a class called 
+Now you can initialize and cleanup the MDC as appropriate. `bootique-shiro` provides a class called 
 [PrincipalMDC](https://github.com/bootique/bootique-shiro/blob/master/bootique-shiro/src/main/java/io/bootique/shiro/mdc/PrincipalMDC.java) 
-that can manage that for you. You just need to call "reset" and "cleanup" methods when appropriate.
+that will do that for you. You just call "reset" and "cleanup" methods as needed.
 
-If your app is a servlet app and is using `bootique-shiro-web`, MDC initialization can be automated.  There is a special
-module `bootique-shiro-web-mdc` for that. So you add it to your dependencies:
-
+Now this was the manual approach. If your app is a servlet app and is using `bootique-shiro-web`, MDC initialization and cleanup can be automated. To do that add `bootique-shiro-web-mdc` module to your dependencies:
 ```xml
 <dependency>
 	<groupId>io.bootique.shiro</groupId>
 	<artifactId>bootique-shiro-web-mdc</artifactId>
 </dependency>
 ```
-
-If your authenticates every request separately and is not using Shiro sessions, this may be all you need for user names
-to appear in the logs. In case you login once, and then keep your Subject in a session, a bit more configuration is needed.
-Specifically you will need an extra filter called "mdc" placed in each of your authenticated Shiro chains:
+If your app authenticates every request separately and is not using Shiro sessions, this (and appender configuration above) is all you need for user names to appear in the logs. But in case the app logs in each user once, and then keeps the Subject in a session, a bit more configuration is needed. You will need an extra filter called "mdc" placed in each of your authenticated Shiro chains:
 
 ```yaml
 shiroweb:
