@@ -3,8 +3,6 @@
 
 # bootique-shiro
 
-_since Bootique 0.22_
-
 ## Overview
 
 This is a set of modules that help to integrate [Apache Shiro](http://shiro.apache.org/) security engine in Bootique apps. 
@@ -134,4 +132,43 @@ public Response get() {
     ...
 }
 
+```
+
+## Logging and Integration with MDC
+
+Often you may want to associate application logs with a user who performed the action that generated a given set of logs. 
+This helps in investigation of production issues, security audit, etc. This can be achieved using 
+[SLF4J MDC](https://logback.qos.ch/manual/mdc.html) (Mapped Diagnostics Context) functionality. `bootique-shiro` 
+provides semi-automated MDC integration facilities. You'd usually start by configuring your logger format to include MDC 
+in the output. We are specifically interested in the "principal" key, so the format might contain `%X{principal:-?}` pattern:
+
+```yaml
+log:
+  appenders:
+    - logFormat: '%t %X{principal:-?} %-5p %c{1}: %m%n%ex'
+```
+
+Now you need to initialize (and cleanup) the MDC for a set of logs.  `bootique-shiro` provides a class called 
+[PrincipalMDC](https://github.com/bootique/bootique-shiro/blob/master/bootique-shiro/src/main/java/io/bootique/shiro/mdc/PrincipalMDC.java) 
+that can manage that for you. You just need to call "reset" and "cleanup" methods when appropriate.
+
+If your app is a servlet app and is using `bootique-shiro-web`, MDC initialization can be automated.  There is a special
+module `bootique-shiro-web-mdc` for that. So you add it to your dependencies:
+
+```xml
+<dependency>
+	<groupId>io.bootique.shiro</groupId>
+	<artifactId>bootique-shiro-web-mdc</artifactId>
+</dependency>
+```
+
+If your authenticates every request separately and is not using Shiro sessions, this may be all you need for user names
+to appear in the logs. In case you login once, and then keep your Subject in a session, a bit more configuration is needed.
+Specifically you will need an extra filter called "mdc" placed in each of your authenticated Shiro chains:
+
+```yaml
+shiroweb:
+  urls:
+    "/admin" : perms[\"admin\"], mdc
+    "/pub"   : anon
 ```
