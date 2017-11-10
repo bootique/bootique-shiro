@@ -1,6 +1,9 @@
 package io.bootique.shiro.web.mdc;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import io.bootique.BQRuntime;
+import io.bootique.jetty.MappedListener;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.authc.AbstractAuthenticator;
@@ -23,9 +26,10 @@ public class ShiroWebMDCModuleIT {
     @Test
     public void testContainerState() {
         BQRuntime runtime = testFactory.app().autoLoadModules().createRuntime();
-        MDCCleaner cleaner = runtime.getInstance(MDCCleaner.class);
+        MappedListener<MDCCleaner> cleaner = runtime.getInstance(Key.get(new TypeLiteral<MappedListener<MDCCleaner>>() {
+        }));
         OnAuthMDCInitializer initializer = runtime.getInstance(OnAuthMDCInitializer.class);
-        assertSame(cleaner.principalMDC, initializer.principalMDC);
+        assertSame(cleaner.getListener().principalMDC, initializer.principalMDC);
     }
 
     @Test
