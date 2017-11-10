@@ -22,7 +22,7 @@ public class ShiroWebMDCModule implements Module {
 
     @Override
     public void configure(Binder binder) {
-        JettyModule.extend(binder).addMappedListener(new TypeLiteral<MappedListener<MDCCleaner>>() {
+        JettyModule.extend(binder).addMappedListener(new TypeLiteral<MappedListener<ShiroWebMDCCleaner>>() {
         });
         ShiroModule.extend(binder).addAuthListener(OnAuthMDCInitializer.class);
         ShiroWebModule.extend(binder).setFilter("mdc", SubjectMDCInitializer.class);
@@ -30,8 +30,8 @@ public class ShiroWebMDCModule implements Module {
 
     @Singleton
     @Provides
-    MappedListener<MDCCleaner> providePrincipalMDCCleaner(PrincipalMDC principalMDC) {
-        MDCCleaner cleaner = new MDCCleaner(principalMDC);
+    MappedListener<ShiroWebMDCCleaner> providePrincipalMDCCleaner(PrincipalMDC principalMDC) {
+        ShiroWebMDCCleaner cleaner = new ShiroWebMDCCleaner(principalMDC);
         return new MappedListener<>(cleaner, MDC_LISTENER_ORDER);
     }
 

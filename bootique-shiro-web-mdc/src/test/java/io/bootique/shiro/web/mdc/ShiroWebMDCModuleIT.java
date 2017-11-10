@@ -26,7 +26,7 @@ public class ShiroWebMDCModuleIT {
     @Test
     public void testContainerState() {
         BQRuntime runtime = testFactory.app().autoLoadModules().createRuntime();
-        MappedListener<MDCCleaner> cleaner = runtime.getInstance(Key.get(new TypeLiteral<MappedListener<MDCCleaner>>() {
+        MappedListener<ShiroWebMDCCleaner> cleaner = runtime.getInstance(Key.get(new TypeLiteral<MappedListener<ShiroWebMDCCleaner>>() {
         }));
         OnAuthMDCInitializer initializer = runtime.getInstance(OnAuthMDCInitializer.class);
         assertSame(cleaner.getListener().principalMDC, initializer.principalMDC);

@@ -10,11 +10,11 @@ import javax.servlet.ServletRequestListener;
  *
  * @since 0.25
  */
-public class MDCCleaner implements ServletRequestListener {
+public class ShiroWebMDCCleaner implements ServletRequestListener {
 
     PrincipalMDC principalMDC;
 
-    public MDCCleaner(PrincipalMDC principalMDC) {
+    public ShiroWebMDCCleaner(PrincipalMDC principalMDC) {
         this.principalMDC = principalMDC;
     }
 
