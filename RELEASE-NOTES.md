@@ -2,6 +2,7 @@
 
 * #14 Support for SLF4J MDC for principal
 * #15 Support for registering authentication listeners
+* #17 Upgrade to bootique-modules-parent 0.8
 
 ## 0.24
 

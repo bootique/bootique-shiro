@@ -36,13 +36,13 @@ public class ShiroModuleIT {
         Realm mockRealm = mock(Realm.class);
         when(mockRealm.getName()).thenReturn("TestRealm");
         when(mockRealm.supports(any(AuthenticationToken.class))).then(invocation -> {
-            AuthenticationToken token = invocation.getArgumentAt(0, AuthenticationToken.class);
+            AuthenticationToken token = invocation.getArgument(0);
             return token instanceof UsernamePasswordToken;
         });
 
         when(mockRealm.getAuthenticationInfo(any(AuthenticationToken.class))).then(invocation -> {
 
-            UsernamePasswordToken token = invocation.getArgumentAt(0, UsernamePasswordToken.class);
+            UsernamePasswordToken token = invocation.getArgument(0);
             if (!"password".equals(new String(token.getPassword()))) {
                 throw new AuthenticationException("Bad password");
             }
