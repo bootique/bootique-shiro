@@ -5,8 +5,8 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import io.bootique.BQRuntime;
 import io.bootique.jetty.MappedFilter;
-import io.bootique.jetty.test.junit.JettyTestFactory;
 import io.bootique.shiro.ShiroModule;
+import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 public class CustomShiroFilterIT {
 
     @ClassRule
-    public static JettyTestFactory TEST_FACTORY = new JettyTestFactory();
+    public static BQTestFactory TEST_FACTORY = new BQTestFactory();
 
     @Test
     public void testCustomFactory() {

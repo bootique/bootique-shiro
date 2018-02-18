@@ -1,8 +1,8 @@
 package io.bootique.shiro.web;
 
 import io.bootique.jersey.JerseyModule;
-import io.bootique.jetty.test.junit.JettyTestFactory;
 import io.bootique.shiro.ShiroModule;
+import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -37,16 +37,17 @@ public class ShiroWebModuleIT {
     private static WebTarget BASE = ClientBuilder.newClient().target("http://localhost:8080/");
 
     @ClassRule
-    public static JettyTestFactory TEST_FACTORY = new JettyTestFactory();
+    public static BQTestFactory TEST_FACTORY = new BQTestFactory();
 
     @BeforeClass
     public static void beforeClass() {
-        TEST_FACTORY.app("-c", "classpath:ShiroWebModuleIT.yml")
+        TEST_FACTORY.app("-c", "classpath:ShiroWebModuleIT.yml", "-s")
                 .module(b -> JerseyModule.extend(b).addResource(Api.class))
                 .module(b -> ShiroModule.extend(b).addRealm(new TestRealm()))
                 // overriding standard "perms" filter to avoid being sent to the login form
                 .module(b -> ShiroWebModule.extend(b).setFilter("perms", PermissionsFilter.class))
-                .autoLoadModules().start();
+                .autoLoadModules()
+                .run();
     }
 
     @Test

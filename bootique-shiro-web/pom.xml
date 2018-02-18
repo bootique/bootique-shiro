@@ -54,11 +54,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.bootique.jetty</groupId>
-            <artifactId>bootique-jetty-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.bootique.jersey</groupId>
             <artifactId>bootique-jersey</artifactId>
             <scope>test</scope>
