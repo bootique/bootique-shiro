@@ -6,8 +6,8 @@ import org.junit.Test;
 public class ShiroModuleProviderTest {
 
     @Test
-    public void testAutoLoading() {
-        BQModuleProviderChecker.testPresentInJar(ShiroModuleProvider.class);
+    public void testAutoLoadable() {
+        BQModuleProviderChecker.testAutoLoadable(ShiroModuleProvider.class);
     }
 
     @Test

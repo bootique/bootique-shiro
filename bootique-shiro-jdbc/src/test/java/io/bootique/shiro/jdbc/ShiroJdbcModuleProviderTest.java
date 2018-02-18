@@ -15,8 +15,8 @@ public class ShiroJdbcModuleProviderTest {
     public BQTestFactory testFactory = new BQTestFactory();
 
     @Test
-    public void testAutoLoading() {
-        BQModuleProviderChecker.testPresentInJar(ShiroJdbcModuleProvider.class);
+    public void testAutoLoadable() {
+        BQModuleProviderChecker.testAutoLoadable(ShiroJdbcModuleProvider.class);
     }
 
     @Test
