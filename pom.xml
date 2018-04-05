@@ -61,11 +61,6 @@
                 <version>${bootique-version}</version>
             </dependency>
             <dependency>
-                <groupId>io.bootique.jetty</groupId>
-                <artifactId>bootique-jetty-test</artifactId>
-                <version>${bootique-version}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.bootique.jdbc</groupId>
                 <artifactId>bootique-jdbc</artifactId>
                 <version>${bootique-version}</version>
