@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.bootique.modules.parent</groupId>
         <artifactId>bootique-modules-parent</artifactId>
-        <version>0.8</version>
+        <version>0.10</version>
     </parent>
 
     <groupId>io.bootique.shiro</groupId>
@@ -17,9 +17,8 @@
     <description>Parent POM of Apache Shiro / Bootique integration modules.</description>
 
     <properties>
-        <bootique-version>${project.version}</bootique-version>
-        <shiro-version>1.4.0</shiro-version>
-        <jersey-version>2.21</jersey-version>
+        <rabbitmq.version>${project.version}</rabbitmq.version>
+        <shiro.version>1.4.0</shiro.version>
     </properties>
 
     <modules>
@@ -48,32 +47,32 @@
             <dependency>
                 <groupId>io.bootique</groupId>
                 <artifactId>bootique</artifactId>
-                <version>${bootique-version}</version>
+                <version>${rabbitmq.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique</groupId>
                 <artifactId>bootique-test</artifactId>
-                <version>${bootique-version}</version>
+                <version>${rabbitmq.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique.jetty</groupId>
                 <artifactId>bootique-jetty</artifactId>
-                <version>${bootique-version}</version>
+                <version>${rabbitmq.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique.jdbc</groupId>
                 <artifactId>bootique-jdbc</artifactId>
-                <version>${bootique-version}</version>
+                <version>${rabbitmq.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique.jersey</groupId>
                 <artifactId>bootique-jersey</artifactId>
-                <version>${bootique-version}</version>
+                <version>${rabbitmq.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
-                <version>${shiro-version}</version>
+                <version>${shiro.version}</version>
                 <!-- Excluding duplicates... -->
                 <exclusions>
                     <exclusion>
@@ -115,27 +114,7 @@
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
-                <version>${shiro-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>3.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jersey.core</groupId>
-                <artifactId>jersey-client</artifactId>
-                <version>${jersey-version}</version>
+                <version>${shiro.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
