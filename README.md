@@ -145,7 +145,7 @@ is already initialized for you:
 ```java
 @GET
 public Response get() {
-    Subject subject = SecurityUtils.subject();
+    Subject subject = SecurityUtils.getSubject();
     subject.checkPermission("A");
     subject.checkPermission("B");
     ...
