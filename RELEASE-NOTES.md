@@ -1,3 +1,7 @@
+## 0.26
+
+* #19 Bootique-injectable SubjectDAO
+
 ## 0.25
 
 * #14 Support for SLF4J MDC for principal

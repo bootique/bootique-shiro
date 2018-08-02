@@ -31,11 +31,14 @@ import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.realm.Realms;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.mgt.SubjectDAO;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.mgt.DefaultWebSessionStorageEvaluator;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
@@ -67,6 +70,7 @@ public class ShiroWebModule extends ConfigModule {
     WebSecurityManager provideWebSecurityManager(
             SessionManager sessionManager,
             RememberMeManager rememberMeManager,
+            SubjectDAO subjectDAO,
             Realms realms,
             Set<AuthenticationListener> authListeners) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms.getRealms());
@@ -75,6 +79,7 @@ public class ShiroWebModule extends ConfigModule {
         ((AbstractAuthenticator) securityManager.getAuthenticator()).setAuthenticationListeners(authListeners);
         securityManager.setSessionManager(sessionManager);
         securityManager.setRememberMeManager(rememberMeManager);
+        securityManager.setSubjectDAO(subjectDAO);
         return securityManager;
     }
 
@@ -99,5 +104,13 @@ public class ShiroWebModule extends ConfigModule {
         return configFactory
                 .config(MappedShiroFilterFactory.class, configPrefix)
                 .createShiroFilter(injector, securityManager, chainFilters);
+    }
+
+    @Provides
+    @Singleton
+    SubjectDAO provideSubjectDAO() {
+        DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
+        subjectDAO.setSessionStorageEvaluator(new DefaultWebSessionStorageEvaluator());
+        return subjectDAO;
     }
 }

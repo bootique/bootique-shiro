@@ -32,8 +32,10 @@ import io.bootique.shiro.realm.RealmsFactory;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.mgt.SubjectDAO;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -73,14 +75,15 @@ public class ShiroModule extends ConfigModule {
     SecurityManager provideSecurityManager(
             SessionManager sessionManager,
             RememberMeManager rememberMeManager,
+            SubjectDAO subjectDAO,
             Realms realms,
             Set<AuthenticationListener> authListeners) {
-
 
         DefaultSecurityManager manager = new DefaultSecurityManager(realms.getRealms());
         ((AbstractAuthenticator) manager.getAuthenticator()).setAuthenticationListeners(authListeners);
         manager.setSessionManager(sessionManager);
         manager.setRememberMeManager(rememberMeManager);
+        manager.setSubjectDAO(subjectDAO);
 
         return manager;
     }
@@ -95,5 +98,11 @@ public class ShiroModule extends ConfigModule {
     @Singleton
     PrincipalMDC providePrincipalMDC() {
         return new PrincipalMDC();
+    }
+
+    @Provides
+    @Singleton
+    SubjectDAO provideSubjectDAO() {
+        return new DefaultSubjectDAO();
     }
 }
