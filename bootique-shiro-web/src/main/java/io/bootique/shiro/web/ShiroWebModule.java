@@ -97,10 +97,12 @@ public class ShiroWebModule extends ConfigModule {
 
     @Singleton
     @Provides
-    MappedFilter<ShiroFilter> provideMappedShiroFilter(ConfigurationFactory configFactory,
-                                                       Injector injector,
-                                                       WebSecurityManager securityManager,
-                                                       @ShiroFilterBinding Map<String, Filter> chainFilters) {
+    MappedFilter<ShiroFilter> provideMappedShiroFilter(
+            ConfigurationFactory configFactory,
+            Injector injector,
+            WebSecurityManager securityManager,
+            @ShiroFilterBinding Map<String, Filter> chainFilters) {
+
         return configFactory
                 .config(MappedShiroFilterFactory.class, configPrefix)
                 .createShiroFilter(injector, securityManager, chainFilters);
