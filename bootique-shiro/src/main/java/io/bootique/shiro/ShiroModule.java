@@ -32,9 +32,11 @@ import io.bootique.shiro.realm.RealmsFactory;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.mgt.SessionStorageEvaluator;
 import org.apache.shiro.mgt.SubjectDAO;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
@@ -102,7 +104,15 @@ public class ShiroModule extends ConfigModule {
 
     @Provides
     @Singleton
-    SubjectDAO provideSubjectDAO() {
-        return new DefaultSubjectDAO();
+    SubjectDAO provideSubjectDAO(SessionStorageEvaluator sessionStorageEvaluator) {
+        DefaultSubjectDAO dao = new DefaultSubjectDAO();
+        dao.setSessionStorageEvaluator(sessionStorageEvaluator);
+        return dao;
+    }
+
+    @Provides
+    @Singleton
+    SessionStorageEvaluator provideSessionStorageEvaluator() {
+        return new DefaultSessionStorageEvaluator();
     }
 }

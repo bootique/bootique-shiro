@@ -1,6 +1,7 @@
 ## 0.26
 
 * #19 Bootique-injectable SubjectDAO
+* #20 Bootique-injectable SessionStorageEvaluator
 
 ## 0.25
 

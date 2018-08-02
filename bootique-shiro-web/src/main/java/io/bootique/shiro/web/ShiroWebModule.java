@@ -31,9 +31,9 @@ import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.realm.Realms;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
-import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.mgt.SessionStorageEvaluator;
 import org.apache.shiro.mgt.SubjectDAO;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
@@ -108,9 +108,7 @@ public class ShiroWebModule extends ConfigModule {
 
     @Provides
     @Singleton
-    SubjectDAO provideSubjectDAO() {
-        DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
-        subjectDAO.setSessionStorageEvaluator(new DefaultWebSessionStorageEvaluator());
-        return subjectDAO;
+    SessionStorageEvaluator provideSessionStorageEvaluator() {
+        return new DefaultWebSessionStorageEvaluator();
     }
 }
