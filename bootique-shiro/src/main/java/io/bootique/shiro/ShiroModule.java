@@ -60,10 +60,8 @@ public class ShiroModule extends ConfigModule {
 
     @Provides
     @Singleton
-    Realms provideRealms(Injector injector, ConfigurationFactory configurationFactory, Set<Realm> diRealms) {
-        return configurationFactory
-                .config(RealmsFactory.class, configPrefix)
-                .createRealms(injector, diRealms);
+    Realms provideRealms(Injector injector, ConfigurationFactory configFactory, Set<Realm> diRealms) {
+        return config(RealmsFactory.class, configFactory).createRealms(injector, diRealms);
     }
 
     @Singleton

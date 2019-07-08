@@ -103,8 +103,7 @@ public class ShiroWebModule extends ConfigModule {
             WebSecurityManager securityManager,
             @ShiroFilterBinding Map<String, Filter> chainFilters) {
 
-        return configFactory
-                .config(MappedShiroFilterFactory.class, configPrefix)
+        return config(MappedShiroFilterFactory.class, configFactory)
                 .createShiroFilter(injector, securityManager, chainFilters);
     }
 
