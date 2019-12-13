@@ -20,9 +20,9 @@
 package io.bootique.shiro.web;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
 import io.bootique.BQRuntime;
+import io.bootique.di.Key;
+import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.test.junit.BQTestFactory;

@@ -19,9 +19,9 @@
 
 package io.bootique.shiro.realm;
 
-import com.google.inject.Injector;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.di.Injector;
 import org.apache.shiro.realm.Realm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

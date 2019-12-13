@@ -19,8 +19,8 @@
 
 package io.bootique.shiro.web.mdc;
 
-import com.google.inject.Module;
 import io.bootique.BQModuleProvider;
+import io.bootique.di.BQModule;
 import io.bootique.shiro.web.ShiroWebModuleProvider;
 
 import java.util.Collection;
@@ -30,7 +30,7 @@ import static java.util.Collections.singletonList;
 public class ShiroWebMDCModuleProvider implements BQModuleProvider {
 
     @Override
-    public Module module() {
+    public BQModule module() {
         return new ShiroWebMDCModule();
     }
 

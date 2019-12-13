@@ -19,10 +19,10 @@
 
 package io.bootique.shiro.jdbc;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
+import io.bootique.di.Binder;
+import io.bootique.di.BQModule;
 
-public class ShiroJdbcModule implements Module {
+public class ShiroJdbcModule implements BQModule {
 
     @Override
     public void configure(Binder binder) {

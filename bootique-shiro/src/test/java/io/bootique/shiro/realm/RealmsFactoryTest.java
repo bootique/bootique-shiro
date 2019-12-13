@@ -19,8 +19,8 @@
 
 package io.bootique.shiro.realm;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import io.bootique.di.DIBootstrap;
+import io.bootique.di.Injector;
 import org.apache.shiro.realm.Realm;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class RealmsFactoryTest {
 
         RealmsFactory realmsFactory = new RealmsFactory();
 
-        Realms realms = realmsFactory.createRealms(Guice.createInjector(), diRealms);
+        Realms realms = realmsFactory.createRealms(DIBootstrap.injectorBuilder().defaultNoScope().enableDynamicBindings().build(), diRealms);
         Assert.assertNotNull(realms);
         assertEquals(2, realms.getRealms().size());
         assertTrue(realms.getRealms().contains(r1));
@@ -56,7 +56,7 @@ public class RealmsFactoryTest {
 
     @Test
     public void testCreateRealms_NoDi() {
-        Injector injector = Guice.createInjector();
+        Injector injector = DIBootstrap.injectorBuilder().defaultNoScope().enableDynamicBindings().build();
 
         Realm r1 = Mockito.mock(Realm.class);
         Realm r2 = Mockito.mock(Realm.class);
@@ -81,7 +81,7 @@ public class RealmsFactoryTest {
 
     @Test
     public void testCreateRealms_DiAndConfig() {
-        Injector injector = Guice.createInjector();
+        Injector injector = DIBootstrap.injectorBuilder().defaultNoScope().enableDynamicBindings().build();
 
         Realm rdi1 = Mockito.mock(Realm.class);
         Realm rdi2 = Mockito.mock(Realm.class);

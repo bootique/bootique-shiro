@@ -19,7 +19,7 @@
 
 package io.bootique.shiro.jdbc.realm;
 
-import com.google.inject.Injector;
+import io.bootique.di.Injector;
 import io.bootique.jdbc.DataSourceFactory;
 import io.bootique.shiro.realm.ActiveDirectoryRealmFactory;
 import io.bootique.shiro.realm.IniRealmFactory;

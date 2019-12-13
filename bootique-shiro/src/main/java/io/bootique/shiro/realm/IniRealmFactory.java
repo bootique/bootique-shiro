@@ -20,9 +20,9 @@
 package io.bootique.shiro.realm;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.inject.Injector;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.di.Injector;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;

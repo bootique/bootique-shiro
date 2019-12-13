@@ -19,16 +19,16 @@
 
 package io.bootique.shiro;
 
-import com.google.inject.Binder;
-import com.google.inject.multibindings.Multibinder;
 import io.bootique.ModuleExtender;
+import io.bootique.di.Binder;
+import io.bootique.di.SetBuilder;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.realm.Realm;
 
 public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
 
-    private Multibinder<Realm> realms;
-    private Multibinder<AuthenticationListener> listeners;
+    private SetBuilder<Realm> realms;
+    private SetBuilder<AuthenticationListener> listeners;
 
     public ShiroModuleExtender(Binder binder) {
         super(binder);
@@ -47,7 +47,7 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
      * @since 0.25
      */
     public ShiroModuleExtender addAuthListener(AuthenticationListener listener) {
-        contributeListeners().addBinding().toInstance(listener);
+        contributeListeners().add(listener);
         return this;
     }
 
@@ -57,7 +57,7 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
      * @since 0.25
      */
     public ShiroModuleExtender addAuthListener(Class<? extends AuthenticationListener> listenerType) {
-        contributeListeners().addBinding().to(listenerType);
+        contributeListeners().add(listenerType);
         return this;
     }
 
@@ -69,7 +69,7 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
      * @return this extender instance.
      */
     public ShiroModuleExtender addRealm(Realm realm) {
-        contributeRealms().addBinding().toInstance(realm);
+        contributeRealms().add(realm);
         return this;
     }
 
@@ -82,15 +82,15 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
      * @return
      */
     public ShiroModuleExtender addRealm(Class<? extends Realm> realmType) {
-        contributeRealms().addBinding().to(realmType);
+        contributeRealms().add(realmType);
         return this;
     }
 
-    protected Multibinder<Realm> contributeRealms() {
+    protected SetBuilder<Realm> contributeRealms() {
         return realms != null ? realms : (realms = newSet(Realm.class));
     }
 
-    protected Multibinder<AuthenticationListener> contributeListeners() {
+    protected SetBuilder<AuthenticationListener> contributeListeners() {
         return listeners != null ? listeners : (listeners = newSet(AuthenticationListener.class));
     }
 

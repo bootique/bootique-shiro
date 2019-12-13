@@ -19,13 +19,12 @@
 
 package io.bootique.shiro.web;
 
-import com.google.inject.Binder;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
 import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
+import io.bootique.di.Binder;
+import io.bootique.di.Injector;
+import io.bootique.di.Provides;
+import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.realm.Realms;
@@ -42,6 +41,7 @@ import org.apache.shiro.web.mgt.DefaultWebSessionStorageEvaluator;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
+import javax.inject.Singleton;
 import javax.servlet.Filter;
 import java.util.Map;
 import java.util.Set;

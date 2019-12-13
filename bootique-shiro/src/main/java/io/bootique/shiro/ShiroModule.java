@@ -19,12 +19,11 @@
 
 package io.bootique.shiro;
 
-import com.google.inject.Binder;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
+import io.bootique.di.Binder;
+import io.bootique.di.Injector;
+import io.bootique.di.Provides;
 import io.bootique.shiro.mdc.PrincipalMDC;
 import io.bootique.shiro.mgt.NoRememberMeManager;
 import io.bootique.shiro.realm.Realms;
@@ -43,6 +42,7 @@ import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
 
 import java.util.Set;
+import javax.inject.Singleton;
 
 /**
  * Specifies a generic fully functional Shiro stack.

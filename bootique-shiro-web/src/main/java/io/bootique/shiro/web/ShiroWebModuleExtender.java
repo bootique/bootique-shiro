@@ -19,9 +19,9 @@
 
 package io.bootique.shiro.web;
 
-import com.google.inject.Binder;
-import com.google.inject.multibindings.MapBinder;
 import io.bootique.ModuleExtender;
+import io.bootique.di.Binder;
+import io.bootique.di.MapBuilder;
 
 import javax.servlet.Filter;
 
@@ -38,16 +38,16 @@ public class ShiroWebModuleExtender extends ModuleExtender<ShiroWebModuleExtende
     }
 
     public ShiroWebModuleExtender setFilter(String name, Filter filter) {
-        contributeFilters().addBinding(name).toInstance(filter);
+        contributeFilters().put(name, filter);
         return this;
     }
 
     public ShiroWebModuleExtender setFilter(String name, Class<? extends Filter> filterType) {
-        contributeFilters().addBinding(name).to(filterType);
+        contributeFilters().put(name, filterType);
         return this;
     }
 
-    protected MapBinder<String, Filter> contributeFilters() {
+    protected MapBuilder<String, Filter> contributeFilters() {
         return newMap(String.class, Filter.class, ShiroFilterBinding.class);
     }
 }

@@ -20,8 +20,8 @@
 package io.bootique.shiro.realm;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.inject.Injector;
 import io.bootique.BQRuntime;
+import io.bootique.di.Injector;
 import io.bootique.test.junit.BQTestFactory;
 import io.bootique.test.junit.PolymorphicConfigurationChecker;
 import org.apache.shiro.realm.Realm;

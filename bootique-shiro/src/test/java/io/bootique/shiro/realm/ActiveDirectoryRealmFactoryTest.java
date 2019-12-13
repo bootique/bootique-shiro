@@ -19,7 +19,7 @@
 
 package io.bootique.shiro.realm;
 
-import com.google.inject.Injector;
+import io.bootique.di.Injector;
 import org.apache.shiro.realm.activedirectory.ActiveDirectoryRealm;
 import org.apache.shiro.realm.ldap.AbstractLdapRealm;
 import org.junit.Assert;

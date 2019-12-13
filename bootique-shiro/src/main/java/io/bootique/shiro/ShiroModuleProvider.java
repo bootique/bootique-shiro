@@ -19,9 +19,9 @@
 
 package io.bootique.shiro;
 
-import com.google.inject.Module;
-import io.bootique.BQModule;
+import io.bootique.BQModuleMetadata;
 import io.bootique.BQModuleProvider;
+import io.bootique.di.BQModule;
 import io.bootique.shiro.realm.RealmsFactory;
 
 import java.lang.reflect.Type;
@@ -31,12 +31,12 @@ import java.util.Map;
 public class ShiroModuleProvider implements BQModuleProvider {
 
     @Override
-    public Module module() {
+    public BQModule module() {
         return new ShiroModule();
     }
 
     @Override
-    public BQModule.Builder moduleBuilder() {
+    public BQModuleMetadata.Builder moduleBuilder() {
         return BQModuleProvider.super
                 .moduleBuilder()
                 .description("Provides injectable Shiro stack with custom Realms.");

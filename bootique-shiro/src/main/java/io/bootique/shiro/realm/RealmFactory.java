@@ -20,10 +20,10 @@
 package io.bootique.shiro.realm;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.inject.Injector;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.config.PolymorphicConfiguration;
+import io.bootique.di.Injector;
 import org.apache.shiro.realm.Realm;
 
 @BQConfig
@@ -39,7 +39,7 @@ public abstract class RealmFactory implements PolymorphicConfiguration {
 
     /**
      * Creates a Realm of type specific to the factory and configured from the factory state. Unfortunately we have to
-     * pass {@link com.google.inject.Injector} to this method, as different factory implementations rely on different
+     * pass {@link io.bootique.di.Injector} to this method, as different factory implementations rely on different
      * injectable services.
      *
      * @param injector DI injector that a subclass can use to locate any dependencies.

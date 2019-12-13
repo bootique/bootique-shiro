@@ -20,10 +20,10 @@
 package io.bootique.shiro.web;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.inject.Injector;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.config.PolymorphicConfiguration;
+import io.bootique.di.Injector;
 import io.bootique.jetty.MappedFilter;
 import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;

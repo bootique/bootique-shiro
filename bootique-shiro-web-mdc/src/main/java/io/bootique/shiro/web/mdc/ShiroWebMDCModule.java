@@ -19,11 +19,12 @@
 
 package io.bootique.shiro.web.mdc;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
+import javax.inject.Singleton;
+
+import io.bootique.di.Binder;
+import io.bootique.di.BQModule;
+import io.bootique.di.Provides;
+import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedListener;
 import io.bootique.shiro.ShiroModule;
@@ -33,7 +34,7 @@ import io.bootique.shiro.web.ShiroWebModule;
 /**
  * @since 0.25
  */
-public class ShiroWebMDCModule implements Module {
+public class ShiroWebMDCModule implements BQModule {
 
     // make sure we wrap request timer listener whose order is defined in
     // InstrumentedJettyModule.REQUEST_TIMER_LISTENER_ORDER

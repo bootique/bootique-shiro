@@ -19,7 +19,7 @@
 
 package io.bootique.shiro.realm;
 
-import com.google.inject.Injector;
+import io.bootique.di.Injector;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.text.IniRealm;
 import org.junit.Test;

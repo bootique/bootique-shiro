@@ -19,9 +19,9 @@
 
 package io.bootique.shiro.web;
 
-import com.google.inject.Module;
-import io.bootique.BQModule;
+import io.bootique.BQModuleMetadata;
 import io.bootique.BQModuleProvider;
+import io.bootique.di.BQModule;
 import io.bootique.jetty.JettyModuleProvider;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.shiro.ShiroModuleProvider;
@@ -36,17 +36,17 @@ import static java.util.Arrays.asList;
 public class ShiroWebModuleProvider implements BQModuleProvider {
 
     @Override
-    public Module module() {
+    public BQModule module() {
         return new ShiroWebModule();
     }
 
     @Override
-    public Collection<Class<? extends Module>> overrides() {
+    public Collection<Class<? extends BQModule>> overrides() {
         return Collections.singleton(ShiroModule.class);
     }
 
     @Override
-    public BQModule.Builder moduleBuilder() {
+    public BQModuleMetadata.Builder moduleBuilder() {
         return BQModuleProvider.super
                 .moduleBuilder()
                 .description("Provides integration with Apache Shiro for Java servlet applications.");
