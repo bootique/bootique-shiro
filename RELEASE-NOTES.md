@@ -1,6 +1,7 @@
 ## 2.0
 
 * #23 Upgrade to Shiro 1.4.2 to address a security vulnerability
+* #24 Upgrade Shiro to 1.5.0
 
 ## 1.0.RC1
 
