@@ -1,3 +1,7 @@
+## 1.2
+
+* #22 Upgrade to Shiro 1.4.2 to address a security vulnerability
+
 ## 1.0.RC1
 
 * #19 Bootique-injectable SubjectDAO
