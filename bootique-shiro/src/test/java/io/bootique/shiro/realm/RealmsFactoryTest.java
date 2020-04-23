@@ -47,7 +47,7 @@ public class RealmsFactoryTest {
 
         RealmsFactory realmsFactory = new RealmsFactory();
 
-        Realms realms = realmsFactory.createRealms(DIBootstrap.injectorBuilder().defaultNoScope().enableDynamicBindings().build(), diRealms);
+        Realms realms = realmsFactory.createRealms(DIBootstrap.injectorBuilder().build(), diRealms);
         Assert.assertNotNull(realms);
         assertEquals(2, realms.getRealms().size());
         assertTrue(realms.getRealms().contains(r1));
@@ -56,7 +56,7 @@ public class RealmsFactoryTest {
 
     @Test
     public void testCreateRealms_NoDi() {
-        Injector injector = DIBootstrap.injectorBuilder().defaultNoScope().enableDynamicBindings().build();
+        Injector injector = DIBootstrap.injectorBuilder().build();
 
         Realm r1 = Mockito.mock(Realm.class);
         Realm r2 = Mockito.mock(Realm.class);
@@ -81,7 +81,7 @@ public class RealmsFactoryTest {
 
     @Test
     public void testCreateRealms_DiAndConfig() {
-        Injector injector = DIBootstrap.injectorBuilder().defaultNoScope().enableDynamicBindings().build();
+        Injector injector = DIBootstrap.injectorBuilder().build();
 
         Realm rdi1 = Mockito.mock(Realm.class);
         Realm rdi2 = Mockito.mock(Realm.class);
