@@ -39,7 +39,7 @@ public class ShiroWebModuleProviderTest {
 
     @Test
     public void testModuleDeclaresDependencies() {
-        final BQRuntime bqRuntime = testFactory.app().module(new ShiroWebMDCModuleProvider()).createRuntime();
+        final BQRuntime bqRuntime = testFactory.app().moduleProvider(new ShiroWebMDCModuleProvider()).createRuntime();
         BQRuntimeChecker.testModulesLoaded(bqRuntime,
                 ShiroWebModule.class,
                 ShiroWebMDCModule.class
