@@ -45,7 +45,7 @@ Include Bootique BOM and `bootique-shiro` module:
         <dependency>
             <groupId>io.bootique.bom</groupId>
             <artifactId>bootique-bom</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
