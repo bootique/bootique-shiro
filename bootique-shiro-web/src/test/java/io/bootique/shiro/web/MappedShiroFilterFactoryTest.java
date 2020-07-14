@@ -75,13 +75,15 @@ public class MappedShiroFilterFactoryTest {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContextPath()).thenReturn("/");
+        when(request.getServletPath()).thenReturn("/p1");
+        when(request.getPathInfo()).thenReturn("/a");
         when(request.getRequestURI()).thenReturn("/p1/a");
 
         doFilter(request);
         verify(mockFilter1)
                 .doFilter(any(HttpServletRequest.class), any(HttpServletResponse.class), any(FilterChain.class));
 
-        verifyZeroInteractions(mockFilter2);
+        verifyNoInteractions(mockFilter2);
     }
 
     @Test
@@ -89,13 +91,15 @@ public class MappedShiroFilterFactoryTest {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContextPath()).thenReturn("/");
+        when(request.getServletPath()).thenReturn("/p2");
+        when(request.getPathInfo()).thenReturn("/b");
         when(request.getRequestURI()).thenReturn("/p2/b");
 
         doFilter(request);
         verify(mockFilter2)
                 .doFilter(any(HttpServletRequest.class), any(HttpServletResponse.class), any(FilterChain.class));
 
-        verifyZeroInteractions(mockFilter1);
+        verifyNoInteractions(mockFilter1);
     }
 
     @Test
@@ -103,11 +107,13 @@ public class MappedShiroFilterFactoryTest {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContextPath()).thenReturn("/");
+        when(request.getServletPath()).thenReturn("/p3");
+        when(request.getPathInfo()).thenReturn("/b");
         when(request.getRequestURI()).thenReturn("/p3/b");
 
         doFilter(request);
 
-        verifyZeroInteractions(mockFilter1);
-        verifyZeroInteractions(mockFilter2);
+        verifyNoInteractions(mockFilter1);
+        verifyNoInteractions(mockFilter2);
     }
 }
