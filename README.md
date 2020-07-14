@@ -121,7 +121,8 @@ shiro:
         admin: "admin"
         
 shiroweb:
-  # These URLs are resolved within ShiroFilter that routes them to the corresponding internal security filters.
+  # These URLs are resolved within ShiroFilter that routes 
+  # them to the corresponding internal security filters.
   urls:
     "/admin" : perms[\"admin\"]
     "/pub"   : anon
