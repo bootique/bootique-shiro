@@ -36,9 +36,8 @@ a powerful Shiro feature - [path matching with filters](https://shiro.apache.org
 
 * `bootique-shiro-jdbc` - Provides configurable JDBC realm. Can be used with any of the above modules.
 
-## Usage Standalone
+To use Shiro modules, include Bootique BOM in your project:
 
-Include Bootique BOM and `bootique-shiro` module:
 ```xml
 <dependencyManagement>
     <dependencies>
@@ -51,9 +50,12 @@ Include Bootique BOM and `bootique-shiro` module:
         </dependency>
     </dependencies>
 </dependencyManagement>
+```
 
-...
+## Usage Standalone
 
+Include `bootique-shiro` module:
+```xml
 <dependency>
 	<groupId>io.bootique.shiro</groupId>
 	<artifactId>bootique-shiro</artifactId>
@@ -100,22 +102,8 @@ public void doSomething() {
 
 ## Usage - Web
 
-Include Bootique BOM and `bootique-shiro-web` module:
+Include `bootique-shiro-web` module:
 ```xml
-<dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>io.bootique.bom</groupId>
-            <artifactId>bootique-bom</artifactId>
-            <version>1.0</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
-
-...
-
 <dependency>
 	<groupId>io.bootique.shiro</groupId>
 	<artifactId>bootique-shiro-web</artifactId>
