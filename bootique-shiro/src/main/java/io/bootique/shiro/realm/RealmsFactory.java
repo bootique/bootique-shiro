@@ -22,6 +22,10 @@ package io.bootique.shiro.realm;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.di.Injector;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.Realm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,25 +50,65 @@ public class RealmsFactory {
 
     public Realms createRealms(Injector injector, Set<Realm> diRealms) {
 
-        // no configured realms, use DI Realms
-        if (realms == null || realms.isEmpty()) {
-            return new Realms(new ArrayList<>(diRealms));
-        }
+        List<Realm> allRealms = new ArrayList<>();
+        loadConfiguredRealms(allRealms, injector);
 
-        // use configured realms...
+        if (allRealms.isEmpty()) {
+            loadDiRealms(allRealms, diRealms);
 
-        // ignoring DI Realms if at least one config realm exists. This allows to fully override and/or order realms
-        // without recompiling
+            // ignoring DI Realms if at least one config realm exists. This allows to fully override and/or order realms
+            // without recompiling
 
-        if (!diRealms.isEmpty() && LOGGER.isInfoEnabled()) {
-            String realmNames = diRealms.stream()
-                    .map(r -> r.getName() != null ? r.getName() : r.getClass().getSimpleName()).collect(joining(", "));
+        } else if (!diRealms.isEmpty() && LOGGER.isInfoEnabled()) {
+            String realmNames = diRealms
+                    .stream()
+                    .map(this::realmName)
+                    .collect(joining(", "));
+
             LOGGER.info("Ignoring DI-originated Realms: " + realmNames + ". Using Realms from configuration instead.");
         }
 
-        List<Realm> orderedRealms = new ArrayList<>(diRealms.size());
-        realms.forEach(rf -> orderedRealms.add(rf.createRealm(injector)));
+        if (allRealms.isEmpty()) {
+            LOGGER.warn("No Realms configured for Shiro. Will create a placeholder do-nothing Realm");
+            loadPlaceholderRealm(allRealms);
+        }
 
-        return new Realms(orderedRealms);
+        return new Realms(allRealms);
+    }
+
+    void loadConfiguredRealms(List<Realm> collector, Injector injector) {
+        if (realms != null) {
+            realms.forEach(rf -> collector.add(rf.createRealm(injector)));
+        }
+    }
+
+    void loadDiRealms(List<Realm> collector, Set<Realm> diRealms) {
+        collector.addAll(diRealms);
+    }
+
+    void loadPlaceholderRealm(List<Realm> collector) {
+
+        collector.add(new Realm() {
+
+            @Override
+            public String getName() {
+                return "do_nothing_realm";
+            }
+
+            @Override
+            public boolean supports(AuthenticationToken token) {
+                throw new UnsupportedTokenException("Realm '" + getName()
+                        + "' is a placeholder and does not support authentication. You need to configure a real Realm");
+            }
+
+            @Override
+            public AuthenticationInfo getAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+                throw new AuthenticationException("This is a placeholder Realm that does not support authentication");
+            }
+        });
+    }
+
+    private String realmName(Realm r) {
+        return r.getName() != null ? r.getName() : r.getClass().getSimpleName();
     }
 }
