@@ -60,16 +60,12 @@ public class RealmsFactory {
             // without recompiling
 
         } else if (!diRealms.isEmpty() && LOGGER.isInfoEnabled()) {
-            String realmNames = diRealms
-                    .stream()
-                    .map(this::realmName)
-                    .collect(joining(", "));
-
+            String realmNames = diRealms.stream().map(this::realmName).collect(joining(", "));
             LOGGER.info("Ignoring DI-originated Realms: " + realmNames + ". Using Realms from configuration instead.");
         }
 
         if (allRealms.isEmpty()) {
-            LOGGER.warn("No Realms configured for Shiro. Will create a placeholder do-nothing Realm");
+            LOGGER.warn("No Realms configured for Shiro");
             loadPlaceholderRealm(allRealms);
         }
 
