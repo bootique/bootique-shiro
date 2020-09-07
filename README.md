@@ -44,7 +44,7 @@ To use Shiro modules, include Bootique BOM in your project:
         <dependency>
             <groupId>io.bootique.bom</groupId>
             <artifactId>bootique-bom</artifactId>
-            <version>1.1</version>
+            <version>2.0.M1</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
