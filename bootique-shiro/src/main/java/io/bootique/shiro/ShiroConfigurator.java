@@ -17,27 +17,33 @@
  * under the License.
  */
 
-package io.bootique.shiro.realm;
+package io.bootique.shiro;
 
 import org.apache.shiro.realm.Realm;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
- * A holder of a final collection of Shiro {@link org.apache.shiro.realm.Realm} objects to be used in
- * {@link org.apache.shiro.mgt.SecurityManager}.
+ * An injectable immutable holder of Shiro configuration (realms, session storage policy).
+ *
+ * @since 2.0.B1
  */
-public class Realms {
+public class ShiroConfigurator {
 
     // the collection is ordered...
     private List<Realm> realms;
+    private boolean sessionStorageDisabled;
 
-    public Realms(List<Realm> realms) {
-        this.realms = Objects.requireNonNull(realms);
+    public ShiroConfigurator(List<Realm> realms, boolean sessionStorageDisabled) {
+        this.realms = realms;
+        this.sessionStorageDisabled = sessionStorageDisabled;
     }
 
     public List<Realm> getRealms() {
         return realms;
+    }
+
+    public boolean isSessionStorageDisabled() {
+        return sessionStorageDisabled;
     }
 }

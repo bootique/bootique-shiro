@@ -17,10 +17,11 @@
  * under the License.
  */
 
-package io.bootique.shiro.realm;
+package io.bootique.shiro;
 
 import io.bootique.di.DIBootstrap;
 import io.bootique.di.Injector;
+import io.bootique.shiro.realm.RealmFactory;
 import org.apache.shiro.realm.Realm;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,7 +36,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RealmsFactoryTest {
+public class ShiroConfiguratorFactoryTest {
 
     @Test
     public void testCreateRealms_NoConfig() {
@@ -45,13 +46,13 @@ public class RealmsFactoryTest {
 
         Set<Realm> diRealms = new HashSet<>(asList(r1, r2));
 
-        RealmsFactory realmsFactory = new RealmsFactory();
+        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory();
 
-        Realms realms = realmsFactory.createRealms(DIBootstrap.injectorBuilder().build(), diRealms);
-        Assert.assertNotNull(realms);
-        assertEquals(2, realms.getRealms().size());
-        assertTrue(realms.getRealms().contains(r1));
-        assertTrue(realms.getRealms().contains(r2));
+        ShiroConfigurator configurator = shiroConfiguratorFactory.createConfigurator(DIBootstrap.injectorBuilder().build(), diRealms);
+        Assert.assertNotNull(configurator);
+        assertEquals(2, configurator.getRealms().size());
+        assertTrue(configurator.getRealms().contains(r1));
+        assertTrue(configurator.getRealms().contains(r2));
     }
 
     @Test
@@ -69,14 +70,14 @@ public class RealmsFactoryTest {
 
         List<RealmFactory> configFactories = asList(rf1, rf2);
 
-        RealmsFactory realmsFactory = new RealmsFactory();
-        realmsFactory.setRealms(configFactories);
+        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory();
+        shiroConfiguratorFactory.setRealms(configFactories);
 
-        Realms realms = realmsFactory.createRealms(injector, Collections.emptySet());
-        Assert.assertNotNull(realms);
-        assertEquals(2, realms.getRealms().size());
-        assertEquals("Realm ordering got lost", r1,  realms.getRealms().get(0));
-        assertEquals("Realm ordering got lost", r2, realms.getRealms().get(1));
+        ShiroConfigurator configurator = shiroConfiguratorFactory.createConfigurator(injector, Collections.emptySet());
+        Assert.assertNotNull(configurator);
+        assertEquals(2, configurator.getRealms().size());
+        assertEquals("Realm ordering got lost", r1,  configurator.getRealms().get(0));
+        assertEquals("Realm ordering got lost", r2, configurator.getRealms().get(1));
     }
 
     @Test
@@ -99,13 +100,13 @@ public class RealmsFactoryTest {
 
         List<RealmFactory> configFactories = asList(rf1, rf2);
 
-        RealmsFactory realmsFactory = new RealmsFactory();
-        realmsFactory.setRealms(configFactories);
+        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory();
+        shiroConfiguratorFactory.setRealms(configFactories);
 
-        Realms realms = realmsFactory.createRealms(injector, diRealms);
-        Assert.assertNotNull(realms);
-        assertEquals(2, realms.getRealms().size());
-        assertEquals("Wrong Realms or Realm ordering got lost", r1,  realms.getRealms().get(0));
-        assertEquals("Wrong Realms or Realm ordering got lost", r2, realms.getRealms().get(1));
+        ShiroConfigurator configurator = shiroConfiguratorFactory.createConfigurator(injector, diRealms);
+        Assert.assertNotNull(configurator);
+        assertEquals(2, configurator.getRealms().size());
+        assertEquals("Wrong Realms or Realm ordering got lost", r1,  configurator.getRealms().get(0));
+        assertEquals("Wrong Realms or Realm ordering got lost", r2, configurator.getRealms().get(1));
     }
 }

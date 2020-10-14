@@ -27,13 +27,11 @@ import io.bootique.di.Provides;
 import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
-import io.bootique.shiro.realm.Realms;
+import io.bootique.shiro.ShiroConfigurator;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
-import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.mgt.SessionStorageEvaluator;
-import org.apache.shiro.mgt.SubjectDAO;
+import org.apache.shiro.mgt.*;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -71,7 +69,7 @@ public class ShiroWebModule extends ConfigModule {
             SessionManager sessionManager,
             RememberMeManager rememberMeManager,
             SubjectDAO subjectDAO,
-            Realms realms,
+            ShiroConfigurator realms,
             Set<AuthenticationListener> authListeners) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms.getRealms());
 
@@ -109,7 +107,9 @@ public class ShiroWebModule extends ConfigModule {
 
     @Provides
     @Singleton
-    SessionStorageEvaluator provideSessionStorageEvaluator() {
-        return new DefaultWebSessionStorageEvaluator();
+    SessionStorageEvaluator provideSessionStorageEvaluator(ShiroConfigurator configurator) {
+        DefaultWebSessionStorageEvaluator sessionStorageEvaluator = new DefaultWebSessionStorageEvaluator();
+        sessionStorageEvaluator.setSessionStorageEnabled(!configurator.isSessionStorageDisabled());
+        return sessionStorageEvaluator;
     }
 }

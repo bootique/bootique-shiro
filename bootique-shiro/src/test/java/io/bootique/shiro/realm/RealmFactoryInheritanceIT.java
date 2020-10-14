@@ -22,6 +22,7 @@ package io.bootique.shiro.realm;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.bootique.BQRuntime;
 import io.bootique.di.Injector;
+import io.bootique.shiro.ShiroConfigurator;
 import io.bootique.test.junit.BQTestFactory;
 import io.bootique.test.junit.PolymorphicConfigurationChecker;
 import org.apache.shiro.realm.Realm;
@@ -43,7 +44,7 @@ public class RealmFactoryInheritanceIT {
                 .autoLoadModules()
                 .createRuntime();
 
-        Object[] names = bqRuntime.getInstance(Realms.class).getRealms().stream().map(Realm::getName).toArray();
+        Object[] names = bqRuntime.getInstance(ShiroConfigurator.class).getRealms().stream().map(Realm::getName).toArray();
         assertEquals(3, names.length);
         assertEquals("Created by RealmFactory2", names[0]);
         assertEquals("Created by RealmFactory1", names[1]);

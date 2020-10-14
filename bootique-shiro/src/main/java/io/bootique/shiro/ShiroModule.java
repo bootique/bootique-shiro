@@ -26,23 +26,16 @@ import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.shiro.mdc.PrincipalMDC;
 import io.bootique.shiro.mgt.NoRememberMeManager;
-import io.bootique.shiro.realm.Realms;
-import io.bootique.shiro.realm.RealmsFactory;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
-import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
-import org.apache.shiro.mgt.DefaultSubjectDAO;
-import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.mgt.SessionStorageEvaluator;
-import org.apache.shiro.mgt.SubjectDAO;
+import org.apache.shiro.mgt.*;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
 
-import java.util.Set;
 import javax.inject.Singleton;
+import java.util.Set;
 
 /**
  * Specifies a generic fully functional Shiro stack.
@@ -60,8 +53,8 @@ public class ShiroModule extends ConfigModule {
 
     @Provides
     @Singleton
-    Realms provideRealms(Injector injector, ConfigurationFactory configFactory, Set<Realm> diRealms) {
-        return config(RealmsFactory.class, configFactory).createRealms(injector, diRealms);
+    ShiroConfigurator provideRealms(Injector injector, ConfigurationFactory configFactory, Set<Realm> diRealms) {
+        return config(ShiroConfiguratorFactory.class, configFactory).createConfigurator(injector, diRealms);
     }
 
     @Singleton
@@ -76,10 +69,10 @@ public class ShiroModule extends ConfigModule {
             SessionManager sessionManager,
             RememberMeManager rememberMeManager,
             SubjectDAO subjectDAO,
-            Realms realms,
+            ShiroConfigurator configurator,
             Set<AuthenticationListener> authListeners) {
 
-        DefaultSecurityManager manager = new DefaultSecurityManager(realms.getRealms());
+        DefaultSecurityManager manager = new DefaultSecurityManager(configurator.getRealms());
         ((AbstractAuthenticator) manager.getAuthenticator()).setAuthenticationListeners(authListeners);
         manager.setSessionManager(sessionManager);
         manager.setRememberMeManager(rememberMeManager);
@@ -110,7 +103,9 @@ public class ShiroModule extends ConfigModule {
 
     @Provides
     @Singleton
-    SessionStorageEvaluator provideSessionStorageEvaluator() {
-        return new DefaultSessionStorageEvaluator();
+    SessionStorageEvaluator provideSessionStorageEvaluator(ShiroConfigurator configurator) {
+        DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
+        sessionStorageEvaluator.setSessionStorageEnabled(!configurator.isSessionStorageDisabled());
+        return sessionStorageEvaluator;
     }
 }

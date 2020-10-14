@@ -1,3 +1,7 @@
+## 2.0.B1
+
+* #25 SessionStorageEvaluator.sessionStorageEnabled should be a YAML property
+
 ## 2.0.M1
 
 * #23 Upgrade to Shiro 1.4.2 to address a security vulnerability

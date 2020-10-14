@@ -17,11 +17,12 @@
  * under the License.
  */
 
-package io.bootique.shiro.realm;
+package io.bootique.shiro;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.di.Injector;
+import io.bootique.shiro.realm.RealmFactory;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -36,20 +37,36 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
 
+/**
+ * @since 2.0.B1
+ */
 @BQConfig
-public class RealmsFactory {
+public class ShiroConfiguratorFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RealmsFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShiroConfiguratorFactory.class);
 
     private List<RealmFactory> realms;
+    private boolean sessionStorageDisabled;
 
     @BQConfigProperty
     public void setRealms(List<RealmFactory> realms) {
         this.realms = realms;
     }
 
-    public Realms createRealms(Injector injector, Set<Realm> diRealms) {
+    @BQConfigProperty("Whether to disable Subject session storage, ensuring a session-less app. " +
+            "Default is 'false' to match Shiro defaults")
+    public void setSessionStorageDisabled(boolean sessionStorageDisabled) {
+        this.sessionStorageDisabled = sessionStorageDisabled;
+    }
 
+    public ShiroConfigurator createConfigurator(Injector injector, Set<Realm> diRealms) {
+        return new ShiroConfigurator(
+                createRealms(injector, diRealms),
+                sessionStorageDisabled
+        );
+    }
+
+    protected List<Realm> createRealms(Injector injector, Set<Realm> diRealms) {
         List<Realm> allRealms = new ArrayList<>();
         loadConfiguredRealms(allRealms, injector);
 
@@ -69,7 +86,7 @@ public class RealmsFactory {
             loadPlaceholderRealm(allRealms);
         }
 
-        return new Realms(allRealms);
+        return allRealms;
     }
 
     void loadConfiguredRealms(List<Realm> collector, Injector injector) {

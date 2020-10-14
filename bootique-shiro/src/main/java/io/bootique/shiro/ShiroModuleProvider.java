@@ -22,7 +22,6 @@ package io.bootique.shiro;
 import io.bootique.BQModuleMetadata;
 import io.bootique.BQModuleProvider;
 import io.bootique.di.BQModule;
-import io.bootique.shiro.realm.RealmsFactory;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -46,6 +45,6 @@ public class ShiroModuleProvider implements BQModuleProvider {
     public Map<String, Type> configs() {
         // TODO: config prefix is hardcoded. Refactor away from ConfigModule, and make provider
         // generate config prefix, reusing it in metadata...
-        return Collections.singletonMap("shiro", RealmsFactory.class);
+        return Collections.singletonMap("shiro", ShiroConfiguratorFactory.class);
     }
 }
