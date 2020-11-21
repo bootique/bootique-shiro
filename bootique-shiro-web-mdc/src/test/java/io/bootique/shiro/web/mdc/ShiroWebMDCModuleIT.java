@@ -23,24 +23,24 @@ import io.bootique.BQRuntime;
 import io.bootique.di.Key;
 import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.MappedListener;
+import io.bootique.junit5.BQTest;
+import io.bootique.junit5.BQTestFactory;
+import io.bootique.junit5.BQTestTool;
 import io.bootique.shiro.ShiroModule;
-import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
+@BQTest
 public class ShiroWebMDCModuleIT {
 
-    @Rule
-    public BQTestFactory testFactory = new BQTestFactory();
+    @BQTestTool
+    final BQTestFactory testFactory = new BQTestFactory();
 
     @Test
     public void testContainerState() {

@@ -22,12 +22,12 @@ package io.bootique.shiro.realm;
 import io.bootique.di.Injector;
 import org.apache.shiro.realm.activedirectory.ActiveDirectoryRealm;
 import org.apache.shiro.realm.ldap.AbstractLdapRealm;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 
 public class ActiveDirectoryRealmFactoryTest {
@@ -41,7 +41,7 @@ public class ActiveDirectoryRealmFactoryTest {
 
         ActiveDirectoryRealm realm = (ActiveDirectoryRealm) factory.createRealm(mock(Injector.class));
 
-        Assert.assertEquals("xyz", realm.getName());
+        assertEquals("xyz", realm.getName());
 
         Field urlField = AbstractLdapRealm.class.getDeclaredField("url");
         urlField.setAccessible(true);

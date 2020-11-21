@@ -19,15 +19,15 @@
 
 package io.bootique.shiro.web;
 
+import io.bootique.BQRuntime;
+import io.bootique.Bootique;
 import io.bootique.jersey.JerseyModule;
+import io.bootique.jetty.junit5.JettyTester;
+import io.bootique.junit5.BQApp;
+import io.bootique.junit5.BQTest;
 import io.bootique.shiro.ShiroModule;
-import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -35,66 +35,54 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-
+@BQTest
 public class ShiroWebModuleIT {
 
-    private static WebTarget BASE = ClientBuilder.newClient().target("http://localhost:8080/");
+    private static final JettyTester jetty = JettyTester.create();
 
-    @ClassRule
-    public static BQTestFactory TEST_FACTORY = new BQTestFactory();
-
-    @BeforeClass
-    public static void beforeClass() {
-        TEST_FACTORY.app("-c", "classpath:ShiroWebModuleIT.yml", "-s")
-                .module(b -> JerseyModule.extend(b).addResource(Api.class))
-                .module(b -> ShiroModule.extend(b).addRealm(new TestRealm()))
-                // overriding standard "perms" filter to avoid being sent to the login form
-                .module(b -> ShiroWebModule.extend(b).setFilter("perms", PermissionsFilter.class))
-                .autoLoadModules()
-                .run();
-    }
+    @BQApp
+    static final BQRuntime app = Bootique
+            .app("-c", "classpath:ShiroWebModuleIT.yml", "-s")
+            .module(jetty.moduleReplacingConnectors())
+            .module(b -> JerseyModule.extend(b).addResource(Api.class))
+            .module(b -> ShiroModule.extend(b).addRealm(new TestRealm()))
+            // overriding standard "perms" filter to avoid being sent to the login form
+            .module(b -> ShiroWebModule.extend(b).setFilter("perms", PermissionsFilter.class))
+            .autoLoadModules()
+            .createRuntime();
 
     @Test
     public void testPublic() {
-
-        Response r1 = BASE.path("/public").request().get();
-        assertEquals(Response.Status.OK.getStatusCode(), r1.getStatus());
-        assertEquals("public_string", r1.readEntity(String.class));
+        Response r = jetty.getTarget().path("/public").request().get();
+        JettyTester.assertOk(r).assertContent("public_string");
     }
 
     @Test
     public void testAnonymous() {
-        Response r1 = BASE.path("/anonymous").request().get();
-        assertEquals(Response.Status.OK.getStatusCode(), r1.getStatus());
-        assertEquals("anon_string_null", r1.readEntity(String.class));
+        Response r = jetty.getTarget().path("/anonymous").request().get();
+        JettyTester.assertOk(r).assertContent("anon_string_null");
     }
 
     @Test
     public void testLogin() {
-        Response r1 = BASE.path("/login_on_demand").request().get();
-        assertEquals(Response.Status.OK.getStatusCode(), r1.getStatus());
-        assertEquals("postlogin_string_myuser", r1.readEntity(String.class));
+        Response r = jetty.getTarget().path("/login_on_demand").request().get();
+        JettyTester.assertOk(r).assertContent("postlogin_string_myuser");
     }
 
     @Test
     public void testAdmin() {
-        Response r1 = BASE.path("/admin").request().get();
-        assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), r1.getStatus());
+        Response r = jetty.getTarget().path("/admin").request().get();
+        JettyTester.assertUnauthorized(r);
     }
 
     @Path("/")

@@ -21,20 +21,19 @@ package io.bootique.shiro.jdbc.realm;
 
 import io.bootique.di.Injector;
 import io.bootique.jdbc.DataSourceFactory;
+import io.bootique.junit5.PolymorphicConfigurationChecker;
 import io.bootique.shiro.realm.ActiveDirectoryRealmFactory;
 import io.bootique.shiro.realm.IniRealmFactory;
 import io.bootique.shiro.realm.RealmFactory;
-import io.bootique.test.junit.PolymorphicConfigurationChecker;
 import org.apache.shiro.realm.jdbc.JdbcRealm;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.sql.DataSource;
-
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

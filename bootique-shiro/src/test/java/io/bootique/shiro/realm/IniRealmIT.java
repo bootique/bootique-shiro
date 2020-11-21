@@ -20,43 +20,42 @@
 package io.bootique.shiro.realm;
 
 import io.bootique.BQRuntime;
-import io.bootique.test.junit.BQTestFactory;
+import io.bootique.Bootique;
+import io.bootique.junit5.BQApp;
+import io.bootique.junit5.BQTest;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
+@BQTest
 public class IniRealmIT {
 
-    @Rule
-    public BQTestFactory testFactory = new BQTestFactory();
+    @BQApp(skipRun = true)
+    static final BQRuntime app = Bootique
+            .app("-c", "classpath:io/bootique/shiro/realm/IniRealmIT.yml")
+            .autoLoadModules()
+            .createRuntime();
 
     @Test
     public void testSubject() {
 
-        BQRuntime bqRuntime = testFactory
-                .app("-c", "classpath:io/bootique/shiro/realm/IniRealmIT.yml")
-                .autoLoadModules()
-                .createRuntime();
-
-        Subject subject = new Subject.Builder(bqRuntime.getInstance(SecurityManager.class)).buildSubject();
+        Subject subject = new Subject.Builder(app.getInstance(SecurityManager.class)).buildSubject();
 
         subject.login(new UsernamePasswordToken("u11", "u11p"));
-        Assert.assertTrue(subject.hasRole("admin"));
+        assertTrue(subject.hasRole("admin"));
         assertArrayEquals(new boolean[]{true, true, true}, subject.isPermitted("do1", "do2", "do3"));
         subject.logout();
 
         subject.login(new UsernamePasswordToken("u12", "u12p"));
-        Assert.assertTrue(subject.hasRole("user"));
+        assertTrue(subject.hasRole("user"));
         assertArrayEquals(new boolean[]{false, false, true}, subject.isPermitted("do1", "do2", "do3"));
         subject.logout();
 
         subject.login(new UsernamePasswordToken("u21", "u21p"));
-        Assert.assertFalse(subject.hasRole("user"));
+        assertFalse(subject.hasRole("user"));
         assertArrayEquals(new boolean[]{false, false, false}, subject.isPermitted("do1", "do2", "do3"));
         subject.logout();
     }

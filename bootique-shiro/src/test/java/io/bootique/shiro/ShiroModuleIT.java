@@ -20,36 +20,27 @@
 package io.bootique.shiro;
 
 import io.bootique.BQRuntime;
-import io.bootique.test.junit.BQTestFactory;
+import io.bootique.junit5.BQTest;
+import io.bootique.junit5.BQTestFactory;
+import io.bootique.junit5.BQTestTool;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationListener;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+@BQTest
 public class ShiroModuleIT {
 
-    @Rule
-    public BQTestFactory testFactory = new BQTestFactory();
+    @BQTestTool
+    final BQTestFactory testFactory = new BQTestFactory();
 
     protected Realm mockRealm() {
         Realm mockRealm = mock(Realm.class);
@@ -88,7 +79,7 @@ public class ShiroModuleIT {
         // try bad login
         try {
             subject.login(new UsernamePasswordToken("uname", "badpassword"));
-            Assert.fail("Should have thrown on bad auth");
+            fail("Should have thrown on bad auth");
         } catch (AuthenticationException authEx) {
             assertFalse(subject.isAuthenticated());
         }
@@ -113,9 +104,7 @@ public class ShiroModuleIT {
         assertNull(ThreadContext.getSubject());
 
         // testing Shiro idiom of wrapping lambda in a subject...
-        subject.execute(() -> {
-            assertSame("Unexpected subject, thread state is disturbed", subject, SecurityUtils.getSubject());
-        });
+        subject.execute(() -> assertSame(subject, SecurityUtils.getSubject(), "Unexpected subject, thread state is disturbed"));
     }
 
     @Test
@@ -138,7 +127,7 @@ public class ShiroModuleIT {
         // try bad login
         try {
             subject.login(new UsernamePasswordToken("uname", "badpassword"));
-            Assert.fail("Should have thrown on bad auth");
+            fail("Should have thrown on bad auth");
         } catch (AuthenticationException authEx) {
             verify(mockListener).onFailure(any(AuthenticationToken.class), any(AuthenticationException.class));
         }
@@ -169,7 +158,7 @@ public class ShiroModuleIT {
         // try bad login
         try {
             subject.login(new UsernamePasswordToken("uname", "badpassword"));
-            Assert.fail("Should have thrown on bad auth");
+            fail("Should have thrown on bad auth");
         } catch (AuthenticationException authEx) {
             assertTrue(TestAuthListener.onFailure);
         }

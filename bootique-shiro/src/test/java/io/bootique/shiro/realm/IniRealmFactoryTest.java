@@ -22,11 +22,11 @@ package io.bootique.shiro.realm;
 import io.bootique.di.Injector;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.text.IniRealm;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class IniRealmFactoryTest {

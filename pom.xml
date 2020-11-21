@@ -70,7 +70,12 @@
             </dependency>
             <dependency>
                 <groupId>io.bootique</groupId>
-                <artifactId>bootique-test</artifactId>
+                <artifactId>bootique-junit5</artifactId>
+                <version>${bootique.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.bootique.jetty</groupId>
+                <artifactId>bootique-jetty-junit5</artifactId>
                 <version>${bootique.version}</version>
             </dependency>
             <dependency>
@@ -87,11 +92,6 @@
                 <groupId>io.bootique.jersey</groupId>
                 <artifactId>bootique-jersey</artifactId>
                 <version>${bootique.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jersey.core</groupId>
-                <artifactId>jersey-client</artifactId>
-                <version>${jersey.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>

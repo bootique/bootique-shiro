@@ -21,39 +21,39 @@ package io.bootique.shiro.web;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.bootique.BQRuntime;
+import io.bootique.Bootique;
 import io.bootique.di.Key;
 import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.MappedFilter;
+import io.bootique.junit5.BQApp;
+import io.bootique.junit5.BQTest;
 import io.bootique.shiro.ShiroModule;
-import io.bootique.test.junit.BQTestFactory;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;
-import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 
-
+@BQTest
 public class CustomShiroFilterIT {
 
-    @ClassRule
-    public static BQTestFactory TEST_FACTORY = new BQTestFactory();
+    @BQApp(skipRun = true)
+    static final BQRuntime app = Bootique
+            .app("-c", "classpath:CustomShiroFilterIT.yml")
+            .autoLoadModules()
+            .module(b -> ShiroModule.extend(b).addRealm(mock(Realm.class)))
+            .createRuntime();
 
     @Test
     public void testCustomFactory() {
-        BQRuntime runtime = TEST_FACTORY
-                .app("-c", "classpath:CustomShiroFilterIT.yml")
-                .autoLoadModules()
-                .module(b -> ShiroModule.extend(b).addRealm(mock(Realm.class)))
-                .createRuntime();
 
         TypeLiteral<MappedFilter<ShiroFilter>> filterKey = new TypeLiteral<MappedFilter<ShiroFilter>>() {
         };
-        MappedFilter<ShiroFilter> mappedFilter = runtime.getInstance(Key.get(filterKey));
+        MappedFilter<ShiroFilter> mappedFilter = app.getInstance(Key.get(filterKey));
 
-        Assert.assertTrue(mappedFilter.getFilter() instanceof CustomFilter);
+        Assertions.assertTrue(mappedFilter.getFilter() instanceof CustomFilter);
     }
 
     @JsonTypeName("it")

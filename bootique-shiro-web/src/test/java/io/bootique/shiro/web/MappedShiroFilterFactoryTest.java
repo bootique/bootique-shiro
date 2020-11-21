@@ -20,8 +20,8 @@
 package io.bootique.shiro.web;
 
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -43,7 +43,7 @@ public class MappedShiroFilterFactoryTest {
     private Filter mockFilter2;
     private FilterChainResolver resolver;
 
-    @Before
+    @BeforeEach
     public void before() {
         this.mockFilter1 = mock(Filter.class);
         this.mockFilter2 = mock(Filter.class);
