@@ -38,7 +38,7 @@ public class ShiroWebModuleExtender extends ModuleExtender<ShiroWebModuleExtende
     }
 
     public ShiroWebModuleExtender setFilter(String name, Filter filter) {
-        contributeFilters().put(name, filter);
+        contributeFilters().putInstance(name, filter);
         return this;
     }
 

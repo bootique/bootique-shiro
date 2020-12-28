@@ -47,7 +47,7 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
      * @since 0.25
      */
     public ShiroModuleExtender addAuthListener(AuthenticationListener listener) {
-        contributeListeners().add(listener);
+        contributeListeners().addInstance(listener);
         return this;
     }
 
@@ -69,7 +69,7 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
      * @return this extender instance.
      */
     public ShiroModuleExtender addRealm(Realm realm) {
-        contributeRealms().add(realm);
+        contributeRealms().addInstance(realm);
         return this;
     }
 
