@@ -29,16 +29,16 @@ import org.slf4j.MDC;
  */
 public class PrincipalMDC {
 
-    private static final String PRINCIPAL_MDC_KEY = "principal";
+    public static final String MDC_KEY = "principal";
 
     /**
      * Initializes SLF4J MDC with the current principal name.
      */
     public void reset(Object principal) {
         if (principal == null) {
-            MDC.remove(PRINCIPAL_MDC_KEY);
+            MDC.remove(MDC_KEY);
         } else {
-            MDC.put(PRINCIPAL_MDC_KEY, String.valueOf(principal));
+            MDC.put(MDC_KEY, String.valueOf(principal));
         }
     }
 
@@ -46,6 +46,6 @@ public class PrincipalMDC {
      * Removes principal name from the logging MDC.
      */
     public void clear() {
-        MDC.remove(PRINCIPAL_MDC_KEY);
+        MDC.remove(MDC_KEY);
     }
 }

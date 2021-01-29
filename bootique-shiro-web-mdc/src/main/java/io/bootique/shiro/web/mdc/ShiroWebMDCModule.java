@@ -36,7 +36,7 @@ public class ShiroWebMDCModule implements BQModule {
 
     @Override
     public void configure(Binder binder) {
-        JettyModule.extend(binder).addRequestMDCItem(ShiroWebPrincipalMDCItem.class);
+        JettyModule.extend(binder).addRequestMDCItem(PrincipalMDC.MDC_KEY, ShiroWebPrincipalMDCItem.class);
         ShiroModule.extend(binder).addAuthListener(ShiroWebPrincipalMDCItem.class);
         ShiroWebModule.extend(binder).setFilter("mdc", SubjectMDCInitializer.class);
     }
