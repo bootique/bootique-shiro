@@ -20,9 +20,6 @@
 package io.bootique.shiro.web.mdc;
 
 import io.bootique.BQRuntime;
-import io.bootique.di.Key;
-import io.bootique.di.TypeLiteral;
-import io.bootique.jetty.MappedListener;
 import io.bootique.junit5.BQTest;
 import io.bootique.junit5.BQTestFactory;
 import io.bootique.junit5.BQTestTool;
@@ -33,7 +30,8 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @BQTest
@@ -41,15 +39,6 @@ public class ShiroWebMDCModuleIT {
 
     @BQTestTool
     final BQTestFactory testFactory = new BQTestFactory();
-
-    @Test
-    public void testContainerState() {
-        BQRuntime runtime = testFactory.app().autoLoadModules().createRuntime();
-        MappedListener<ShiroWebMDCCleaner> cleaner = runtime.getInstance(Key.get(new TypeLiteral<MappedListener<ShiroWebMDCCleaner>>() {
-        }));
-        OnAuthMDCInitializer initializer = runtime.getInstance(OnAuthMDCInitializer.class);
-        assertSame(cleaner.getListener().principalMDC, initializer.principalMDC);
-    }
 
     @Test
     public void testContainerState_InitializerListener() {
@@ -62,6 +51,6 @@ public class ShiroWebMDCModuleIT {
         DefaultSecurityManager securityManager = (DefaultSecurityManager) runtime.getInstance(SecurityManager.class);
         AbstractAuthenticator authenticator = (AbstractAuthenticator) securityManager.getAuthenticator();
         assertEquals(1, authenticator.getAuthenticationListeners().size());
-        assertTrue(authenticator.getAuthenticationListeners().iterator().next() instanceof OnAuthMDCInitializer);
+        assertTrue(authenticator.getAuthenticationListeners().iterator().next() instanceof ShiroWebPrincipalMDCItem);
     }
 }

@@ -19,6 +19,7 @@
 
 package io.bootique.shiro.web.mdc;
 
+import io.bootique.jetty.request.RequestMDCItem;
 import io.bootique.shiro.mdc.PrincipalMDC;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -26,17 +27,33 @@ import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.PrincipalCollection;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import java.util.Objects;
+
 /**
- * Initializes MDC state after user authentication.
+ * Resets principal MDC information at the end of the web request.
  *
- * @since 0.25
+ * @since 2.0.B1
  */
-public class OnAuthMDCInitializer implements AuthenticationListener {
+public class ShiroWebPrincipalMDCItem implements RequestMDCItem, AuthenticationListener {
 
-    PrincipalMDC principalMDC;
+    private final PrincipalMDC principalMDC;
 
-    public OnAuthMDCInitializer(PrincipalMDC principalMDC) {
-        this.principalMDC = principalMDC;
+    public ShiroWebPrincipalMDCItem(PrincipalMDC principalMDC) {
+        this.principalMDC = Objects.requireNonNull(principalMDC);
+    }
+
+    @Override
+    public void initMDC(ServletContext sc, ServletRequest request) {
+        // do nothing, wait for authentication ...
+        // cleaning just in case the thread came in dirty
+        principalMDC.clear();
+    }
+
+    @Override
+    public void cleanupMDC(ServletContext sc, ServletRequest request) {
+        principalMDC.clear();
     }
 
     @Override
@@ -58,4 +75,5 @@ public class OnAuthMDCInitializer implements AuthenticationListener {
     public void onLogout(PrincipalCollection principals) {
         principalMDC.clear();
     }
+
 }

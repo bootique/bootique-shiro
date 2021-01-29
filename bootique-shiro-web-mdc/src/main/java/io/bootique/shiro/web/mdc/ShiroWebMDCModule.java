@@ -19,46 +19,33 @@
 
 package io.bootique.shiro.web.mdc;
 
-import javax.inject.Singleton;
-
-import io.bootique.di.Binder;
 import io.bootique.di.BQModule;
+import io.bootique.di.Binder;
 import io.bootique.di.Provides;
-import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.JettyModule;
-import io.bootique.jetty.MappedListener;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.shiro.mdc.PrincipalMDC;
 import io.bootique.shiro.web.ShiroWebModule;
+
+import javax.inject.Singleton;
 
 /**
  * @since 0.25
  */
 public class ShiroWebMDCModule implements BQModule {
 
-    // make sure we wrap request timer listener whose order is defined in
-    // InstrumentedJettyModule.REQUEST_TIMER_LISTENER_ORDER
-    public static final int MDC_LISTENER_ORDER = Integer.MIN_VALUE + 900;
-
     @Override
     public void configure(Binder binder) {
-        JettyModule.extend(binder).addMappedListener(new TypeLiteral<MappedListener<ShiroWebMDCCleaner>>() {
-        });
-        ShiroModule.extend(binder).addAuthListener(OnAuthMDCInitializer.class);
+        JettyModule.extend(binder).addRequestMDCItem(ShiroWebPrincipalMDCItem.class);
+        ShiroModule.extend(binder).addAuthListener(ShiroWebPrincipalMDCItem.class);
         ShiroWebModule.extend(binder).setFilter("mdc", SubjectMDCInitializer.class);
     }
 
     @Singleton
     @Provides
-    MappedListener<ShiroWebMDCCleaner> providePrincipalMDCCleaner(PrincipalMDC principalMDC) {
-        ShiroWebMDCCleaner cleaner = new ShiroWebMDCCleaner(principalMDC);
-        return new MappedListener<>(cleaner, MDC_LISTENER_ORDER);
-    }
-
-    @Singleton
-    @Provides
-    OnAuthMDCInitializer providePrincipalMDCInitializer(PrincipalMDC principalMDC) {
-        return new OnAuthMDCInitializer(principalMDC);
+    ShiroWebPrincipalMDCItem providePrincipalMDCCleaner(PrincipalMDC principalMDC) {
+        ShiroWebPrincipalMDCItem cleaner = new ShiroWebPrincipalMDCItem(principalMDC);
+        return cleaner;
     }
 
     @Singleton
