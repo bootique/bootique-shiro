@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.bootique.modules.parent</groupId>
         <artifactId>bootique-modules-parent</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.2</version>
     </parent>
 
     <groupId>io.bootique.shiro</groupId>
@@ -52,14 +52,6 @@
         <url>https://github.com/bootique/bootique-shiro</url>
         <tag>HEAD</tag>
     </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>bintray-bootique-releases</id>
-            <name>bintray-bootique-releases</name>
-            <url>https://api.bintray.com/maven/bootique/releases/bootique-shiro/;publish=1</url>
-        </repository>
-    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>
