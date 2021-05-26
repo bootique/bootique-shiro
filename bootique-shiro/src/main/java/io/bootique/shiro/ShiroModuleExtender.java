@@ -44,7 +44,6 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
     /**
      * @param listener a listener instance.
      * @return this extender instance.
-     * @since 0.25
      */
     public ShiroModuleExtender addAuthListener(AuthenticationListener listener) {
         contributeListeners().addInstance(listener);
@@ -54,7 +53,6 @@ public class ShiroModuleExtender extends ModuleExtender<ShiroModuleExtender> {
     /**
      * @param listenerType a class of the auth listener
      * @return this extender instance.
-     * @since 0.25
      */
     public ShiroModuleExtender addAuthListener(Class<? extends AuthenticationListener> listenerType) {
         contributeListeners().add(listenerType);

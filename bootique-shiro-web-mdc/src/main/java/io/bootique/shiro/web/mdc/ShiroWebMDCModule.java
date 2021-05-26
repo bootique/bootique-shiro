@@ -29,9 +29,6 @@ import io.bootique.shiro.web.ShiroWebModule;
 
 import javax.inject.Singleton;
 
-/**
- * @since 0.25
- */
 public class ShiroWebMDCModule implements BQModule {
 
     @Override

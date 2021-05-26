@@ -24,8 +24,6 @@ import org.slf4j.MDC;
 /**
  * A wrapper around SLF4J MDC (Mapped Diagnostic Context) class that allows to expose current principal name in the
  * logging context.
- *
- * @since 0.25
  */
 public class PrincipalMDC {
 

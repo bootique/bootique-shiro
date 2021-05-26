@@ -35,8 +35,6 @@ import java.io.IOException;
  * A Shiro filter that initializes MDC state from the current Subject. It needs to be explicitly placed in the
  * authentication chain in the "shiroweb.urls" configuration under the name "mdc". This filter is optional and is only
  * needed in session-based apps that do not perform login on every request.
- *
- * @since 0.25
  */
 public class SubjectMDCInitializer implements Filter {
 

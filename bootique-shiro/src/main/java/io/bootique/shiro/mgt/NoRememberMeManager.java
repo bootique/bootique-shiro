@@ -30,8 +30,6 @@ import org.apache.shiro.subject.SubjectContext;
 
 /**
  * A {@link RememberMeManager} implementation that disables "remember me" functionality.
- *
- * @since 0.24
  */
 public class NoRememberMeManager implements RememberMeManager {
 
