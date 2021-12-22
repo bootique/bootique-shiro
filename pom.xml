@@ -29,7 +29,7 @@
 
     <groupId>io.bootique.shiro</groupId>
     <artifactId>bootique-shiro-parent</artifactId>
-    <version>1.3</version>
+    <version>1.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>bootique-shiro-parent: Parent of bootique-shiro* Modules.</name>
@@ -50,7 +50,7 @@
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/bootique/bootique-shiro</developerConnection>
         <url>https://github.com/bootique/bootique-shiro</url>
-        <tag>1.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencyManagement>
