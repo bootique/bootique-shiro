@@ -1,3 +1,7 @@
+## 3.0.M1
+
+* #31 Bump shiro-core from 1.8.0 to 1.9.1
+
 ## 2.0.RC1
 
 * #30 Upgrade Shiro to 1.8.0 to fix Shiro security vulnerability

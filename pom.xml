@@ -37,7 +37,7 @@
 
     <properties>
         <bootique.version>${project.version}</bootique.version>
-        <shiro.version>1.8.0</shiro.version>
+        <shiro.version>1.9.1</shiro.version>
     </properties>
 
     <modules>
@@ -92,45 +92,21 @@
                 <!-- Excluding duplicates... -->
                 <exclusions>
                     <exclusion>
-                        <groupId>org.apache.shiro</groupId>
-                        <artifactId>shiro-lang</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.shiro</groupId>
-                        <artifactId>shiro-cache</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.shiro</groupId>
-                        <artifactId>shiro-crypto-hash</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.shiro</groupId>
-                        <artifactId>shiro-crypto-cipher</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.shiro</groupId>
-                        <artifactId>shiro-config-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.shiro</groupId>
-                        <artifactId>shiro-config-ogdl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.shiro</groupId>
-                        <artifactId>shiro-event</artifactId>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-web</artifactId>
+                <version>${shiro.version}</version>
             </dependency>
             <!-- As a result of the Shiro exclusions above we need to add this one explicitly-->
             <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>1.9.4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-web</artifactId>
-                <version>${shiro.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
