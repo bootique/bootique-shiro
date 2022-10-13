@@ -1,6 +1,7 @@
 ## 3.0.M1
 
 * #31 Bump shiro-core from 1.8.0 to 1.9.1
+* #33 Upgrade to Shiro 1.10.0
 
 ## 2.0.RC1
 
