@@ -1,3 +1,7 @@
+## 2.0.2
+
+* #34 2.x: Upgrade Shiro to 1.10.1
+
 ## 2.0.RC1
 
 * #30 Upgrade Shiro to 1.8.0 to fix Shiro security vulnerability
