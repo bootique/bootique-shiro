@@ -32,6 +32,31 @@
 
     <name>bootique-shiro-web: Bootique / Shiro Web Stack</name>
     <description>Provides Apache Shiro integration with Bootique in servlet environment.</description>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-web</artifactId>
+                <version>${shiro.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.bootique.jetty</groupId>
+                <artifactId>bootique-jetty</artifactId>
+                <version>${bootique.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.bootique.jersey</groupId>
+                <artifactId>bootique-jersey</artifactId>
+                <version>${bootique.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.bootique.jetty</groupId>
+                <artifactId>bootique-jetty-junit5</artifactId>
+                <version>${bootique.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>

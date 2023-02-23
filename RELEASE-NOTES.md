@@ -1,6 +1,7 @@
 ## 3.0.M2
 
 * #36 Upgrade to Shiro 1.11.0
+* #37 Support for "jakarta" option in bootique-shiro-web
 
 ## 3.0.M1
 
