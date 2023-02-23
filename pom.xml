@@ -43,8 +43,11 @@
     <modules>
         <module>bootique-shiro</module>
         <module>bootique-shiro-jdbc</module>
+
         <module>bootique-shiro-web</module>
         <module>bootique-shiro-web-mdc</module>
+
+        <module>bootique-shiro-web-jakarta</module>
     </modules>
 
     <scm>
