@@ -37,7 +37,7 @@
 
     <properties>
         <bootique.version>${project.version}</bootique.version>
-        <shiro.version>1.11.0</shiro.version>
+        <shiro.version>1.13.0</shiro.version>
     </properties>
 
     <modules>
