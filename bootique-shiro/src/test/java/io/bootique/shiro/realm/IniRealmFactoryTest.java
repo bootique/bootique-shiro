@@ -32,7 +32,7 @@ import static org.mockito.Mockito.mock;
 public class IniRealmFactoryTest {
 
     @Test
-    public void testCreateRealm() {
+    public void createRealm() {
         IniRealmFactory factory = new IniRealmFactory();
         factory.setName("xyz");
         factory.setRoles(Collections.singletonMap("r1", "p1, p2"));

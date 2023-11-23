@@ -25,12 +25,12 @@ import org.junit.jupiter.api.Test;
 public class ShiroWebModuleProviderTest {
 
     @Test
-    public void testAutoLoadable() {
+    public void autoLoadable() {
         BQModuleProviderChecker.testAutoLoadable(ShiroWebModuleProvider.class);
     }
 
     @Test
-    public void testMetadata() {
+    public void metadata() {
         BQModuleProviderChecker.testMetadata(ShiroWebModuleProvider.class);
     }
 }

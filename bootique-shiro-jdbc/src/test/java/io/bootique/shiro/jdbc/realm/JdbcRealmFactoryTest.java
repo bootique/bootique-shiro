@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 public class JdbcRealmFactoryTest {
 
     @Test
-    public void testMapping() {
+    public void mapping() {
         PolymorphicConfigurationChecker.test(RealmFactory.class,
                 IniRealmFactory.class,
                 ActiveDirectoryRealmFactory.class,
@@ -48,7 +48,7 @@ public class JdbcRealmFactoryTest {
     }
 
     @Test
-    public void testCreateRealm() throws NoSuchFieldException, IllegalAccessException {
+    public void createRealm() throws NoSuchFieldException, IllegalAccessException {
 
         DataSource ds = mock(DataSource.class);
 

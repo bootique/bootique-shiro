@@ -62,25 +62,25 @@ public class ShiroWebModuleIT {
             .createRuntime();
 
     @Test
-    public void testPublic() {
+    public void publicAccess() {
         Response r = jetty.getTarget().path("/public").request().get();
         JettyTester.assertOk(r).assertContent("public_string");
     }
 
     @Test
-    public void testAnonymous() {
+    public void anonymousAccess() {
         Response r = jetty.getTarget().path("/anonymous").request().get();
         JettyTester.assertOk(r).assertContent("anon_string_null");
     }
 
     @Test
-    public void testLogin() {
+    public void login() {
         Response r = jetty.getTarget().path("/login_on_demand").request().get();
         JettyTester.assertOk(r).assertContent("postlogin_string_myuser");
     }
 
     @Test
-    public void testAdmin() {
+    public void admin() {
         Response r = jetty.getTarget().path("/admin").request().get();
         JettyTester.assertUnauthorized(r);
     }

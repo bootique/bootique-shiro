@@ -41,7 +41,7 @@ public class ShiroWebMDCModuleIT {
     final BQTestFactory testFactory = new BQTestFactory();
 
     @Test
-    public void testContainerState_InitializerListener() {
+    public void containerState_InitializerListener() {
         Realm mockRealm = mock(Realm.class);
         BQRuntime runtime = testFactory.app()
                 .module(b -> ShiroModule.extend(b).addRealm(mockRealm))

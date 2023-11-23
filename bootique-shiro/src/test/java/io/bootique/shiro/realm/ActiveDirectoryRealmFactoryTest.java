@@ -33,7 +33,7 @@ import static org.mockito.Mockito.mock;
 public class ActiveDirectoryRealmFactoryTest {
 
     @Test
-    public void testCreateRealm() throws NoSuchFieldException, IllegalAccessException {
+    public void createRealm() throws NoSuchFieldException, IllegalAccessException {
         ActiveDirectoryRealmFactory factory = new ActiveDirectoryRealmFactory();
         factory.setName("xyz");
         factory.setUrl("ldap://example.org");

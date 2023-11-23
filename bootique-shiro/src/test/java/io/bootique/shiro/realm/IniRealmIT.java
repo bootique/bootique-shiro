@@ -40,7 +40,7 @@ public class IniRealmIT {
             .createRuntime();
 
     @Test
-    public void testSubject() {
+    public void subject() {
 
         Subject subject = new Subject.Builder(app.getInstance(SecurityManager.class)).buildSubject();
 

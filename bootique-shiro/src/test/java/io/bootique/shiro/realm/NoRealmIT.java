@@ -42,7 +42,7 @@ public class NoRealmIT {
             .createRuntime();
 
     @Test
-    public void testSubject() {
+    public void subject() {
 
         try {
             Subject subject = new Subject.Builder(app.getInstance(SecurityManager.class)).buildSubject();

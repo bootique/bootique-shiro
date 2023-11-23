@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ShiroConfiguratorFactoryTest {
 
     @Test
-    public void testCreateRealms_NoConfig() {
+    public void createRealms_NoConfig() {
 
         Realm r1 = Mockito.mock(Realm.class);
         Realm r2 = Mockito.mock(Realm.class);
@@ -54,7 +54,7 @@ public class ShiroConfiguratorFactoryTest {
     }
 
     @Test
-    public void testCreateRealms_NoDi() {
+    public void createRealms_NoDi() {
         Injector injector = DIBootstrap.injectorBuilder().build();
 
         Realm r1 = Mockito.mock(Realm.class);
@@ -79,7 +79,7 @@ public class ShiroConfiguratorFactoryTest {
     }
 
     @Test
-    public void testCreateRealms_DiAndConfig() {
+    public void createRealms_DiAndConfig() {
         Injector injector = DIBootstrap.injectorBuilder().build();
 
         Realm rdi1 = Mockito.mock(Realm.class);

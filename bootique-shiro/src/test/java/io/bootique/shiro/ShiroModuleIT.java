@@ -64,7 +64,7 @@ public class ShiroModuleIT {
     }
 
     @Test
-    public void testFullStack() {
+    public void fullStack() {
 
         Realm mockRealm = mockRealm();
 
@@ -91,7 +91,7 @@ public class ShiroModuleIT {
     }
 
     @Test
-    public void testFullStack_SecurityUtils() {
+    public void fullStack_SecurityUtils() {
         Realm mockRealm = mockRealm();
 
         BQRuntime runtime = testFactory.app()
@@ -108,7 +108,7 @@ public class ShiroModuleIT {
     }
 
     @Test
-    public void testFullStack_AuthListener() {
+    public void fullStack_AuthListener() {
 
         Realm mockRealm = mockRealm();
         AuthenticationListener mockListener = mock(AuthenticationListener.class);
@@ -138,7 +138,7 @@ public class ShiroModuleIT {
     }
 
     @Test
-    public void testFullStack_AuthListenerType() {
+    public void fullStack_AuthListenerType() {
 
         TestAuthListener.reset();
 

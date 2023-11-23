@@ -71,7 +71,7 @@ public class MappedShiroFilterFactoryTest {
     }
 
     @Test
-    public void testCreateFilterChainResolver1() throws IOException, ServletException {
+    public void createFilterChainResolver1() throws IOException, ServletException {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContextPath()).thenReturn("/");
@@ -87,7 +87,7 @@ public class MappedShiroFilterFactoryTest {
     }
 
     @Test
-    public void testCreateFilterChainResolver2() throws IOException, ServletException {
+    public void createFilterChainResolver2() throws IOException, ServletException {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContextPath()).thenReturn("/");
@@ -103,7 +103,7 @@ public class MappedShiroFilterFactoryTest {
     }
 
     @Test
-    public void testCreateFilterChainResolver_DefaultResolvers() throws IOException, ServletException {
+    public void createFilterChainResolver_DefaultResolvers() throws IOException, ServletException {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContextPath()).thenReturn("/");

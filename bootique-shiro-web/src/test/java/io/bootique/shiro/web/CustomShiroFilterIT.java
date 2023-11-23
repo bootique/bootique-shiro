@@ -47,7 +47,7 @@ public class CustomShiroFilterIT {
             .createRuntime();
 
     @Test
-    public void testCustomFactory() {
+    public void customFactory() {
 
         TypeLiteral<MappedFilter<ShiroFilter>> filterKey = new TypeLiteral<MappedFilter<ShiroFilter>>() {
         };
