@@ -19,9 +19,8 @@
 
 package io.bootique.shiro.jdbc;
 
-import io.bootique.BQModuleMetadata;
 import io.bootique.BQModuleProvider;
-import io.bootique.di.BQModule;
+import io.bootique.bootstrap.BuiltModule;
 import io.bootique.jdbc.JdbcModuleProvider;
 import io.bootique.shiro.ShiroModuleProvider;
 
@@ -32,15 +31,11 @@ import static java.util.Arrays.asList;
 public class ShiroJdbcModuleProvider implements BQModuleProvider {
 
     @Override
-    public BQModule module() {
-        return new ShiroJdbcModule();
-    }
-
-    @Override
-    public BQModuleMetadata.Builder moduleBuilder() {
-        return BQModuleProvider.super
-                .moduleBuilder()
-                .description("Provides a factory to create JDBC Realms based on a set of configurable SQL queries.");
+    public BuiltModule buildModule() {
+        return BuiltModule.of(new ShiroJdbcModule())
+                .provider(this)
+                .description("Integrates Apache Shiro JDBC extensions")
+                .build();
     }
 
     @Override

@@ -19,42 +19,26 @@
 
 package io.bootique.shiro.web;
 
-import io.bootique.BQModuleMetadata;
 import io.bootique.BQModuleProvider;
-import io.bootique.di.BQModule;
+import io.bootique.bootstrap.BuiltModule;
 import io.bootique.jetty.JettyModuleProvider;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.shiro.ShiroModuleProvider;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 
 import static java.util.Arrays.asList;
 
 public class ShiroWebModuleProvider implements BQModuleProvider {
 
     @Override
-    public BQModule module() {
-        return new ShiroWebModule();
-    }
-
-    @Override
-    public Collection<Class<? extends BQModule>> overrides() {
-        return Collections.singleton(ShiroModule.class);
-    }
-
-    @Override
-    public BQModuleMetadata.Builder moduleBuilder() {
-        return BQModuleProvider.super
-                .moduleBuilder()
-                .description("Provides integration with Apache Shiro for Java servlet applications.");
-    }
-
-    @Override
-    public Map<String, Type> configs() {
-        return Collections.singletonMap("shiroweb", MappedShiroFilterFactory.class);
+    public BuiltModule buildModule() {
+        return BuiltModule.of(new ShiroWebModule())
+                .provider(this)
+                .description("Integrates Apache Shiro webapp extensions (security filters, etc.)")
+                .config("shiroweb", MappedShiroFilterFactory.class)
+                .overrides(ShiroModule.class)
+                .build();
     }
 
     @Override
