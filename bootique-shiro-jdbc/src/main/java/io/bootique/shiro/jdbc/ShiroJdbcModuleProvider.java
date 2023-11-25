@@ -21,7 +21,7 @@ package io.bootique.shiro.jdbc;
 
 import io.bootique.BQModuleProvider;
 import io.bootique.bootstrap.BuiltModule;
-import io.bootique.jdbc.JdbcModuleProvider;
+import io.bootique.jdbc.JdbcModule;
 import io.bootique.shiro.ShiroModuleProvider;
 
 import java.util.Collection;
@@ -42,7 +42,7 @@ public class ShiroJdbcModuleProvider implements BQModuleProvider {
     @Deprecated(since = "3.0", forRemoval = true)
     public Collection<BQModuleProvider> dependencies() {
         return asList(
-                new JdbcModuleProvider(),
+                new JdbcModule(),
                 new ShiroModuleProvider()
         );
     }
