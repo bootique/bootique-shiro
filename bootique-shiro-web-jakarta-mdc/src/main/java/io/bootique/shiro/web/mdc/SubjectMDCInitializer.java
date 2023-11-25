@@ -33,18 +33,14 @@ import java.io.IOException;
  */
 public class SubjectMDCInitializer implements Filter {
 
-    private PrincipalMDC principalMDC;
+    private final PrincipalMDC principalMDC;
 
     public SubjectMDCInitializer(PrincipalMDC principalMDC) {
         this.principalMDC = principalMDC;
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
-
-    @Override
-    public void destroy() {
+    public void init(FilterConfig filterConfig) {
     }
 
     @Override

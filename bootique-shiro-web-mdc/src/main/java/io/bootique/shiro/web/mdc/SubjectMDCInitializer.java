@@ -48,11 +48,7 @@ public class SubjectMDCInitializer implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
-
-    @Override
-    public void destroy() {
+    public void init(FilterConfig filterConfig) {
     }
 
     @Override
