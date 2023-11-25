@@ -39,7 +39,7 @@ public class ShiroWebModuleProvider implements BQModuleProvider {
     public BuiltModule buildModule() {
         return BuiltModule.of(new ShiroWebModule())
                 .provider(this)
-                .description("Deprecated and can be replaced with 'bootique-shiro-web-jakarta'.")
+                .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta'.")
                 .config("shiroweb", MappedShiroFilterFactory.class)
                 .overrides(ShiroModule.class)
                 .build();

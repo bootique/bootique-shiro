@@ -37,7 +37,7 @@ public class ShiroWebMDCModuleProvider implements BQModuleProvider {
     public BuiltModule buildModule() {
         return BuiltModule.of(new ShiroWebMDCModule())
                 .provider(this)
-                .description("Deprecated and can be replaced with 'bootique-shiro-web-jakarta-mdc'.")
+                .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta-mdc'.")
                 .build();
     }
 
