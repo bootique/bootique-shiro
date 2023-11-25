@@ -17,19 +17,15 @@
  * under the License.
  */
 
-package io.bootique.shiro;
+package io.bootique.shiro.web.mdc;
 
-import io.bootique.BQModuleProvider;
-import io.bootique.bootstrap.BuiltModule;
+import io.bootique.junit5.BQModuleProviderChecker;
+import org.junit.jupiter.api.Test;
 
-public class ShiroModuleProvider implements BQModuleProvider {
+public class ShiroWebModuleTest {
 
-    @Override
-    public BuiltModule buildModule() {
-        return BuiltModule.of(new ShiroModule())
-                .provider(this)
-                .description("Integrates Apache Shiro")
-                .config("shiro", ShiroConfiguratorFactory.class)
-                .build();
+    @Test
+    public void autoLoadable() {
+        BQModuleProviderChecker.testAutoLoadable(ShiroWebMDCModule.class);
     }
 }

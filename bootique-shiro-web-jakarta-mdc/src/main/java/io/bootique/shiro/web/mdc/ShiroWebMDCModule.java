@@ -19,6 +19,8 @@
 
 package io.bootique.shiro.web.mdc;
 
+import io.bootique.BQModuleProvider;
+import io.bootique.bootstrap.BuiltModule;
 import io.bootique.di.BQModule;
 import io.bootique.di.Binder;
 import io.bootique.di.Provides;
@@ -28,8 +30,24 @@ import io.bootique.shiro.mdc.PrincipalMDC;
 import io.bootique.shiro.web.ShiroWebModule;
 
 import javax.inject.Singleton;
+import java.util.Collection;
 
-public class ShiroWebMDCModule implements BQModule {
+import static java.util.Collections.singletonList;
+
+public class ShiroWebMDCModule implements BQModule, BQModuleProvider {
+
+    @Override
+    public BuiltModule buildModule() {
+        return BuiltModule.of(this)
+                .description("Integrates MDC logging of Apache Shiro subjects")
+                .build();
+    }
+
+    @Override
+    @Deprecated(since = "3.0", forRemoval = true)
+    public Collection<BQModuleProvider> dependencies() {
+        return singletonList(new ShiroWebModule());
+    }
 
     @Override
     public void configure(Binder binder) {

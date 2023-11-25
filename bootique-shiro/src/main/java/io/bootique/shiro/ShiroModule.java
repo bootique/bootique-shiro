@@ -19,8 +19,10 @@
 
 package io.bootique.shiro;
 
-import io.bootique.ConfigModule;
+import io.bootique.BQModuleProvider;
+import io.bootique.bootstrap.BuiltModule;
 import io.bootique.config.ConfigurationFactory;
+import io.bootique.di.BQModule;
 import io.bootique.di.Binder;
 import io.bootique.di.Injector;
 import io.bootique.di.Provides;
@@ -40,10 +42,20 @@ import java.util.Set;
 /**
  * Specifies a generic fully functional Shiro stack.
  */
-public class ShiroModule extends ConfigModule {
+public class ShiroModule implements BQModule, BQModuleProvider {
+
+    private static final String CONFIG_PREFIX = "shiro";
 
     public static ShiroModuleExtender extend(Binder binder) {
         return new ShiroModuleExtender(binder);
+    }
+
+    @Override
+    public BuiltModule buildModule() {
+        return BuiltModule.of(this)
+                .description("Integrates Apache Shiro")
+                .config(CONFIG_PREFIX, ShiroConfiguratorFactory.class)
+                .build();
     }
 
     @Override
@@ -54,7 +66,7 @@ public class ShiroModule extends ConfigModule {
     @Provides
     @Singleton
     ShiroConfigurator provideRealms(Injector injector, ConfigurationFactory configFactory, Set<Realm> diRealms) {
-        return config(ShiroConfiguratorFactory.class, configFactory).createConfigurator(injector, diRealms);
+        return configFactory.config(ShiroConfiguratorFactory.class, CONFIG_PREFIX).createConfigurator(injector, diRealms);
     }
 
     @Singleton

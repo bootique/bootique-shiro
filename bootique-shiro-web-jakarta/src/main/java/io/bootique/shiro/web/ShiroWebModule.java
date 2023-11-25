@@ -19,20 +19,21 @@
 
 package io.bootique.shiro.web;
 
-import io.bootique.ConfigModule;
+import io.bootique.BQModuleProvider;
+import io.bootique.bootstrap.BuiltModule;
 import io.bootique.config.ConfigurationFactory;
-import io.bootique.di.Binder;
-import io.bootique.di.Injector;
-import io.bootique.di.Provides;
-import io.bootique.di.TypeLiteral;
+import io.bootique.di.*;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.ShiroConfigurator;
+import io.bootique.shiro.ShiroModule;
 import jakarta.servlet.Filter;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
+import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.mgt.*;
+import org.apache.shiro.mgt.SessionStorageEvaluator;
+import org.apache.shiro.mgt.SubjectDAO;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -41,13 +42,33 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public class ShiroWebModule extends ConfigModule {
+import static java.util.Arrays.asList;
+
+public class ShiroWebModule implements BQModule, BQModuleProvider {
+
+    private static final String CONFIG_PREFIX = "shiroweb";
 
     public static ShiroWebModuleExtender extend(Binder binder) {
         return new ShiroWebModuleExtender(binder);
+    }
+
+    @Override
+    public BuiltModule buildModule() {
+        return BuiltModule.of(this)
+                .description("Integrates Apache Shiro webapp extensions (security filters, etc.)")
+                .config(CONFIG_PREFIX, MappedShiroFilterFactory.class)
+                .overrides(ShiroModule.class)
+                .build();
+    }
+
+    @Override
+    @Deprecated(since = "3.0", forRemoval = true)
+    public Collection<BQModuleProvider> dependencies() {
+        return asList(new JettyModule(), new ShiroModule());
     }
 
     @Override
@@ -101,7 +122,8 @@ public class ShiroWebModule extends ConfigModule {
             WebSecurityManager securityManager,
             @ShiroFilterBinding Map<String, Filter> chainFilters) {
 
-        return config(MappedShiroFilterFactory.class, configFactory)
+        return configFactory
+                .config(MappedShiroFilterFactory.class, CONFIG_PREFIX)
                 .createShiroFilter(injector, securityManager, chainFilters);
     }
 

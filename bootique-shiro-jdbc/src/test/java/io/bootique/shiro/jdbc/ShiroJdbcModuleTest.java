@@ -17,20 +17,20 @@
  * under the License.
  */
 
-package io.bootique.shiro;
+package io.bootique.shiro.jdbc;
 
 import io.bootique.junit5.BQModuleProviderChecker;
 import org.junit.jupiter.api.Test;
 
-public class ShiroModuleProviderTest {
+public class ShiroJdbcModuleTest {
 
     @Test
     public void autoLoadable() {
-        BQModuleProviderChecker.testAutoLoadable(ShiroModuleProvider.class);
+        BQModuleProviderChecker.testAutoLoadable(ShiroJdbcModule.class);
     }
 
     @Test
     public void metadata() {
-        BQModuleProviderChecker.testMetadata(ShiroModuleProvider.class);
+        BQModuleProviderChecker.testMetadata(ShiroJdbcModule.class);
     }
 }

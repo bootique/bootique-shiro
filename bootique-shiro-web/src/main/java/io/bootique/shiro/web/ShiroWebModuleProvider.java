@@ -23,7 +23,6 @@ import io.bootique.BQModuleProvider;
 import io.bootique.bootstrap.BuiltModule;
 import io.bootique.jetty.JettyModuleProvider;
 import io.bootique.shiro.ShiroModule;
-import io.bootique.shiro.ShiroModuleProvider;
 
 import java.util.Collection;
 
@@ -48,9 +47,6 @@ public class ShiroWebModuleProvider implements BQModuleProvider {
     @Override
     @Deprecated(since = "3.0", forRemoval = true)
     public Collection<BQModuleProvider> dependencies() {
-        return asList(
-                new JettyModuleProvider(),
-                new ShiroModuleProvider()
-        );
+        return asList(new JettyModuleProvider(), new ShiroModule());
     }
 }

@@ -19,13 +19,33 @@
 
 package io.bootique.shiro.jdbc;
 
+import io.bootique.BQModuleProvider;
+import io.bootique.bootstrap.BuiltModule;
 import io.bootique.di.Binder;
 import io.bootique.di.BQModule;
+import io.bootique.jdbc.JdbcModule;
+import io.bootique.shiro.ShiroModule;
 
-public class ShiroJdbcModule implements BQModule {
+import java.util.Collection;
+
+import static java.util.Arrays.asList;
+
+public class ShiroJdbcModule implements BQModule, BQModuleProvider {
+
+    @Override
+    public BuiltModule buildModule() {
+        return BuiltModule.of(this)
+                .description("Integrates Apache Shiro JDBC extensions")
+                .build();
+    }
+
+    @Override
+    @Deprecated(since = "3.0", forRemoval = true)
+    public Collection<BQModuleProvider> dependencies() {
+        return asList(new JdbcModule(), new ShiroModule());
+    }
 
     @Override
     public void configure(Binder binder) {
-
     }
 }

@@ -1,1 +1,1 @@
-io.bootique.shiro.jdbc.ShiroJdbcModuleProvider
+io.bootique.shiro.jdbc.ShiroJdbcModule
