@@ -39,7 +39,7 @@ public class ShiroWebModuleProvider implements BQModuleProvider {
     public BuiltModule buildModule() {
         return BuiltModule.of(new ShiroWebModule())
                 .provider(this)
-                .description("Integrates Apache Shiro webapp extensions (security filters, etc.)")
+                .description("Deprecated and can be replaced with 'bootique-shiro-web-jakarta'.")
                 .config("shiroweb", MappedShiroFilterFactory.class)
                 .overrides(ShiroModule.class)
                 .build();

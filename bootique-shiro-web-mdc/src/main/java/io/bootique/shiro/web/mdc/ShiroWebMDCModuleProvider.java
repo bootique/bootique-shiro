@@ -37,7 +37,7 @@ public class ShiroWebMDCModuleProvider implements BQModuleProvider {
     public BuiltModule buildModule() {
         return BuiltModule.of(new ShiroWebMDCModule())
                 .provider(this)
-                .description("Integrates MDC logging of Apache Shiro subjects")
+                .description("Deprecated and can be replaced with 'bootique-shiro-web-jakarta-mdc'.")
                 .build();
     }
 
