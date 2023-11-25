@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * An injectable immutable holder of Shiro configuration (realms, session storage policy).
  *
- * @since 2.0.B1
+ * @since 2.0
  */
 public class ShiroConfigurator {
 

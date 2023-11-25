@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Resets principal MDC information at the end of the web request.
  *
- * @since 2.0.B1
+ * @since 2.0
  */
 public class ShiroWebPrincipalMDCItem implements RequestMDCItem, AuthenticationListener {
 

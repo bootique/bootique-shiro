@@ -38,7 +38,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.joining;
 
 /**
- * @since 2.0.B1
+ * @since 2.0
  */
 @BQConfig
 public class ShiroConfiguratorFactory {
