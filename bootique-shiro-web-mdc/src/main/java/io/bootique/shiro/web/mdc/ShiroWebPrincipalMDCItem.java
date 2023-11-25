@@ -34,8 +34,10 @@ import java.util.Objects;
 /**
  * Resets principal MDC information at the end of the web request.
  *
- * @since 2.0.B1
+ * @since 2.0
+ * @deprecated in favor of the Jakarta flavor
  */
+@Deprecated(since = "3.0", forRemoval = true)
 public class ShiroWebPrincipalMDCItem implements RequestMDCItem, AuthenticationListener {
 
     private final PrincipalMDC principalMDC;

@@ -25,7 +25,10 @@ import org.apache.shiro.web.servlet.AbstractShiroFilter;
 
 /**
  * Servlet filter that should be installed in the web container to intercept web requests and apply Shiro chains.
+ *
+ * @deprecated in favor of the Jakarta flavor
  */
+@Deprecated(since = "3.0", forRemoval = true)
 public class ShiroFilter extends AbstractShiroFilter {
 
     public ShiroFilter(WebSecurityManager securityManager, FilterChainResolver filterChainResolver) {

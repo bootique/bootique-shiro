@@ -37,6 +37,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @deprecated in favor of the Jakarta flavor
+ */
+@Deprecated(since = "3.0", forRemoval = true)
 @BQConfig("Configures Shiro in a servlet environment.")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = MappedShiroFilterFactory.class)
 public class MappedShiroFilterFactory implements PolymorphicConfiguration {

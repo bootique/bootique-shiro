@@ -25,6 +25,10 @@ import io.bootique.di.MapBuilder;
 
 import javax.servlet.Filter;
 
+/**
+ * @deprecated in favor of the Jakarta flavor
+ */
+@Deprecated(since = "3.0", forRemoval = true)
 public class ShiroWebModuleExtender extends ModuleExtender<ShiroWebModuleExtender> {
 
     public ShiroWebModuleExtender(Binder binder) {

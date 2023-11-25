@@ -44,6 +44,10 @@ import javax.servlet.Filter;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @deprecated in favor of the Jakarta flavor
+ */
+@Deprecated(since = "3.0", forRemoval = true)
 public class ShiroWebModule extends ConfigModule {
 
     public static ShiroWebModuleExtender extend(Binder binder) {

@@ -1,3 +1,7 @@
+## 3.0-M3
+
+* #39 (Jakarta migration) Deprecate "javax" based modules
+
 ## 3.0.M2
 
 * #36 Upgrade to Shiro 1.11.0
