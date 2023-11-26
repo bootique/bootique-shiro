@@ -20,7 +20,7 @@
 package io.bootique.shiro.web.mdc;
 
 import io.bootique.BQModuleProvider;
-import io.bootique.bootstrap.BuiltModule;
+import io.bootique.ModuleCrate;
 import io.bootique.di.BQModule;
 import io.bootique.di.Binder;
 import io.bootique.di.Provides;
@@ -37,8 +37,8 @@ import static java.util.Collections.singletonList;
 public class ShiroWebMDCModule implements BQModule, BQModuleProvider {
 
     @Override
-    public BuiltModule buildModule() {
-        return BuiltModule.of(this)
+    public ModuleCrate moduleCrate() {
+        return ModuleCrate.of(this)
                 .description("Integrates MDC logging of Apache Shiro subjects")
                 .build();
     }

@@ -20,7 +20,7 @@
 package io.bootique.shiro.web;
 
 import io.bootique.BQModuleProvider;
-import io.bootique.bootstrap.BuiltModule;
+import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.*;
 import io.bootique.jetty.JettyModule;
@@ -57,8 +57,8 @@ public class ShiroWebModule implements BQModule, BQModuleProvider {
     }
 
     @Override
-    public BuiltModule buildModule() {
-        return BuiltModule.of(this)
+    public ModuleCrate moduleCrate() {
+        return ModuleCrate.of(this)
                 .description("Integrates Apache Shiro webapp extensions (security filters, etc.)")
                 .config(CONFIG_PREFIX, MappedShiroFilterFactory.class)
                 .overrides(ShiroModule.class)

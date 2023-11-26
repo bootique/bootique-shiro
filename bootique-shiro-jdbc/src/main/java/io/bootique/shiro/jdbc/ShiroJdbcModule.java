@@ -20,7 +20,7 @@
 package io.bootique.shiro.jdbc;
 
 import io.bootique.BQModuleProvider;
-import io.bootique.bootstrap.BuiltModule;
+import io.bootique.ModuleCrate;
 import io.bootique.di.Binder;
 import io.bootique.di.BQModule;
 import io.bootique.jdbc.JdbcModule;
@@ -33,8 +33,8 @@ import static java.util.Arrays.asList;
 public class ShiroJdbcModule implements BQModule, BQModuleProvider {
 
     @Override
-    public BuiltModule buildModule() {
-        return BuiltModule.of(this)
+    public ModuleCrate moduleCrate() {
+        return ModuleCrate.of(this)
                 .description("Integrates Apache Shiro JDBC extensions")
                 .build();
     }

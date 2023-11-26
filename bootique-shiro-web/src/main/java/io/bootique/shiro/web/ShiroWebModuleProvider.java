@@ -20,7 +20,7 @@
 package io.bootique.shiro.web;
 
 import io.bootique.BQModuleProvider;
-import io.bootique.bootstrap.BuiltModule;
+import io.bootique.ModuleCrate;
 import io.bootique.jetty.JettyModuleProvider;
 import io.bootique.shiro.ShiroModule;
 
@@ -35,8 +35,8 @@ import static java.util.Arrays.asList;
 public class ShiroWebModuleProvider implements BQModuleProvider {
 
     @Override
-    public BuiltModule buildModule() {
-        return BuiltModule.of(new ShiroWebModule())
+    public ModuleCrate moduleCrate() {
+        return ModuleCrate.of(new ShiroWebModule())
                 .provider(this)
                 .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta'.")
                 .config("shiroweb", MappedShiroFilterFactory.class)

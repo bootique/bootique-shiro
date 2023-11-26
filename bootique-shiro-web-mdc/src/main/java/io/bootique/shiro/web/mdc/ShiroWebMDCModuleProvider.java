@@ -20,7 +20,7 @@
 package io.bootique.shiro.web.mdc;
 
 import io.bootique.BQModuleProvider;
-import io.bootique.bootstrap.BuiltModule;
+import io.bootique.ModuleCrate;
 import io.bootique.shiro.web.ShiroWebModuleProvider;
 
 import java.util.Collection;
@@ -34,8 +34,8 @@ import static java.util.Collections.singletonList;
 public class ShiroWebMDCModuleProvider implements BQModuleProvider {
 
     @Override
-    public BuiltModule buildModule() {
-        return BuiltModule.of(new ShiroWebMDCModule())
+    public ModuleCrate moduleCrate() {
+        return ModuleCrate.of(new ShiroWebMDCModule())
                 .provider(this)
                 .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta-mdc'.")
                 .build();
