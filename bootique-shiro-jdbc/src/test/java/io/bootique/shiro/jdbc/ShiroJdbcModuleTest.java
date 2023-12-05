@@ -19,18 +19,13 @@
 
 package io.bootique.shiro.jdbc;
 
-import io.bootique.junit5.BQModuleProviderChecker;
+import io.bootique.junit5.BQModuleTester;
 import org.junit.jupiter.api.Test;
 
 public class ShiroJdbcModuleTest {
 
     @Test
-    public void autoLoadable() {
-        BQModuleProviderChecker.testAutoLoadable(ShiroJdbcModule.class);
-    }
-
-    @Test
-    public void metadata() {
-        BQModuleProviderChecker.testMetadata(ShiroJdbcModule.class);
+    public void check() {
+        BQModuleTester.of(ShiroJdbcModule.class).testAutoLoadable().testConfig();
     }
 }

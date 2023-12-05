@@ -19,10 +19,13 @@
 
 package io.bootique.shiro.web;
 
-import io.bootique.BQModuleProvider;
+import io.bootique.BQModule;
 import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
-import io.bootique.di.*;
+import io.bootique.di.Binder;
+import io.bootique.di.Injector;
+import io.bootique.di.Provides;
+import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.ShiroConfigurator;
@@ -42,13 +45,10 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
 import javax.inject.Singleton;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
-
-public class ShiroWebModule implements BQModule, BQModuleProvider {
+public class ShiroWebModule implements BQModule {
 
     private static final String CONFIG_PREFIX = "shiroweb";
 
@@ -57,18 +57,12 @@ public class ShiroWebModule implements BQModule, BQModuleProvider {
     }
 
     @Override
-    public ModuleCrate moduleCrate() {
+    public ModuleCrate crate() {
         return ModuleCrate.of(this)
                 .description("Integrates Apache Shiro webapp extensions (security filters, etc.)")
                 .config(CONFIG_PREFIX, MappedShiroFilterFactory.class)
                 .overrides(ShiroModule.class)
                 .build();
-    }
-
-    @Override
-    @Deprecated(since = "3.0", forRemoval = true)
-    public Collection<BQModuleProvider> dependencies() {
-        return asList(new JettyModule(), new ShiroModule());
     }
 
     @Override

@@ -20,6 +20,7 @@
 package io.bootique.shiro.web;
 
 import io.bootique.ConfigModule;
+import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
 import io.bootique.di.Injector;
@@ -28,6 +29,7 @@ import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.ShiroConfigurator;
+import io.bootique.shiro.ShiroModule;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.mgt.SecurityManager;
@@ -52,6 +54,15 @@ public class ShiroWebModule extends ConfigModule {
 
     public static ShiroWebModuleExtender extend(Binder binder) {
         return new ShiroWebModuleExtender(binder);
+    }
+
+    @Override
+    public ModuleCrate crate() {
+        return ModuleCrate.of(this)
+                .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta'.")
+                .config("shiroweb", MappedShiroFilterFactory.class)
+                .overrides(ShiroModule.class)
+                .build();
     }
 
     @Override

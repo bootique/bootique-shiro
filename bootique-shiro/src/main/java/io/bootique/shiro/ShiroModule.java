@@ -19,10 +19,9 @@
 
 package io.bootique.shiro;
 
-import io.bootique.BQModuleProvider;
+import io.bootique.BQModule;
 import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
-import io.bootique.di.BQModule;
 import io.bootique.di.Binder;
 import io.bootique.di.Injector;
 import io.bootique.di.Provides;
@@ -42,7 +41,7 @@ import java.util.Set;
 /**
  * Specifies a generic fully functional Shiro stack.
  */
-public class ShiroModule implements BQModule, BQModuleProvider {
+public class ShiroModule implements BQModule {
 
     private static final String CONFIG_PREFIX = "shiro";
 
@@ -51,7 +50,7 @@ public class ShiroModule implements BQModule, BQModuleProvider {
     }
 
     @Override
-    public ModuleCrate moduleCrate() {
+    public ModuleCrate crate() {
         return ModuleCrate.of(this)
                 .description("Integrates Apache Shiro")
                 .config(CONFIG_PREFIX, ShiroConfiguratorFactory.class)

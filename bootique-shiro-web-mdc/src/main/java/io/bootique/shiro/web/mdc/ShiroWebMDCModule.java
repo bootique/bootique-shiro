@@ -19,7 +19,8 @@
 
 package io.bootique.shiro.web.mdc;
 
-import io.bootique.di.BQModule;
+import io.bootique.ModuleCrate;
+import io.bootique.BQModule;
 import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.jetty.JettyModule;
@@ -34,6 +35,13 @@ import javax.inject.Singleton;
  */
 @Deprecated(since = "3.0", forRemoval = true)
 public class ShiroWebMDCModule implements BQModule {
+
+    @Override
+    public ModuleCrate crate() {
+        return ModuleCrate.of(this)
+                .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta-mdc'.")
+                .build();
+    }
 
     @Override
     public void configure(Binder binder) {

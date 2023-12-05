@@ -19,13 +19,13 @@
 
 package io.bootique.shiro.web.mdc;
 
-import io.bootique.junit5.BQModuleProviderChecker;
+import io.bootique.junit5.BQModuleTester;
 import org.junit.jupiter.api.Test;
 
 public class ShiroWebModuleTest {
 
     @Test
-    public void autoLoadable() {
-        BQModuleProviderChecker.testAutoLoadable(ShiroWebMDCModule.class);
+    public void check() {
+        BQModuleTester.of(ShiroWebMDCModule.class).testAutoLoadable().testConfig();
     }
 }

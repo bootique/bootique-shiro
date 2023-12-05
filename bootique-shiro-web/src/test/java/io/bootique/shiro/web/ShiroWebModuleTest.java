@@ -19,18 +19,13 @@
 
 package io.bootique.shiro.web;
 
-import io.bootique.junit5.BQModuleProviderChecker;
+import io.bootique.junit5.BQModuleTester;
 import org.junit.jupiter.api.Test;
 
-public class ShiroWebModuleProviderTest {
+public class ShiroWebModuleTest {
 
     @Test
-    public void autoLoadable() {
-        BQModuleProviderChecker.testAutoLoadable(ShiroWebModuleProvider.class);
-    }
-
-    @Test
-    public void metadata() {
-        BQModuleProviderChecker.testMetadata(ShiroWebModuleProvider.class);
+    public void check() {
+        BQModuleTester.of(ShiroWebModule.class).testAutoLoadable().testConfig();
     }
 }
