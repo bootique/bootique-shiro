@@ -19,7 +19,7 @@
 
 package io.bootique.shiro.web;
 
-import io.bootique.ConfigModule;
+import io.bootique.BQModule;
 import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
@@ -32,8 +32,10 @@ import io.bootique.shiro.ShiroConfigurator;
 import io.bootique.shiro.ShiroModule;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
+import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.mgt.*;
+import org.apache.shiro.mgt.SessionStorageEvaluator;
+import org.apache.shiro.mgt.SubjectDAO;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -50,7 +52,9 @@ import java.util.Set;
  * @deprecated in favor of the Jakarta flavor
  */
 @Deprecated(since = "3.0", forRemoval = true)
-public class ShiroWebModule extends ConfigModule {
+public class ShiroWebModule implements BQModule {
+
+    private static final String CONFIG_PREFIX = "shiroweb";
 
     public static ShiroWebModuleExtender extend(Binder binder) {
         return new ShiroWebModuleExtender(binder);
@@ -60,7 +64,7 @@ public class ShiroWebModule extends ConfigModule {
     public ModuleCrate crate() {
         return ModuleCrate.of(this)
                 .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta'.")
-                .config("shiroweb", MappedShiroFilterFactory.class)
+                .config(CONFIG_PREFIX, MappedShiroFilterFactory.class)
                 .overrides(ShiroModule.class)
                 .build();
     }
@@ -116,7 +120,8 @@ public class ShiroWebModule extends ConfigModule {
             WebSecurityManager securityManager,
             @ShiroFilterBinding Map<String, Filter> chainFilters) {
 
-        return config(MappedShiroFilterFactory.class, configFactory)
+        return configFactory
+                .config(MappedShiroFilterFactory.class, CONFIG_PREFIX)
                 .createShiroFilter(injector, securityManager, chainFilters);
     }
 
