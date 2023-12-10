@@ -19,7 +19,6 @@
 
 package io.bootique.shiro.jdbc.realm;
 
-import io.bootique.di.Injector;
 import io.bootique.jdbc.DataSourceFactory;
 import io.bootique.junit5.PolymorphicConfigurationChecker;
 import io.bootique.shiro.realm.ActiveDirectoryRealmFactory;
@@ -27,7 +26,6 @@ import io.bootique.shiro.realm.IniRealmFactory;
 import io.bootique.shiro.realm.RealmFactory;
 import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -55,15 +53,11 @@ public class JdbcRealmFactoryTest {
         DataSourceFactory mockDSFactory = mock((DataSourceFactory.class));
         when(mockDSFactory.forName("testDS")).thenReturn(ds);
 
-        Injector injector = mock(Injector.class);
-        Mockito.when(injector.getInstance(DataSourceFactory.class)).thenReturn(mockDSFactory);
-
-
-        JdbcRealmFactory factory = new JdbcRealmFactory();
+        JdbcRealmFactory factory = new JdbcRealmFactory(mockDSFactory);
         factory.setName("testName");
         factory.setDatasource("testDS");
 
-        JdbcRealm realm = (JdbcRealm) factory.createRealm(injector);
+        JdbcRealm realm = (JdbcRealm) factory.createRealm();
         assertEquals("testName", realm.getName());
 
         Field dsField = JdbcRealm.class.getDeclaredField("dataSource");

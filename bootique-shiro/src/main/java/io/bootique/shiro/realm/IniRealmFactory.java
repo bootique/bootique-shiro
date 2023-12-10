@@ -22,7 +22,6 @@ package io.bootique.shiro.realm;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.di.Injector;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
@@ -53,7 +52,7 @@ public class IniRealmFactory extends RealmFactory {
     }
 
     @Override
-    public Realm createRealm(Injector injector) {
+    public Realm createRealm() {
 
         Ini ini = new Ini();
 

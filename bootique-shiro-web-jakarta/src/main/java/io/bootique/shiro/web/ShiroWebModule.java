@@ -23,14 +23,12 @@ import io.bootique.BQModule;
 import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
-import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.MappedFilter;
 import io.bootique.shiro.ShiroConfigurator;
 import io.bootique.shiro.ShiroModule;
-import jakarta.servlet.Filter;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.mgt.RememberMeManager;
@@ -45,7 +43,6 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
 import javax.inject.Singleton;
-import java.util.Map;
 import java.util.Set;
 
 public class ShiroWebModule implements BQModule {
@@ -110,15 +107,10 @@ public class ShiroWebModule implements BQModule {
 
     @Singleton
     @Provides
-    MappedFilter<ShiroFilter> provideMappedShiroFilter(
-            ConfigurationFactory configFactory,
-            Injector injector,
-            WebSecurityManager securityManager,
-            @ShiroFilterBinding Map<String, Filter> chainFilters) {
-
+    MappedFilter<ShiroFilter> provideMappedShiroFilter(ConfigurationFactory configFactory) {
         return configFactory
                 .config(MappedShiroFilterFactory.class, CONFIG_PREFIX)
-                .createShiroFilter(injector, securityManager, chainFilters);
+                .create();
     }
 
     @Provides

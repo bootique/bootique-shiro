@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.config.PolymorphicConfiguration;
-import io.bootique.di.Injector;
 import io.bootique.jetty.MappedFilter;
 import jakarta.servlet.Filter;
 import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
@@ -33,6 +32,7 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -43,8 +43,19 @@ public class MappedShiroFilterFactory implements PolymorphicConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MappedShiroFilterFactory.class);
 
+    protected final WebSecurityManager securityManager;
+    protected final Map<String, Filter> chainFilters;
+
     private Map<String, String> urls;
     private Set<String> urlPatterns;
+
+    @Inject
+    public MappedShiroFilterFactory(
+            WebSecurityManager securityManager,
+            @ShiroFilterBinding Map<String, Filter> chainFilters) {
+        this.securityManager = securityManager;
+        this.chainFilters = chainFilters;
+    }
 
     @BQConfigProperty("A map of URL patterns to filter chain definitions. Names in the definitions must correspond"
             + " to the Shiro filter names mapped via DI. Corresponds to the [url] section in a traditional Shiro config."
@@ -59,13 +70,9 @@ public class MappedShiroFilterFactory implements PolymorphicConfiguration {
     }
 
     // passing injector for the sake of subclasses
-    public MappedFilter<ShiroFilter> createShiroFilter(
-            Injector injector,
-            WebSecurityManager securityManager,
-            Map<String, Filter> chainFilters) {
-
-        FilterChainResolver chainResolver = createChainResolver(chainFilters);
-        ShiroFilter shiroFilter = createShiroFilter(securityManager, chainResolver);
+    public MappedFilter<ShiroFilter> create() {
+        FilterChainResolver chainResolver = createChainResolver();
+        ShiroFilter shiroFilter = createShiroFilter(chainResolver);
         return createMappedShiroFilter(shiroFilter);
     }
 
@@ -74,11 +81,11 @@ public class MappedShiroFilterFactory implements PolymorphicConfiguration {
         return new MappedFilter<>(shiroFilter, urlPatterns, "bootiqueShiro", 0);
     }
 
-    protected ShiroFilter createShiroFilter(WebSecurityManager securityManager, FilterChainResolver chainResolver) {
+    protected ShiroFilter createShiroFilter(FilterChainResolver chainResolver) {
         return new ShiroFilter(securityManager, chainResolver);
     }
 
-    protected FilterChainResolver createChainResolver(Map<String, Filter> chainFilters) {
+    protected FilterChainResolver createChainResolver() {
         DefaultFilterChainManager chainManager = new DefaultFilterChainManager();
 
         // load filters

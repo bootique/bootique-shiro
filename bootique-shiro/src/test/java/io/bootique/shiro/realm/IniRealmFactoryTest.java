@@ -19,7 +19,6 @@
 
 package io.bootique.shiro.realm;
 
-import io.bootique.di.Injector;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.text.IniRealm;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 public class IniRealmFactoryTest {
 
@@ -38,7 +36,7 @@ public class IniRealmFactoryTest {
         factory.setRoles(Collections.singletonMap("r1", "p1, p2"));
         factory.setUsers(Collections.singletonMap("u1", "up, r1"));
 
-        IniRealm realm = (IniRealm) factory.createRealm(mock(Injector.class));
+        IniRealm realm = (IniRealm) factory.createRealm();
 
         assertEquals("xyz", realm.getName());
         assertNull(realm.getResourcePath());

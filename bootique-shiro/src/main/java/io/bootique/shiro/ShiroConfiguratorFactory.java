@@ -31,6 +31,7 @@ import org.apache.shiro.realm.Realm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -45,8 +46,15 @@ public class ShiroConfiguratorFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShiroConfiguratorFactory.class);
 
+    private final Set<Realm> diRealms;
+
     private List<RealmFactory> realms;
     private boolean sessionStorageDisabled;
+
+    @Inject
+    public ShiroConfiguratorFactory(Set<Realm> diRealms) {
+        this.diRealms = diRealms;
+    }
 
     @BQConfigProperty
     public void setRealms(List<RealmFactory> realms) {
@@ -59,19 +67,16 @@ public class ShiroConfiguratorFactory {
         this.sessionStorageDisabled = sessionStorageDisabled;
     }
 
-    public ShiroConfigurator createConfigurator(Injector injector, Set<Realm> diRealms) {
-        return new ShiroConfigurator(
-                createRealms(injector, diRealms),
-                sessionStorageDisabled
-        );
+    public ShiroConfigurator create() {
+        return new ShiroConfigurator(createRealms(), sessionStorageDisabled);
     }
 
-    protected List<Realm> createRealms(Injector injector, Set<Realm> diRealms) {
+    protected List<Realm> createRealms() {
         List<Realm> allRealms = new ArrayList<>();
-        loadConfiguredRealms(allRealms, injector);
+        loadConfiguredRealms(allRealms);
 
         if (allRealms.isEmpty()) {
-            loadDiRealms(allRealms, diRealms);
+            loadDiRealms(allRealms);
 
             // ignoring DI Realms if at least one config realm exists. This allows to fully override and/or order realms
             // without recompiling
@@ -89,13 +94,13 @@ public class ShiroConfiguratorFactory {
         return allRealms;
     }
 
-    void loadConfiguredRealms(List<Realm> collector, Injector injector) {
+    void loadConfiguredRealms(List<Realm> collector) {
         if (realms != null) {
-            realms.forEach(rf -> collector.add(rf.createRealm(injector)));
+            realms.forEach(rf -> collector.add(rf.createRealm()));
         }
     }
 
-    void loadDiRealms(List<Realm> collector, Set<Realm> diRealms) {
+    void loadDiRealms(List<Realm> collector) {
         collector.addAll(diRealms);
     }
 

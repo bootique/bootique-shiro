@@ -22,7 +22,6 @@ package io.bootique.shiro.realm;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
-import io.bootique.di.Injector;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import io.bootique.junit5.PolymorphicConfigurationChecker;
@@ -67,7 +66,7 @@ public class RealmFactoryInheritanceIT {
     public static class RealmFactory1 extends RealmFactory {
 
         @Override
-        public Realm createRealm(Injector injector) {
+        public Realm createRealm() {
             Realm realm = Mockito.mock(Realm.class);
             Mockito.when(realm.getName()).thenReturn("Created by RealmFactory1");
             return realm;
@@ -78,7 +77,7 @@ public class RealmFactoryInheritanceIT {
     public static class RealmFactory2 extends RealmFactory {
 
         @Override
-        public Realm createRealm(Injector injector) {
+        public Realm createRealm() {
             Realm realm = Mockito.mock(Realm.class);
             Mockito.when(realm.getName()).thenReturn("Created by RealmFactory2");
             return realm;

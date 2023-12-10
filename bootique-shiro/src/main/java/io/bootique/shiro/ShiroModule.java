@@ -23,7 +23,6 @@ import io.bootique.BQModule;
 import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
-import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.shiro.mdc.PrincipalMDC;
 import io.bootique.shiro.mgt.NoRememberMeManager;
@@ -31,7 +30,6 @@ import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.*;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
 
@@ -64,8 +62,8 @@ public class ShiroModule implements BQModule {
 
     @Provides
     @Singleton
-    ShiroConfigurator provideRealms(Injector injector, ConfigurationFactory configFactory, Set<Realm> diRealms) {
-        return configFactory.config(ShiroConfiguratorFactory.class, CONFIG_PREFIX).createConfigurator(injector, diRealms);
+    ShiroConfigurator provideRealms(ConfigurationFactory configFactory) {
+        return configFactory.config(ShiroConfiguratorFactory.class, CONFIG_PREFIX).create();
     }
 
     @Singleton

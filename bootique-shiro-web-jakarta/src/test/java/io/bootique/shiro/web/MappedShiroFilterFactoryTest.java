@@ -25,6 +25,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
+import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,10 +58,10 @@ public class MappedShiroFilterFactoryTest {
         filters.put("f1", mockFilter1);
         filters.put("f2", mockFilter2);
 
-        MappedShiroFilterFactory factory = new MappedShiroFilterFactory();
+        MappedShiroFilterFactory factory = new MappedShiroFilterFactory(mock(WebSecurityManager.class), filters);
         factory.setUrls(urls);
 
-        this.resolver = factory.createChainResolver(filters);
+        this.resolver = factory.createChainResolver();
         assertNotNull(resolver);
     }
 

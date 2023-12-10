@@ -22,7 +22,6 @@ package io.bootique.shiro.jdbc.realm;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.di.Injector;
 import io.bootique.jdbc.DataSourceFactory;
 import io.bootique.shiro.realm.RealmFactory;
 import org.apache.shiro.realm.Realm;
@@ -30,6 +29,7 @@ import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.util.Collection;
 
@@ -39,12 +39,19 @@ public class JdbcRealmFactory extends RealmFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcRealmFactory.class);
 
+    private final DataSourceFactory dataSourceFactory;
+
     private String datasource;
     private String authenticationQuery;
     private boolean lookupPermissions;
     private String permissionsQuery;
     private JdbcRealm.SaltStyle saltStyle;
     private String userRolesQuery;
+
+    @Inject
+    public JdbcRealmFactory(DataSourceFactory dataSourceFactory) {
+        this.dataSourceFactory = dataSourceFactory;
+    }
 
     @BQConfigProperty
     public void setDatasource(String datasource) {
@@ -80,9 +87,9 @@ public class JdbcRealmFactory extends RealmFactory {
     }
 
     @Override
-    public Realm createRealm(Injector injector) {
+    public Realm createRealm() {
 
-        DataSource ds = findDataSource(injector.getInstance(DataSourceFactory.class));
+        DataSource ds = findDataSource();
 
         JdbcRealm realm = new JdbcRealm();
 
@@ -112,19 +119,19 @@ public class JdbcRealmFactory extends RealmFactory {
         return realm;
     }
 
-    protected DataSource findDataSource(DataSourceFactory factory) {
+    protected DataSource findDataSource() {
         if (this.datasource == null) {
 
-            Collection<String> allNames = factory.allNames();
+            Collection<String> allNames = dataSourceFactory.allNames();
             if (allNames.size() == 1) {
                 String defaultName = allNames.iterator().next();
                 LOGGER.debug("No explicit DataSource name is set, using default '{}'", defaultName);
-                return factory.forName(defaultName);
+                return dataSourceFactory.forName(defaultName);
             }
 
             throw new IllegalStateException("No explicit DataSource name is set, and no default DataSource is defined");
         }
 
-        return factory.forName(datasource);
+        return dataSourceFactory.forName(datasource);
     }
 }

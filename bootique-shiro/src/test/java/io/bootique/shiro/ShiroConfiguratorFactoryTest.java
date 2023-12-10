@@ -19,14 +19,11 @@
 
 package io.bootique.shiro;
 
-import io.bootique.di.DIBootstrap;
-import io.bootique.di.Injector;
 import io.bootique.shiro.realm.RealmFactory;
 import org.apache.shiro.realm.Realm;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,9 +41,9 @@ public class ShiroConfiguratorFactoryTest {
 
         Set<Realm> diRealms = new HashSet<>(asList(r1, r2));
 
-        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory();
+        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory(diRealms);
 
-        ShiroConfigurator configurator = shiroConfiguratorFactory.createConfigurator(DIBootstrap.injectorBuilder().build(), diRealms);
+        ShiroConfigurator configurator = shiroConfiguratorFactory.create();
         assertNotNull(configurator);
         assertEquals(2, configurator.getRealms().size());
         assertTrue(configurator.getRealms().contains(r1));
@@ -55,23 +52,22 @@ public class ShiroConfiguratorFactoryTest {
 
     @Test
     public void createRealms_NoDi() {
-        Injector injector = DIBootstrap.injectorBuilder().build();
 
         Realm r1 = Mockito.mock(Realm.class);
         Realm r2 = Mockito.mock(Realm.class);
 
         RealmFactory rf1 = Mockito.mock(RealmFactory.class);
-        Mockito.when(rf1.createRealm(injector)).thenReturn(r1);
+        Mockito.when(rf1.createRealm()).thenReturn(r1);
 
         RealmFactory rf2 = Mockito.mock(RealmFactory.class);
-        Mockito.when(rf2.createRealm(injector)).thenReturn(r2);
+        Mockito.when(rf2.createRealm()).thenReturn(r2);
 
         List<RealmFactory> configFactories = asList(rf1, rf2);
 
-        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory();
+        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory(Set.of());
         shiroConfiguratorFactory.setRealms(configFactories);
 
-        ShiroConfigurator configurator = shiroConfiguratorFactory.createConfigurator(injector, Collections.emptySet());
+        ShiroConfigurator configurator = shiroConfiguratorFactory.create();
         assertNotNull(configurator);
         assertEquals(2, configurator.getRealms().size());
         assertEquals(r1, configurator.getRealms().get(0), "Realm ordering got lost");
@@ -80,7 +76,6 @@ public class ShiroConfiguratorFactoryTest {
 
     @Test
     public void createRealms_DiAndConfig() {
-        Injector injector = DIBootstrap.injectorBuilder().build();
 
         Realm rdi1 = Mockito.mock(Realm.class);
         Realm rdi2 = Mockito.mock(Realm.class);
@@ -91,17 +86,17 @@ public class ShiroConfiguratorFactoryTest {
         Realm r2 = Mockito.mock(Realm.class);
 
         RealmFactory rf1 = Mockito.mock(RealmFactory.class);
-        Mockito.when(rf1.createRealm(injector)).thenReturn(r1);
+        Mockito.when(rf1.createRealm()).thenReturn(r1);
 
         RealmFactory rf2 = Mockito.mock(RealmFactory.class);
-        Mockito.when(rf2.createRealm(injector)).thenReturn(r2);
+        Mockito.when(rf2.createRealm()).thenReturn(r2);
 
         List<RealmFactory> configFactories = asList(rf1, rf2);
 
-        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory();
+        ShiroConfiguratorFactory shiroConfiguratorFactory = new ShiroConfiguratorFactory(diRealms);
         shiroConfiguratorFactory.setRealms(configFactories);
 
-        ShiroConfigurator configurator = shiroConfiguratorFactory.createConfigurator(injector, diRealms);
+        ShiroConfigurator configurator = shiroConfiguratorFactory.create();
         assertNotNull(configurator);
         assertEquals(2, configurator.getRealms().size());
         assertEquals(r1, configurator.getRealms().get(0), "Wrong Realms or Realm ordering got lost");

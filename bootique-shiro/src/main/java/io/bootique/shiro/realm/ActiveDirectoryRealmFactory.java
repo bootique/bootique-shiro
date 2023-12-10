@@ -22,7 +22,6 @@ package io.bootique.shiro.realm;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.di.Injector;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.activedirectory.ActiveDirectoryRealm;
 
@@ -71,7 +70,7 @@ public class ActiveDirectoryRealmFactory extends RealmFactory {
     }
 
     @Override
-    public Realm createRealm(Injector injector) {
+    public Realm createRealm() {
 
         ActiveDirectoryRealm realm = new ActiveDirectoryRealm();
 
