@@ -78,19 +78,15 @@
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
                 <version>${shiro.version}</version>
-                <!-- Excluding duplicates... -->
+                <!-- Excluding things that are already in Bootique, Shiro "duplicates", and optional dependencies. -->
+                <!-- E.g. "commons-beanutils" doesn't seem useful in the context of Bootique, but there's a security issue -->
+                <!-- with the underlying commons-collections:3.2.2 -->
                 <exclusions>
                     <exclusion>
                         <groupId>*</groupId>
                         <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <!-- As a result of the Shiro exclusions above we need to add this one explicitly-->
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>1.9.4</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
