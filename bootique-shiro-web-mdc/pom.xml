@@ -38,7 +38,6 @@
             <groupId>io.bootique.shiro</groupId>
             <artifactId>bootique-shiro-web</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <!-- Unit test dependencies -->
