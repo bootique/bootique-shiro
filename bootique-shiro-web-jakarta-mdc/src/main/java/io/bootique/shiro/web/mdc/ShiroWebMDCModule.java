@@ -28,7 +28,7 @@ import io.bootique.shiro.ShiroModule;
 import io.bootique.shiro.mdc.PrincipalMDC;
 import io.bootique.shiro.web.ShiroWebModule;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 public class ShiroWebMDCModule implements BQModule {
 

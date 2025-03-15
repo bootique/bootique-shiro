@@ -33,7 +33,7 @@ import org.apache.shiro.mgt.*;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.Set;
 
 /**

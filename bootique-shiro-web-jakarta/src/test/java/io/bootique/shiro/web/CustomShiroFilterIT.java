@@ -35,7 +35,7 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;

@@ -42,7 +42,7 @@ import org.apache.shiro.web.mgt.DefaultWebSessionStorageEvaluator;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.Set;
 
 public class ShiroWebModule implements BQModule {

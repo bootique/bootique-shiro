@@ -43,7 +43,7 @@ import org.apache.shiro.web.mgt.DefaultWebSessionStorageEvaluator;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.servlet.Filter;
 import java.util.Map;
 import java.util.Set;

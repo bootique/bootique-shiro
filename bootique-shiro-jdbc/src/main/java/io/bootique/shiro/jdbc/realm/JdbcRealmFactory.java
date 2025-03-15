@@ -29,7 +29,7 @@ import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.sql.DataSource;
 import java.util.Collection;
 
