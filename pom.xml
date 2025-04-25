@@ -45,9 +45,6 @@
 
         <module>bootique-shiro-web</module>
         <module>bootique-shiro-web-mdc</module>
-
-        <module>bootique-shiro-web-jakarta</module>
-        <module>bootique-shiro-web-jakarta-mdc</module>
     </modules>
 
     <scm>

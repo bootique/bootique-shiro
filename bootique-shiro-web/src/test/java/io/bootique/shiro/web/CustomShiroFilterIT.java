@@ -28,11 +28,15 @@ import io.bootique.jetty.MappedFilter;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import io.bootique.shiro.ShiroModule;
+import jakarta.servlet.Filter;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import jakarta.inject.Inject;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 
@@ -58,8 +62,14 @@ public class CustomShiroFilterIT {
 
     @JsonTypeName("it")
     public static class CustomFactory extends MappedShiroFilterFactory {
+
+        @Inject
+        public CustomFactory(WebSecurityManager securityManager, @ShiroFilterBinding  Map<String, Filter> chainFilters) {
+            super(securityManager, chainFilters);
+        }
+
         @Override
-        protected ShiroFilter createShiroFilter(WebSecurityManager securityManager, FilterChainResolver chainResolver) {
+        protected ShiroFilter createShiroFilter(FilterChainResolver chainResolver) {
             return new CustomFilter(securityManager, chainResolver);
         }
     }

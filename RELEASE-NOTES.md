@@ -1,3 +1,7 @@
+## 4.0-M1
+
+*  #41 Remove deprecated modules (javax flavor)
+
 ## 3.0-M3
 
 * #39 (Jakarta migration) Deprecate "javax" based modules

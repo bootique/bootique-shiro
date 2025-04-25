@@ -23,7 +23,6 @@ import io.bootique.BQModule;
 import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
-import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.di.TypeLiteral;
 import io.bootique.jetty.JettyModule;
@@ -44,14 +43,8 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
 import jakarta.inject.Singleton;
-import javax.servlet.Filter;
-import java.util.Map;
 import java.util.Set;
 
-/**
- * @deprecated in favor of the Jakarta flavor
- */
-@Deprecated(since = "3.0", forRemoval = true)
 public class ShiroWebModule implements BQModule {
 
     private static final String CONFIG_PREFIX = "shiroweb";
@@ -63,7 +56,7 @@ public class ShiroWebModule implements BQModule {
     @Override
     public ModuleCrate crate() {
         return ModuleCrate.of(this)
-                .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta'.")
+                .description("Integrates Apache Shiro webapp extensions (security filters, etc.)")
                 .config(CONFIG_PREFIX, MappedShiroFilterFactory.class)
                 .overrides(ShiroModule.class)
                 .build();
@@ -114,15 +107,10 @@ public class ShiroWebModule implements BQModule {
 
     @Singleton
     @Provides
-    MappedFilter<ShiroFilter> provideMappedShiroFilter(
-            ConfigurationFactory configFactory,
-            Injector injector,
-            WebSecurityManager securityManager,
-            @ShiroFilterBinding Map<String, Filter> chainFilters) {
-
+    MappedFilter<ShiroFilter> provideMappedShiroFilter(ConfigurationFactory configFactory) {
         return configFactory
                 .config(MappedShiroFilterFactory.class, CONFIG_PREFIX)
-                .createShiroFilter(injector, securityManager, chainFilters);
+                .create();
     }
 
     @Provides

@@ -20,35 +20,23 @@
 package io.bootique.shiro.web.mdc;
 
 import io.bootique.shiro.mdc.PrincipalMDC;
+import jakarta.servlet.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import java.io.IOException;
 
 /**
  * A Shiro filter that initializes MDC state from the current Subject. It needs to be explicitly placed in the
  * authentication chain in the "shiroweb.urls" configuration under the name "mdc". This filter is optional and is only
  * needed in session-based apps that do not perform login on every request.
- * 
- * @deprecated in favor of the Jakarta flavor
  */
-@Deprecated(since = "3.0", forRemoval = true)
 public class SubjectMDCInitializer implements Filter {
 
-    private PrincipalMDC principalMDC;
+    private final PrincipalMDC principalMDC;
 
     public SubjectMDCInitializer(PrincipalMDC principalMDC) {
         this.principalMDC = principalMDC;
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) {
     }
 
     @Override

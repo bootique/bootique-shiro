@@ -21,23 +21,21 @@ package io.bootique.shiro.web.mdc;
 
 import io.bootique.jetty.request.RequestMDCItem;
 import io.bootique.shiro.mdc.PrincipalMDC;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequest;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.PrincipalCollection;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
 import java.util.Objects;
 
 /**
  * Resets principal MDC information at the end of the web request.
  *
  * @since 2.0
- * @deprecated in favor of the Jakarta flavor
  */
-@Deprecated(since = "3.0", forRemoval = true)
 public class ShiroWebPrincipalMDCItem implements RequestMDCItem, AuthenticationListener {
 
     private final PrincipalMDC principalMDC;

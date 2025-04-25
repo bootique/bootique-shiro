@@ -22,13 +22,9 @@ package io.bootique.shiro.web;
 import io.bootique.ModuleExtender;
 import io.bootique.di.Binder;
 import io.bootique.di.MapBuilder;
+import jakarta.servlet.Filter;
 
-import javax.servlet.Filter;
 
-/**
- * @deprecated in favor of the Jakarta flavor
- */
-@Deprecated(since = "3.0", forRemoval = true)
 public class ShiroWebModuleExtender extends ModuleExtender<ShiroWebModuleExtender> {
 
     public ShiroWebModuleExtender(Binder binder) {

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class ShiroWebModuleTest {
 
     @Test
-    public void autoLoadable() {
+    public void check() {
         BQModuleTester.of(ShiroWebMDCModule.class).testAutoLoadable().testConfig();
     }
 }

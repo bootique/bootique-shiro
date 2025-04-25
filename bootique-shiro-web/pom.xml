@@ -31,31 +31,34 @@
     <packaging>jar</packaging>
 
     <name>bootique-shiro-web: Bootique / Shiro Web Stack</name>
-    <description>Provides Apache Shiro integration with Bootique in servlet environment.</description>
+    <description>Provides Apache Shiro integration with Bootique in servlet environment</description>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
+                <classifier>jakarta</classifier>
                 <version>${shiro.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique.jetty</groupId>
-                <artifactId>bootique-jetty</artifactId>
+                <artifactId>bootique-jetty-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique.jersey</groupId>
-                <artifactId>bootique-jersey</artifactId>
+                <artifactId>bootique-jersey-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique.jetty</groupId>
-                <artifactId>bootique-jetty-junit5</artifactId>
+                <artifactId>bootique-jetty-jakarta-junit5</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
 
     <dependencies>
         <!-- Compile dependencies -->
@@ -67,14 +70,15 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
+            <classifier>jakarta</classifier>
+        </dependency>
+        <dependency>
+            <groupId>io.bootique.jetty</groupId>
+            <artifactId>bootique-jetty-jakarta</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.bootique.jetty</groupId>
-            <artifactId>bootique-jetty</artifactId>
         </dependency>
 
         <!-- Unit test dependencies -->
@@ -84,18 +88,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.bootique</groupId>
-            <artifactId>bootique-junit5</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.bootique.jetty</groupId>
-            <artifactId>bootique-jetty-junit5</artifactId>
+            <artifactId>bootique-jetty-jakarta-junit5</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.bootique.jersey</groupId>
-            <artifactId>bootique-jersey</artifactId>
+            <artifactId>bootique-jersey-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

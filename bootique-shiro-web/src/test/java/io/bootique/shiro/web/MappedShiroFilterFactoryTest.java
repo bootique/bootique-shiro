@@ -19,15 +19,16 @@
 
 package io.bootique.shiro.web;
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
+import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,10 +58,10 @@ public class MappedShiroFilterFactoryTest {
         filters.put("f1", mockFilter1);
         filters.put("f2", mockFilter2);
 
-        MappedShiroFilterFactory factory = new MappedShiroFilterFactory();
+        MappedShiroFilterFactory factory = new MappedShiroFilterFactory(mock(WebSecurityManager.class), filters);
         factory.setUrls(urls);
 
-        this.resolver = factory.createChainResolver(filters);
+        this.resolver = factory.createChainResolver();
         assertNotNull(resolver);
     }
 

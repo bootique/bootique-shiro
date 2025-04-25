@@ -19,8 +19,8 @@
 
 package io.bootique.shiro.web.mdc;
 
-import io.bootique.ModuleCrate;
 import io.bootique.BQModule;
+import io.bootique.ModuleCrate;
 import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.jetty.JettyModule;
@@ -30,16 +30,12 @@ import io.bootique.shiro.web.ShiroWebModule;
 
 import jakarta.inject.Singleton;
 
-/**
- * @deprecated in favor of the Jakarta flavor
- */
-@Deprecated(since = "3.0", forRemoval = true)
 public class ShiroWebMDCModule implements BQModule {
 
     @Override
     public ModuleCrate crate() {
         return ModuleCrate.of(this)
-                .description("Deprecated, can be replaced with 'bootique-shiro-web-jakarta-mdc'.")
+                .description("Integrates MDC logging of Apache Shiro subjects")
                 .build();
     }
 
