@@ -1,6 +1,7 @@
 ## 4.0-M1
 
-*  #41 Remove deprecated modules (javax flavor)
+* #41 Remove deprecated modules (javax flavor)
+* #42 Upgrade Shiro to 2.0.4
 
 ## 3.0-M3
 

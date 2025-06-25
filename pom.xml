@@ -36,7 +36,7 @@
     <description>Parent POM of Apache Shiro / Bootique integration modules.</description>
 
     <properties>
-        <shiro.version>1.13.0</shiro.version>
+        <shiro.version>2.0.4</shiro.version>
     </properties>
 
     <modules>
@@ -74,13 +74,13 @@
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
                 <version>${shiro.version}</version>
-                <!-- Excluding things that are already in Bootique, Shiro "duplicates", and optional dependencies. -->
-                <!-- E.g. "commons-beanutils" doesn't seem useful in the context of Bootique, but there's a security issue -->
-                <!-- with the underlying commons-collections:3.2.2 -->
                 <exclusions>
+                    <!-- This brings in commons-beanutils and commons-collections that we don't want.
+                    And it looks like the whole OGDL is not needed in Bootique
+                    -->
                     <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
+                        <groupId>org.apache.shiro</groupId>
+                        <artifactId>shiro-config-ogdl</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
