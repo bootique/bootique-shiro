@@ -9,7 +9,7 @@ import java.net.URL;
 @BQConfig("Configuration of Jwk provider")
 public class JwksProviderFactory {
 
-    private static final Duration DEFAULT_EXPIRES_IN = new Duration((100*356) + " days");
+    private static final Duration DEFAULT_EXPIRES_IN = new Duration((100*365) + " days");
 
     private ResourceFactory keyLocation;
     private Duration expiresIn;

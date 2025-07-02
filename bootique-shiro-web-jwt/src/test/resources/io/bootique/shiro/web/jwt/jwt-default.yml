@@ -21,5 +21,5 @@ shiroweb:
 shirowebjwt:
   jwk:
     keyLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
-    expiresIn: "20 sec"
+    expiresIn: "0 sec"
 
