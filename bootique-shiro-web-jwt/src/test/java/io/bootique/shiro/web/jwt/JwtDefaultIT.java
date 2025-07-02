@@ -37,4 +37,12 @@ public class JwtDefaultIT extends ShiroWebJwtModuleIT {
     JettyTester jetty() {
         return jetty;
     }
+
+    @Test
+    public void testNoRolesInToken() {
+        Map<String, ?> map = Map.of("noroles", "role1");
+        JettyTester.assertUnauthorized(getResponse("private-one", map));
+        JettyTester.assertUnauthorized(getResponse("private-two", map));
+        JettyTester.assertUnauthorized(getResponse("private-three", map));
+    }
 }

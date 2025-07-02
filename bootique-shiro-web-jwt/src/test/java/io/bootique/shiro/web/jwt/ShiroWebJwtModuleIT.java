@@ -81,11 +81,11 @@ public abstract class ShiroWebJwtModuleIT {
         JettyTester.assertUnauthorized(getResponse("private-one", map, 15));
     }
 
-    private Response getResponse(String resource, Map<String, ?> rolesClaim) {
+    protected Response getResponse(String resource, Map<String, ?> rolesClaim) {
         return getResponse(resource, rolesClaim, null);
     }
 
-    private Response getResponse(String resource, Map<String, ?> rolesClaim, Integer expirationSec) {
+    protected Response getResponse(String resource, Map<String, ?> rolesClaim, Integer expirationSec) {
         try {
             Date expiration = null;
             if (expirationSec != null) {
