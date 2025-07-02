@@ -1,6 +1,8 @@
 package io.bootique.shiro.web.jwt.token;
 
 import io.bootique.shiro.web.jwt.keys.JwksProvider;
+import io.bootique.shiro.web.jwt.token.claim.JwtClaim;
+import io.bootique.shiro.web.jwt.token.claim.StringListClaim;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.IOException;
 import io.jsonwebtoken.security.Jwk;
@@ -11,11 +13,14 @@ import java.util.List;
 public class JwtTokenProvider {
 
     private final JwksProvider jwkProvider;
-    private final JwtTokenClaim rolesClaim;
+    private JwtClaim<List<String>> rolesClaim;
 
-    JwtTokenProvider(JwksProvider jwkProvider,JwtTokenClaim roles) {
+    public JwtTokenProvider(JwksProvider jwkProvider) {
         this.jwkProvider = jwkProvider;
-        this.rolesClaim = roles;
+    }
+
+    public void setRolesClaim(StringListClaim claim) {
+        this.rolesClaim = claim;
     }
 
     private Jwt<?,?> getJwt(String token) throws IOException {
@@ -31,11 +36,7 @@ public class JwtTokenProvider {
 
     public JwtToken getJwtToken(String token) {
         JwtToken jwtToken = new JwtToken();
-        getJwt(token).accept(Jws.CLAIMS).getPayload().forEach((key, value) -> {
-            if (key.equals(rolesClaim.getName())) {
-                jwtToken.setRoles(rolesClaim.parse(value));
-            }
-        });
+        jwtToken.setRoles(rolesClaim.parse(getJwt(token).accept(Jws.CLAIMS).getPayload()));
         return jwtToken;
     }
 }

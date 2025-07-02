@@ -15,14 +15,11 @@
 shiroweb:
   urls:
     "/private-one" : "jwtBearer, roles[role1]"
-    "/private-two" : "jwtBearer, roles[\"role2\"]"
-    "/private-three" : "jwtBearer, roles[\"role3\"]"
+    "/private-two" : "jwtBearer, roles[role2]"
+    "/private-three" : "jwtBearer, roles[role3]"
 
 shirowebjwt:
-  provider:
-    jwk:
-      target: "classpath:io/bootique/shiro/web/jwt/jwks.json"
-    rolesClaim:
-      name: "roles"
-      regexp: "string:list"
-
+  jwk:
+    keyLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
+  rolesClaim:
+    name: "access.client.roles"
