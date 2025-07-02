@@ -1,12 +1,17 @@
 package io.bootique.shiro.web.jwt.auth;
 
 import io.bootique.shiro.web.jwt.token.JwtTokenProvider;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
+import org.apache.shiro.web.util.WebUtils;
+
+import java.io.IOException;
 
 
 public class ShiroJwtAuthFilter extends BearerHttpAuthenticationFilter {
@@ -17,11 +22,6 @@ public class ShiroJwtAuthFilter extends BearerHttpAuthenticationFilter {
         this.authenticator = authenticator;
     }
 
-    public boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-        request.setAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
-        return super.onPreHandle(request, response, mappedValue);
-    }
-
     @Override
     protected AuthenticationToken createToken(ServletRequest servletRequest,
                                               ServletResponse servletResponse) {
@@ -29,12 +29,13 @@ public class ShiroJwtAuthFilter extends BearerHttpAuthenticationFilter {
         return new ShiroJwtAuthToken(authenticator.getJwtToken(bearerToken.getPrincipal().toString()));
     }
 
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        if (!this.isLoginRequest(request, response)) {
-            throw new UnauthenticatedException("Request is not authenticated");
-        } else {
-            this.executeLogin(request, response);
-            return true;
+    @Override
+    protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
+        try {
+            return super.executeLogin(request, response);
+        } catch (JwtException e) {
+            WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            return false;
         }
     }
 }
