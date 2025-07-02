@@ -13,14 +13,11 @@ import java.util.List;
 public class JwtTokenProvider {
 
     private final JwksProvider jwkProvider;
-    private JwtClaim<List<String>> rolesClaim;
+    private JwtClaim<?,?> rolesClaim;
 
-    public JwtTokenProvider(JwksProvider jwkProvider) {
+    public JwtTokenProvider(JwksProvider jwkProvider, JwtClaim<?,?> rolesClaim) {
         this.jwkProvider = jwkProvider;
-    }
-
-    public void setRolesClaim(StringListClaim claim) {
-        this.rolesClaim = claim;
+        this.rolesClaim = rolesClaim;
     }
 
     private Jwt<?,?> getJwt(String token) throws IOException {
@@ -34,9 +31,8 @@ public class JwtTokenProvider {
         return Jwts.parser().keyLocator(keyLocator).build().parse(token);
     }
 
+    @SuppressWarnings("unchecked")
     public JwtToken getJwtToken(String token) {
-        JwtToken jwtToken = new JwtToken();
-        jwtToken.setRoles(rolesClaim.parse(getJwt(token).accept(Jws.CLAIMS).getPayload()));
-        return jwtToken;
+        return new JwtToken((List<String>) rolesClaim.parse(getJwt(token).accept(Jws.CLAIMS).getPayload()));
     }
 }

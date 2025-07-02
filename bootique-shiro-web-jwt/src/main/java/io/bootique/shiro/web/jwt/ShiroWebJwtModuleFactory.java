@@ -5,7 +5,6 @@ import io.bootique.annotation.BQConfigProperty;
 import io.bootique.shiro.web.jwt.keys.JwksProviderFactory;
 import io.bootique.shiro.web.jwt.token.claim.JwtTokenClaimFactory;
 import io.bootique.shiro.web.jwt.token.JwtTokenProvider;
-import io.bootique.shiro.web.jwt.token.claim.StringListClaim;
 
 @BQConfig("JWT Configuration")
 public class ShiroWebJwtModuleFactory {
@@ -43,8 +42,6 @@ public class ShiroWebJwtModuleFactory {
     }
 
     public JwtTokenProvider provideJwt() {
-        JwtTokenProvider tokenProvider = new JwtTokenProvider(getJwk().provideJwk());
-        tokenProvider.setRolesClaim((StringListClaim) getRolesClaim().provideClaim());
-        return tokenProvider;
+        return new JwtTokenProvider(getJwk().provideJwk(), getRolesClaim().provideClaim());
     }
 }

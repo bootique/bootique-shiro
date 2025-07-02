@@ -5,7 +5,7 @@ import io.jsonwebtoken.io.IOException;
 
 import java.util.Map;
 
-public abstract class JwtClaim<T> {
+public abstract class JwtClaim<T,V> {
 
     private final String name;
 
@@ -17,16 +17,17 @@ public abstract class JwtClaim<T> {
         return this.name;
     }
 
+    @SuppressWarnings("unchecked")
     public final T parse(Claims claims) {
         String[] path = path();
         Object value = claims.get(path[0]);
         if (path.length == 1) {
-            return parseValue(value);
+            return parseValue((V) value);
         }
         int i = 0;
         while (i < path.length) {
             if (i == path.length - 1) {
-                return parseValue(value);
+                return parseValue((V) value);
             } else {
                 if (value instanceof Map) {
                     value = ((Map<?,?>) value).get(path[i + 1]);
@@ -39,7 +40,7 @@ public abstract class JwtClaim<T> {
         return emptyValue();
     }
 
-    protected abstract T parseValue(Object claimValue);
+    protected abstract T parseValue(V claimValue);
 
     protected abstract T emptyValue();
 

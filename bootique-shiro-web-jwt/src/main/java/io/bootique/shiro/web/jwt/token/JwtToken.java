@@ -7,13 +7,13 @@ import java.util.Set;
 
 public class JwtToken {
 
-    private Set<String> roles;
+    private final Set<String> roles;
 
-    public Set<String> getRoles() {
-        return roles == null ? Collections.emptySet() : roles;
+    public JwtToken(List<String> roles) {
+        this.roles = roles == null ? Collections.emptySet() : new HashSet<>(roles);
     }
 
-    void setRoles(List<String> roles) {
-        this.roles = new HashSet<>(roles);
+    public Set<String> getRoles() {
+        return roles;
     }
 }

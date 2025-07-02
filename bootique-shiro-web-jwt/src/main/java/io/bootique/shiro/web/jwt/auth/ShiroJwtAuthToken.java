@@ -1,6 +1,7 @@
 package io.bootique.shiro.web.jwt.auth;
 
 import io.bootique.shiro.web.jwt.token.JwtToken;
+import io.jsonwebtoken.lang.Collections;
 import org.apache.shiro.authc.AuthenticationToken;
 
 public class ShiroJwtAuthToken implements AuthenticationToken {
@@ -16,6 +17,6 @@ public class ShiroJwtAuthToken implements AuthenticationToken {
     }
 
     public Object getCredentials() {
-        return this.token.getRoles();
+        return Collections.emptySet();
     }
 }
