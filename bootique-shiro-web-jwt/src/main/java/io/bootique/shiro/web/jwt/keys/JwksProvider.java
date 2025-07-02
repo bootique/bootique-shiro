@@ -44,8 +44,7 @@ public class JwksProvider {
     }
 
     public Map<Object, Jwk<?>> getJwks() throws IOException {
-        if (jwks.isEmpty() || (expiresIn != null &&
-                LocalDateTime.now().isAfter(LocalDateTime.from(loadTime).plusSeconds(expiresIn.getDuration().toSeconds())))) {
+        if (jwks.isEmpty() || LocalDateTime.now().isAfter(LocalDateTime.from(loadTime).plusSeconds(expiresIn.getDuration().toSeconds()))) {
             refresh();
         }
         return this.jwks;
