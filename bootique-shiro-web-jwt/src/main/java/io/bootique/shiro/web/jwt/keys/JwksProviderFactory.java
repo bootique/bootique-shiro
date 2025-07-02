@@ -12,11 +12,12 @@ public class JwksProviderFactory {
     private ResourceFactory keyLocation;
     private Duration expiresIn;
 
-    @BQConfigProperty("Jwks keys target")
+    @BQConfigProperty("Jwks keys key localtion")
     public void setKeyLocation(ResourceFactory keyLocation) {
         this.keyLocation = keyLocation;
     }
 
+    @BQConfigProperty("Expiration interval when jwks must be reloaded")
     public void setExpiresIn(Duration expiresIn) {
         this.expiresIn = expiresIn;
     }

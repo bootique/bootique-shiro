@@ -25,7 +25,7 @@ public class JwtTokenClaimFactory implements PolymorphicConfiguration {
         return name;
     }
 
-    public JwtClaim<?> provideClaim() {
+    public JwtClaim<?,?> provideClaim() {
         return new StringListClaim(getName());
     }
 }
