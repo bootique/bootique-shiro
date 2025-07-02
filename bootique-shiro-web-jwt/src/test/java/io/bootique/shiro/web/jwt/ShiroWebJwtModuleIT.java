@@ -5,6 +5,7 @@ import io.bootique.Bootique;
 import io.bootique.jersey.JerseyModule;
 import io.bootique.jetty.junit5.JettyTester;
 import io.bootique.junit5.BQTest;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.ws.rs.GET;
@@ -74,12 +75,29 @@ public abstract class ShiroWebJwtModuleIT {
         JettyTester.assertOk(getResponse("private-three", map)).assertContent("private-three");
     }
 
+    @Test
+    public void testExpiration() {
+        Map<String, ?> map = rolesMap("role1");
+        JettyTester.assertUnauthorized(getResponse("private-one", map, 15));
+    }
+
     private Response getResponse(String resource, Map<String, ?> rolesClaim) {
+        return getResponse(resource, rolesClaim, null);
+    }
+
+    private Response getResponse(String resource, Map<String, ?> rolesClaim, Integer expirationSec) {
         try {
+            Date expiration = null;
+            if (expirationSec != null) {
+                Calendar c = Calendar.getInstance();
+                c.add(Calendar.SECOND, -expirationSec);
+                expiration = c.getTime();
+            }
+            String token = TokenGenerator.token(rolesClaim, expiration);
             return jetty().getTarget()
                     .path("/" + resource)
                     .request()
-                    .header(HttpHeaders.AUTHORIZATION, TokenGenerator.token(rolesClaim))
+                    .header(HttpHeaders.AUTHORIZATION, token)
                     .get();
         } catch (Exception e) {
             Assertions.fail(e);
@@ -118,6 +136,10 @@ public abstract class ShiroWebJwtModuleIT {
     static class TokenGenerator {
 
         static String token(Map<String, ?> rolesClaim) throws Exception {
+            return token(rolesClaim, null);
+        }
+
+        static String token(Map<String, ?> rolesClaim, Date expiration) throws Exception {
 
             String key = Files.readString(Paths.get(ClassLoader.getSystemResource("io/bootique/shiro/web/jwt/jwks-private-key.pem").toURI()));
             String privateKeyPEM = key
@@ -130,7 +152,19 @@ public abstract class ShiroWebJwtModuleIT {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-            return "Bearer " + Jwts.builder().header().add("kid", "xGpTsw0DJs0vbe5CEcKMl5oZc7nKzAC9sF7kx1nQu1I").and().claims(rolesClaim).signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            return build(privateKey, rolesClaim, expiration);
+        }
+
+        private static String build(PrivateKey privateKey, Map<String, ?> rolesClaim, Date expiration) {
+            JwtBuilder builder = Jwts.builder()
+                    .header().add("kid", "xGpTsw0DJs0vbe5CEcKMl5oZc7nKzAC9sF7kx1nQu1I")
+                    .and()
+                    .claims(rolesClaim).signWith(SignatureAlgorithm.RS256, privateKey);
+            if (expiration != null) {
+                builder = builder.expiration(expiration);
+            }
+            return "Bearer " + builder.compact();
+
         }
     }
 }
