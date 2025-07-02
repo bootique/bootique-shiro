@@ -2,7 +2,6 @@ package io.bootique.shiro.web.jwt.token;
 
 import io.bootique.shiro.web.jwt.keys.JwksProvider;
 import io.bootique.shiro.web.jwt.token.claim.JwtClaim;
-import io.bootique.shiro.web.jwt.token.claim.StringListClaim;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.IOException;
 import io.jsonwebtoken.security.Jwk;
@@ -13,7 +12,7 @@ import java.util.List;
 public class JwtTokenProvider {
 
     private final JwksProvider jwkProvider;
-    private JwtClaim<?,?> rolesClaim;
+    private final JwtClaim<?,?> rolesClaim;
 
     public JwtTokenProvider(JwksProvider jwkProvider, JwtClaim<?,?> rolesClaim) {
         this.jwkProvider = jwkProvider;

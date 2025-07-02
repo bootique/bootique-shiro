@@ -32,7 +32,7 @@ public class JwksProvider {
     }
 
     private synchronized void refresh() throws IOException {
-        LOGGER.info("Loading jwks from " + location.toString() + "...");
+        LOGGER.info("Loading jwks from " + location + "...");
         try (InputStream is = this.location.openStream()) {
             this.jwks.clear();
             Jwks.setParser().build().parse(is).getKeys().forEach(k -> jwks.put(k.getId(), k));
@@ -40,7 +40,7 @@ public class JwksProvider {
         } catch (Exception e) {
             throw new IOException("Unable to load jwks", e);
         }
-        LOGGER.info("Jwks has been loaded from " + location.toString() + " at " + loadTime);
+        LOGGER.info("Jwks has been loaded from " + location + " at " + loadTime);
     }
 
     public Map<Object, Jwk<?>> getJwks() throws IOException {

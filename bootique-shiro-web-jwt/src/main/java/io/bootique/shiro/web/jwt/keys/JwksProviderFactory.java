@@ -14,7 +14,7 @@ public class JwksProviderFactory {
     private ResourceFactory keyLocation;
     private Duration expiresIn;
 
-    @BQConfigProperty("Jwks keys key localtion")
+    @BQConfigProperty("Jwks keys key location")
     public void setKeyLocation(ResourceFactory keyLocation) {
         this.keyLocation = keyLocation;
     }

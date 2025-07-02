@@ -6,12 +6,8 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authz.UnauthenticatedException;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
-
-import java.io.IOException;
 
 
 public class ShiroJwtAuthFilter extends BearerHttpAuthenticationFilter {
