@@ -9,26 +9,26 @@ import java.net.URL;
 @BQConfig("Configuration of Jwk provider")
 public class JwksProviderFactory {
 
-    private ResourceFactory target;
+    private ResourceFactory keyLocation;
     private Duration expiresIn;
 
     @BQConfigProperty("Jwks keys target")
-    public void setTarget(ResourceFactory target) {
-        this.target = target;
+    public void setKeyLocation(ResourceFactory keyLocation) {
+        this.keyLocation = keyLocation;
     }
 
     public void setExpiresIn(Duration expiresIn) {
         this.expiresIn = expiresIn;
     }
 
-    private URL getTarget() {
-        if (this.target == null) {
-            throw new IllegalStateException("Jwks target is not defined");
+    private URL getKeyLocation() {
+        if (this.keyLocation == null) {
+            throw new IllegalStateException("Jwks key location is not defined");
         }
-        return target.getUrl();
+        return keyLocation.getUrl();
     }
 
     public JwksProvider provideJwk() {
-        return new JwksProvider(getTarget(), this.expiresIn);
+        return new JwksProvider(getKeyLocation(), this.expiresIn);
     }
 }

@@ -2,23 +2,49 @@ package io.bootique.shiro.web.jwt;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.shiro.web.jwt.keys.JwksProviderFactory;
+import io.bootique.shiro.web.jwt.token.claim.JwtTokenClaimFactory;
 import io.bootique.shiro.web.jwt.token.JwtTokenProvider;
-import io.bootique.shiro.web.jwt.token.JwtTokenProviderFactory;
+import io.bootique.shiro.web.jwt.token.claim.StringListClaim;
 
 @BQConfig("JWT Configuration")
 public class ShiroWebJwtModuleFactory {
 
-    private JwtTokenProviderFactory provider;
+    private static final JwtTokenClaimFactory DEFAULT_ROLES_CLAIM;
 
-    @BQConfigProperty("JWT Token Provider Configuration")
-    public void setProvider(JwtTokenProviderFactory provider) {
-        this.provider = provider;
+    static {
+        DEFAULT_ROLES_CLAIM = new JwtTokenClaimFactory();
+        DEFAULT_ROLES_CLAIM.setName("roles");
+    }
+
+    private JwksProviderFactory jwk;
+
+    private JwtTokenClaimFactory rolesClaim;
+
+    @BQConfigProperty("JWK Configuration")
+    public void setJwk(JwksProviderFactory jwk) {
+        this.jwk = jwk;
+    }
+
+    @BQConfigProperty("JWT Token roles claim")
+    public void setRolesClaim(JwtTokenClaimFactory rolesClaim) {
+        this.rolesClaim = rolesClaim;
+    }
+
+    private JwksProviderFactory getJwk() {
+        if (jwk == null) {
+            throw new IllegalStateException("Jwk configuration is not defined");
+        }
+        return jwk;
+    }
+
+    private JwtTokenClaimFactory getRolesClaim() {
+        return rolesClaim == null ? DEFAULT_ROLES_CLAIM : rolesClaim;
     }
 
     public JwtTokenProvider provideJwt() {
-        if (provider == null) {
-            throw new IllegalStateException("JWT Token Provider configuration is not defined");
-        }
-        return provider.provideJwt();
+        JwtTokenProvider tokenProvider = new JwtTokenProvider(getJwk().provideJwk());
+        tokenProvider.setRolesClaim((StringListClaim) getRolesClaim().provideClaim());
+        return tokenProvider;
     }
 }

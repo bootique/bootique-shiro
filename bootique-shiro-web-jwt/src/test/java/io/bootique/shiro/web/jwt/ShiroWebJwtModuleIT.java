@@ -4,9 +4,7 @@ import io.bootique.BQRuntime;
 import io.bootique.Bootique;
 import io.bootique.jersey.JerseyModule;
 import io.bootique.jetty.junit5.JettyTester;
-import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
-import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.ws.rs.GET;
@@ -24,55 +22,65 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 
 @BQTest
-public class ShiroWebJwtModuleIT {
+public abstract class ShiroWebJwtModuleIT {
 
-    private static final JettyTester jetty = JettyTester.create();
+    static BQRuntime getApp(JettyTester jetty, String ymlConfig) {
+        return Bootique
+                .app("-c", ymlConfig, "-s")
+                .module(jetty.moduleReplacingConnectors())
+                .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
+                .autoLoadModules()
+                .createRuntime();
+    }
 
-    @BQApp
-    static final BQRuntime app = Bootique
-            .app("-c", "classpath:io/bootique/shiro/web/jwt/ShiroWebJwtModuleIT.yml", "-s")
-            .module(jetty.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
-            .autoLoadModules()
-            .createRuntime();
+    abstract Map<String, ?> rolesMap(String... roles);
+
+    abstract JettyTester jetty();
 
     @Test
     public void testPublicAccess() {
-        JettyTester.assertOk(getResponse("public", Collections.emptyList())).assertContent("public");
+        JettyTester.assertOk(getResponse("public", Collections.emptyMap())).assertContent("public");
     }
 
     @Test
     public void testRole1() {
-        List<String> roles = List.of("role1");
-        JettyTester.assertOk(getResponse("private-one", roles)).assertContent("private-one");
-        JettyTester.assertUnauthorized(getResponse("private-two", roles));
-        JettyTester.assertUnauthorized(getResponse("private-three", roles));
+        Map<String, ?> map = rolesMap("role1");
+        JettyTester.assertOk(getResponse("private-one", map)).assertContent("private-one");
+        JettyTester.assertUnauthorized(getResponse("private-two", map));
+        JettyTester.assertUnauthorized(getResponse("private-three", map));
     }
 
     @Test
     public void testRole2() {
-        List<String> roles = List.of("role2");
-        JettyTester.assertUnauthorized(getResponse("private-one", roles));
-        JettyTester.assertOk(getResponse("private-two", roles)).assertContent("private-two");
-        JettyTester.assertUnauthorized(getResponse("private-three", roles));
+        Map<String, ?> map = rolesMap("role2");
+        JettyTester.assertUnauthorized(getResponse("private-one", map));
+        JettyTester.assertOk(getResponse("private-two", map)).assertContent("private-two");
+        JettyTester.assertUnauthorized(getResponse("private-three", map));
     }
 
     @Test
     public void testRole3() {
-        List<String> roles = List.of("role3");
-        JettyTester.assertUnauthorized(getResponse("private-one", roles));
-        JettyTester.assertUnauthorized(getResponse("private-two", roles));
-        JettyTester.assertOk(getResponse("private-three", roles)).assertContent("private-three");
+        Map<String, ?> map = rolesMap("role3");
+        JettyTester.assertUnauthorized(getResponse("private-one", map));
+        JettyTester.assertUnauthorized(getResponse("private-two", map));
+        JettyTester.assertOk(getResponse("private-three", map)).assertContent("private-three");
     }
 
-    private Response getResponse(String resource, List<String> roles) {
+    @Test
+    public void testRole1And3() {
+        Map<String, ?> map = rolesMap("role1", "role3");
+        JettyTester.assertOk(getResponse("private-one", map)).assertContent("private-one");
+        JettyTester.assertUnauthorized(getResponse("private-two", map));
+        JettyTester.assertOk(getResponse("private-three", map)).assertContent("private-three");
+    }
+
+    private Response getResponse(String resource, Map<String, ?> rolesClaim) {
         try {
-            Response r = jetty.getTarget()
+            return jetty().getTarget()
                     .path("/" + resource)
                     .request()
-                    .header(HttpHeaders.AUTHORIZATION, TokenGenerator.token(roles))
+                    .header(HttpHeaders.AUTHORIZATION, TokenGenerator.token(rolesClaim))
                     .get();
-            return r;
         } catch (Exception e) {
             Assertions.fail(e);
         }
@@ -109,8 +117,7 @@ public class ShiroWebJwtModuleIT {
 
     static class TokenGenerator {
 
-        static String token(List<String> roles) throws Exception {
-            Map<String, List<String>> map = Map.of("roles", roles);
+        static String token(Map<String, ?> rolesClaim) throws Exception {
 
             String key = Files.readString(Paths.get(ClassLoader.getSystemResource("io/bootique/shiro/web/jwt/jwks-private-key.pem").toURI()));
             String privateKeyPEM = key
@@ -123,8 +130,7 @@ public class ShiroWebJwtModuleIT {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-            Header kidHeader = Jwts.header().build();
-            return "Bearer " + Jwts.builder().header().add("kid", "xGpTsw0DJs0vbe5CEcKMl5oZc7nKzAC9sF7kx1nQu1I").and().claims(map).signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            return "Bearer " + Jwts.builder().header().add("kid", "xGpTsw0DJs0vbe5CEcKMl5oZc7nKzAC9sF7kx1nQu1I").and().claims(rolesClaim).signWith(SignatureAlgorithm.RS256, privateKey).compact();
         }
     }
 }
