@@ -1,0 +1,2 @@
+io.bootique.shiro.web.jwt.SpaceSeparatedClaimFactory
+io.bootique.shiro.web.jwt.CommaSeparatedClaimFactory
