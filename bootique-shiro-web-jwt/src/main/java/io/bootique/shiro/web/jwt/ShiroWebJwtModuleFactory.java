@@ -6,7 +6,7 @@ import io.bootique.resource.ResourceFactory;
 import io.bootique.shiro.web.jwt.jjwt.JwtParserMaker;
 import io.bootique.shiro.web.jwt.realm.AuthzReaderFactory;
 import io.bootique.shiro.web.jwt.realm.JsonListAuthzReaderFactory;
-import io.bootique.shiro.web.jwt.realm.ShiroJwtAuthRealm;
+import io.bootique.shiro.web.jwt.realm.JwtRealm;
 import io.bootique.value.Duration;
 import io.jsonwebtoken.JwtParser;
 
@@ -47,8 +47,8 @@ public class ShiroWebJwtModuleFactory {
         return JwtParserMaker.createParser(getJwkLocation(), getJwkExpiresIn());
     }
 
-    public ShiroJwtAuthRealm createRealm() {
-        return new ShiroJwtAuthRealm(getRoles().createReader());
+    public JwtRealm createRealm() {
+        return new JwtRealm(getRoles().createReader());
     }
 
     private AuthzReaderFactory getRoles() {

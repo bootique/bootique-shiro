@@ -14,11 +14,11 @@ import org.apache.shiro.subject.PrincipalCollection;
 /**
  * @since 4.0
  */
-public class ShiroJwtAuthRealm extends AuthorizingRealm {
+public class JwtRealm extends AuthorizingRealm {
 
     private final AuthzReader rolesReader;
 
-    public ShiroJwtAuthRealm(AuthzReader rolesReader) {
+    public JwtRealm(AuthzReader rolesReader) {
         this.setAuthenticationTokenClass(JwtBearerToken.class);
         this.rolesReader = rolesReader;
     }
@@ -38,6 +38,6 @@ public class ShiroJwtAuthRealm extends AuthorizingRealm {
         return new SimpleAuthenticationInfo(
                 authenticationToken.getPrincipal(),
                 authenticationToken.getCredentials(),
-                ShiroJwtAuthRealm.class.getSimpleName());
+                JwtRealm.class.getSimpleName());
     }
 }

@@ -27,7 +27,7 @@ import io.bootique.di.Provides;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.shiro.web.ShiroWebModule;
 import io.bootique.shiro.web.jwt.filter.JwtBearerFilter;
-import io.bootique.shiro.web.jwt.realm.ShiroJwtAuthRealm;
+import io.bootique.shiro.web.jwt.realm.JwtRealm;
 import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
@@ -51,7 +51,7 @@ public class ShiroWebJwtModule implements BQModule {
     @Override
     public void configure(Binder binder) {
         ShiroWebModule.extend(binder).setFilter(JWT_BEARER_FILTER_IDENTIFIER, JwtBearerFilter.class);
-        ShiroModule.extend(binder).addRealm(ShiroJwtAuthRealm.class);
+        ShiroModule.extend(binder).addRealm(JwtRealm.class);
     }
 
     @Provides
@@ -62,7 +62,7 @@ public class ShiroWebJwtModule implements BQModule {
 
     @Provides
     @Singleton
-    public ShiroJwtAuthRealm provideRealm(ConfigurationFactory configFactory) {
+    public JwtRealm provideRealm(ConfigurationFactory configFactory) {
         return configFactory.config(ShiroWebJwtModuleFactory.class, CONFIG_PREFIX).createRealm();
     }
 
