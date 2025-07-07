@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-class NamedClaimReader implements AuthzReader {
+public class NamedClaimReader implements AuthzReader {
 
     private final String claim;
     private final Function<Object, List<String>> parser;
