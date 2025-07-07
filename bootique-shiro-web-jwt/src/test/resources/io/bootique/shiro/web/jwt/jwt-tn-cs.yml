@@ -22,5 +22,5 @@ shirowebjwt:
   jwk:
     keyLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
   rolesClaim:
-    type: "cs"
+    type: "tn-cs"
     name: "access.client.roles"

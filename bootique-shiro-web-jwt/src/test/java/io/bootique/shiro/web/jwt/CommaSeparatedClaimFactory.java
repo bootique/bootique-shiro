@@ -5,7 +5,6 @@ import io.bootique.shiro.web.jwt.token.claim.JwtClaim;
 import io.bootique.shiro.web.jwt.token.claim.JwtTokenClaimFactory;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @JsonTypeName("cs")
@@ -13,22 +12,17 @@ public class CommaSeparatedClaimFactory extends JwtTokenClaimFactory {
 
     @Override
     public JwtClaim<?,?> provideClaim() {
-        return new SpaceSeparatedClaim(getName());
+        return new CommaSeparatedClaim(getName());
     }
 
-    static class SpaceSeparatedClaim extends JwtClaim<List<String>, String> {
-        public SpaceSeparatedClaim(String name) {
+    static class CommaSeparatedClaim extends JwtClaim<List<String>, String> {
+        public CommaSeparatedClaim(String name) {
             super(name);
         }
 
         @Override
         protected List<String> parseValue(String claimValue) {
-                return Arrays.asList(claimValue.split(","));
-            }
-
-        @Override
-        protected List<String> emptyValue() {
-            return Collections.emptyList();
+            return Arrays.asList(claimValue.split(","));
         }
     }
 }
