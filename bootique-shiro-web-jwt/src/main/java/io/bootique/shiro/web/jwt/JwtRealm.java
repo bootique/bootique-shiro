@@ -20,7 +20,6 @@ package io.bootique.shiro.web.jwt;
 
 import io.bootique.shiro.web.jwt.authz.AuthzReader;
 import io.jsonwebtoken.Claims;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -42,20 +41,19 @@ public class JwtRealm extends AuthorizingRealm {
     }
 
     @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        principalCollection
+        principals
                 .byType(Claims.class)
                 .forEach(c -> authorizationInfo.addRoles(rolesReader.readAuthz(c)));
         return authorizationInfo;
     }
 
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken)
-            throws AuthenticationException {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
         return new SimpleAuthenticationInfo(
-                authenticationToken.getPrincipal(),
-                authenticationToken.getCredentials(),
+                token.getPrincipal(),
+                token.getCredentials(),
                 JwtRealm.class.getSimpleName());
     }
 }
