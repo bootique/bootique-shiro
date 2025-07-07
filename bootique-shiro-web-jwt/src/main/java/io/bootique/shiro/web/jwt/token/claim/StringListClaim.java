@@ -11,6 +11,6 @@ public class StringListClaim extends JwtClaim<List<String>, List<String>> {
 
     @Override
     protected List<String> parseValue(List<String> claimValue) {
-        return claimValue;
+        return claimValue == null ? Collections.emptyList() : claimValue;
     }
 }

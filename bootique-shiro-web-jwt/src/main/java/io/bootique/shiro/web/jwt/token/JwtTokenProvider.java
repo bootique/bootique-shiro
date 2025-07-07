@@ -32,6 +32,8 @@ public class JwtTokenProvider {
 
     @SuppressWarnings("unchecked")
     public JwtToken getJwtToken(String token) {
-        return new JwtToken((List<String>) rolesClaim.parse(getJwt(token).accept(Jws.CLAIMS).getPayload()));
+        Claims claims = getJwt(token).accept(Jws.CLAIMS).getPayload();
+        List<String> roles = (List<String>) rolesClaim.parse(claims);
+        return new JwtToken(roles);
     }
 }

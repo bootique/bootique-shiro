@@ -35,8 +35,12 @@ public class ShiroWebJwtModuleIT {
             .autoLoadModules()
             .createRuntime();
 
-    private Map<String, ?> rolesMap(String... roles) {
-        return Map.of("roles", Arrays.asList(roles));
+    private Map<String, ?> rolesMap(String claimName, List<String> roles) {
+        return Map.of(claimName, roles);
+    }
+
+    private Map<String, ?> rolesMap(List<String> roles) {
+        return Map.of("roles", roles);
     }
 
     @Test
@@ -46,7 +50,7 @@ public class ShiroWebJwtModuleIT {
 
     @Test
     public void testRole1() {
-        Map<String, ?> map = rolesMap("role1");
+        Map<String, ?> map = rolesMap(List.of("role1"));
         JettyTester.assertOk(getResponse("private-one", map)).assertContent("private-one");
         JettyTester.assertUnauthorized(getResponse("private-two", map));
         JettyTester.assertUnauthorized(getResponse("private-three", map));
@@ -54,7 +58,7 @@ public class ShiroWebJwtModuleIT {
 
     @Test
     public void testRole2() {
-        Map<String, ?> map = rolesMap("role2");
+        Map<String, ?> map = rolesMap(List.of("role2"));
         JettyTester.assertUnauthorized(getResponse("private-one", map));
         JettyTester.assertOk(getResponse("private-two", map)).assertContent("private-two");
         JettyTester.assertUnauthorized(getResponse("private-three", map));
@@ -62,7 +66,7 @@ public class ShiroWebJwtModuleIT {
 
     @Test
     public void testRole3() {
-        Map<String, ?> map = rolesMap("role3");
+        Map<String, ?> map = rolesMap(List.of("role3"));
         JettyTester.assertUnauthorized(getResponse("private-one", map));
         JettyTester.assertUnauthorized(getResponse("private-two", map));
         JettyTester.assertOk(getResponse("private-three", map)).assertContent("private-three");
@@ -70,7 +74,7 @@ public class ShiroWebJwtModuleIT {
 
     @Test
     public void testRole1And3() {
-        Map<String, ?> map = rolesMap("role1", "role3");
+        Map<String, ?> map = rolesMap(List.of("role1", "role3"));
         JettyTester.assertOk(getResponse("private-one", map)).assertContent("private-one");
         JettyTester.assertUnauthorized(getResponse("private-two", map));
         JettyTester.assertOk(getResponse("private-three", map)).assertContent("private-three");
@@ -78,8 +82,16 @@ public class ShiroWebJwtModuleIT {
 
     @Test
     public void testExpiration() {
-        Map<String, ?> map = rolesMap("role1");
+        Map<String, ?> map = rolesMap(List.of("role1"));
         JettyTester.assertUnauthorized(getResponse("private-one", map, 15));
+    }
+
+    @Test
+    public void testWithoutRolesClaim() {
+        Map<String, ?> map = rolesMap("no-roles", List.of("role1"));
+        JettyTester.assertUnauthorized(getResponse("private-one", map));
+        JettyTester.assertUnauthorized(getResponse("private-two", map));
+        JettyTester.assertUnauthorized(getResponse("private-three", map));
     }
 
     protected Response getResponse(String resource, Map<String, ?> rolesClaim) {
