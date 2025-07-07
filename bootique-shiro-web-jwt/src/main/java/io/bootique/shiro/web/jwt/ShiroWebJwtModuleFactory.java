@@ -2,17 +2,15 @@ package io.bootique.shiro.web.jwt;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.shiro.web.jwt.jjwt.JwksManager;
-import io.bootique.shiro.web.jwt.realm.ShiroJwtAuthRealm;
-import io.bootique.shiro.web.jwt.jjwt.JwksManagerFactory;
+import io.bootique.resource.ResourceFactory;
+import io.bootique.shiro.web.jwt.jjwt.JwtParserMaker;
 import io.bootique.shiro.web.jwt.realm.AuthzReaderFactory;
 import io.bootique.shiro.web.jwt.realm.JsonListAuthzReaderFactory;
-import io.jsonwebtoken.Header;
+import io.bootique.shiro.web.jwt.realm.ShiroJwtAuthRealm;
+import io.bootique.value.Duration;
 import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Jwk;
 
-import java.security.Key;
+import java.net.URL;
 import java.util.Objects;
 
 /**
@@ -21,42 +19,47 @@ import java.util.Objects;
 @BQConfig("JWT Configuration")
 public class ShiroWebJwtModuleFactory {
 
-    private JwksManagerFactory jwk;
+    private static final java.time.Duration DEFAULT_JWK_EXPIRES_IN = java.time.Duration.ofDays(100 * 365);
+
+    private ResourceFactory jwkLocation;
+    private Duration jwkExpiresIn;
     private AuthzReaderFactory roles;
 
-    @BQConfigProperty("Configured JWK")
-    public void setJwk(JwksManagerFactory jwk) {
-        this.jwk = jwk;
+    @BQConfigProperty("Jwks key file location")
+    public ShiroWebJwtModuleFactory setJwkLocation(ResourceFactory jwkLocation) {
+        this.jwkLocation = jwkLocation;
+        return this;
+    }
+
+    @BQConfigProperty("Expiration interval when JWKS must be reloaded")
+    public ShiroWebJwtModuleFactory setJwkExpiresIn(Duration jwkExpiresIn) {
+        this.jwkExpiresIn = jwkExpiresIn;
+        return this;
     }
 
     @BQConfigProperty("Configures JWT roles parser")
-    public void setRoles(AuthzReaderFactory roles) {
+    public ShiroWebJwtModuleFactory setRoles(AuthzReaderFactory roles) {
         this.roles = roles;
+        return this;
     }
 
     public JwtParser createTokenParser() {
-        JwksManager jwksManager = getJwk().createManager();
-        return Jwts.parser()
-                .keyLocator(h -> locateKey(jwksManager, h))
-                .build();
+        return JwtParserMaker.createParser(getJwkLocation(), getJwkExpiresIn());
     }
 
     public ShiroJwtAuthRealm createRealm() {
         return new ShiroJwtAuthRealm(getRoles().createReader());
     }
 
-    private JwksManagerFactory getJwk() {
-        return Objects.requireNonNull(jwk, "'jwk' configuration is not specified");
-    }
-
     private AuthzReaderFactory getRoles() {
         return roles != null ? roles : new JsonListAuthzReaderFactory();
     }
 
-    private Key locateKey(JwksManager manager, Header header) {
-        // must call "getJwks()" every time we process a header. This way manager can refresh the list of keys
-        // if needed
-        Jwk<?> jwk = manager.getJwks().get(header.getOrDefault("kid", ""));
-        return jwk != null ? jwk.toKey() : null;
+    private URL getJwkLocation() {
+        return Objects.requireNonNull(jwkLocation, "JWKS 'keyLocation' is not specified").getUrl();
+    }
+
+    private java.time.Duration getJwkExpiresIn() {
+        return jwkExpiresIn != null ? jwkExpiresIn.getDuration() : DEFAULT_JWK_EXPIRES_IN;
     }
 }

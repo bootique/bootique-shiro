@@ -19,7 +19,6 @@ shiroweb:
     "/private-three" : "jwtBearer, roles[role3]"
 
 shirowebjwt:
-  jwk:
-    keyLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
-    expiresIn: "100 sec"
+  jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
+  jwkExpiresIn: "100 sec"
 

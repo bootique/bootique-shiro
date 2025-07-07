@@ -1,5 +1,6 @@
 package io.bootique.shiro.web.jwt.jjwt;
 
+import io.jsonwebtoken.Header;
 import io.jsonwebtoken.io.IOException;
 import io.jsonwebtoken.security.Jwk;
 import io.jsonwebtoken.security.Jwks;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.security.Key;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import java.util.Map;
 /**
  * @since 4.0
  */
-public class JwksManager {
+class JwksManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwksManager.class);
 
@@ -31,7 +33,14 @@ public class JwksManager {
         this.expiresIn = expiresIn;
     }
 
-    public Map<Object, Jwk<?>> getJwks() {
+    public Key readKey(Header header) {
+        // must call "getKeys()" every time we process a header. This way the manager can refresh keys as defined
+        // by the expiration policy
+        Jwk<?> jwk = getKeys().get(header.getOrDefault("kid", ""));
+        return jwk != null ? jwk.toKey() : null;
+    }
+
+    private Map<Object, Jwk<?>> getKeys() {
         if (needRefresh()) {
             synchronized (this) {
                 if (needRefresh()) {
