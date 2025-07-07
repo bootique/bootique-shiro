@@ -26,12 +26,15 @@ import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.shiro.web.ShiroWebModule;
-import io.bootique.shiro.web.jwt.auth.ShiroJwtAuthFilter;
-import io.bootique.shiro.web.jwt.auth.ShiroJwtAuthRealm;
-import io.bootique.shiro.web.jwt.token.JwtTokenProvider;
+import io.bootique.shiro.web.jwt.filter.JwtBearerFilter;
+import io.bootique.shiro.web.jwt.realm.ShiroJwtAuthRealm;
+import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
+/**
+ * @since 4.0
+ */
 public class ShiroWebJwtModule implements BQModule {
 
     private static final String CONFIG_PREFIX = "shirowebjwt";
@@ -47,25 +50,25 @@ public class ShiroWebJwtModule implements BQModule {
 
     @Override
     public void configure(Binder binder) {
-        ShiroWebModule.extend(binder).setFilter(JWT_BEARER_FILTER_IDENTIFIER, ShiroJwtAuthFilter.class);
+        ShiroWebModule.extend(binder).setFilter(JWT_BEARER_FILTER_IDENTIFIER, JwtBearerFilter.class);
         ShiroModule.extend(binder).addRealm(ShiroJwtAuthRealm.class);
     }
 
     @Provides
     @Singleton
-    public JwtTokenProvider provideJwtTokenProvider(ConfigurationFactory configFactory) {
-        return configFactory.config(ShiroWebJwtModuleFactory.class, CONFIG_PREFIX).provideJwt();
+    public JwtParser provideJwtParser(ConfigurationFactory configFactory) {
+        return configFactory.config(ShiroWebJwtModuleFactory.class, CONFIG_PREFIX).createTokenParser();
     }
 
     @Provides
     @Singleton
-    public ShiroJwtAuthFilter provideFilter(Provider<JwtTokenProvider> tokenProvider) {
-        return new ShiroJwtAuthFilter(tokenProvider);
+    public ShiroJwtAuthRealm provideRealm(ConfigurationFactory configFactory) {
+        return configFactory.config(ShiroWebJwtModuleFactory.class, CONFIG_PREFIX).createRealm();
     }
 
     @Provides
     @Singleton
-    public ShiroJwtAuthRealm provideRealm() {
-        return new ShiroJwtAuthRealm();
+    public JwtBearerFilter provideBearerFilter(Provider<JwtParser> tokenParser) {
+        return new JwtBearerFilter(tokenParser);
     }
 }

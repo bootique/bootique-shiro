@@ -1,6 +1,7 @@
-package io.bootique.shiro.web.jwt.auth;
+package io.bootique.shiro.web.jwt.realm;
 
-import io.bootique.shiro.web.jwt.token.JwtToken;
+import io.bootique.shiro.web.jwt.JwtBearerToken;
+import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -10,18 +11,24 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
+/**
+ * @since 4.0
+ */
 public class ShiroJwtAuthRealm extends AuthorizingRealm {
 
-    public ShiroJwtAuthRealm() {
-        this.setAuthenticationTokenClass(ShiroJwtAuthToken.class);
+    private final AuthzReader rolesReader;
+
+    public ShiroJwtAuthRealm(AuthzReader rolesReader) {
+        this.setAuthenticationTokenClass(JwtBearerToken.class);
+        this.rolesReader = rolesReader;
     }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         principalCollection
-                .byType(JwtToken.class)
-                .forEach(p -> authorizationInfo.addRoles(p.getRoles()));
+                .byType(Claims.class)
+                .forEach(c -> authorizationInfo.addRoles(rolesReader.readAuthz(c)));
         return authorizationInfo;
     }
 

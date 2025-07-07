@@ -1,1 +1,2 @@
-io.bootique.shiro.web.jwt.token.claim.JwtTokenClaimFactory
+io.bootique.shiro.web.jwt.realm.AuthzReaderFactory
+io.bootique.shiro.web.jwt.realm.JsonListAuthzReaderFactory
