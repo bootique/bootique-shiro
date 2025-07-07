@@ -1,2 +1,4 @@
 io.bootique.shiro.web.jwt.SpaceSeparatedClaimFactory
 io.bootique.shiro.web.jwt.CommaSeparatedClaimFactory
+io.bootique.shiro.web.jwt.TreeNameStringListClaimFactory
+io.bootique.shiro.web.jwt.TreeNameCommaSeparatedClaimFactory
