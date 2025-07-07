@@ -1,4 +1,4 @@
-package io.bootique.shiro.web.jwt.realm;
+package io.bootique.shiro.web.jwt.authz;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.bootique.annotation.BQConfig;

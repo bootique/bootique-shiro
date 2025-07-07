@@ -1,2 +1,2 @@
-io.bootique.shiro.web.jwt.realm.AuthzReaderFactory
-io.bootique.shiro.web.jwt.realm.JsonListAuthzReaderFactory
+io.bootique.shiro.web.jwt.authz.AuthzReaderFactory
+io.bootique.shiro.web.jwt.authz.JsonListAuthzReaderFactory

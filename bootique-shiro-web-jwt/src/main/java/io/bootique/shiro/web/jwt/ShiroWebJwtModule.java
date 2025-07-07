@@ -26,8 +26,6 @@ import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.shiro.web.ShiroWebModule;
-import io.bootique.shiro.web.jwt.filter.JwtBearerFilter;
-import io.bootique.shiro.web.jwt.realm.JwtRealm;
 import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;

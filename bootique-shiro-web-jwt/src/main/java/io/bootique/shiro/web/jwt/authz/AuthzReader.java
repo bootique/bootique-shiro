@@ -1,4 +1,4 @@
-package io.bootique.shiro.web.jwt.realm;
+package io.bootique.shiro.web.jwt.authz;
 
 import io.jsonwebtoken.Claims;
 

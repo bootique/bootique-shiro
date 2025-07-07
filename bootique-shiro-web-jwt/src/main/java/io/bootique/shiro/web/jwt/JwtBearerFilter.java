@@ -1,6 +1,5 @@
-package io.bootique.shiro.web.jwt.filter;
+package io.bootique.shiro.web.jwt;
 
-import io.bootique.shiro.web.jwt.JwtBearerToken;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;

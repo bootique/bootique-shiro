@@ -4,9 +4,8 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.resource.ResourceFactory;
 import io.bootique.shiro.web.jwt.jjwt.JwtParserMaker;
-import io.bootique.shiro.web.jwt.realm.AuthzReaderFactory;
-import io.bootique.shiro.web.jwt.realm.JsonListAuthzReaderFactory;
-import io.bootique.shiro.web.jwt.realm.JwtRealm;
+import io.bootique.shiro.web.jwt.authz.AuthzReaderFactory;
+import io.bootique.shiro.web.jwt.authz.JsonListAuthzReaderFactory;
 import io.bootique.value.Duration;
 import io.jsonwebtoken.JwtParser;
 

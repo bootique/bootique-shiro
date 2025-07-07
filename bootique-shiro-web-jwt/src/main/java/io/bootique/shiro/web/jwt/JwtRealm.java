@@ -1,6 +1,6 @@
-package io.bootique.shiro.web.jwt.realm;
+package io.bootique.shiro.web.jwt;
 
-import io.bootique.shiro.web.jwt.JwtBearerToken;
+import io.bootique.shiro.web.jwt.authz.AuthzReader;
 import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
