@@ -2,6 +2,7 @@ package io.bootique.shiro.web.jwt.auth;
 
 import io.bootique.shiro.web.jwt.token.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
+import jakarta.inject.Provider;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,9 +13,9 @@ import org.apache.shiro.web.util.WebUtils;
 
 public class ShiroJwtAuthFilter extends BearerHttpAuthenticationFilter {
 
-    private final JwtTokenProvider authenticator;
+    private final Provider<JwtTokenProvider> authenticator;
 
-    public ShiroJwtAuthFilter(JwtTokenProvider authenticator) {
+    public ShiroJwtAuthFilter(Provider<JwtTokenProvider> authenticator) {
         this.authenticator = authenticator;
     }
 
@@ -22,7 +23,7 @@ public class ShiroJwtAuthFilter extends BearerHttpAuthenticationFilter {
     protected AuthenticationToken createToken(ServletRequest servletRequest,
                                               ServletResponse servletResponse) {
         AuthenticationToken bearerToken = super.createToken(servletRequest, servletResponse);
-        return new ShiroJwtAuthToken(authenticator.getJwtToken(bearerToken.getPrincipal().toString()));
+        return new ShiroJwtAuthToken(authenticator.get().getJwtToken(bearerToken.getPrincipal().toString()));
     }
 
     @Override

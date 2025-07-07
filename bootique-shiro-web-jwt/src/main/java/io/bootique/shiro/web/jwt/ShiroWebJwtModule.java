@@ -29,6 +29,7 @@ import io.bootique.shiro.web.ShiroWebModule;
 import io.bootique.shiro.web.jwt.auth.ShiroJwtAuthFilter;
 import io.bootique.shiro.web.jwt.auth.ShiroJwtAuthRealm;
 import io.bootique.shiro.web.jwt.token.JwtTokenProvider;
+import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 public class ShiroWebJwtModule implements BQModule {
@@ -58,7 +59,7 @@ public class ShiroWebJwtModule implements BQModule {
 
     @Provides
     @Singleton
-    public ShiroJwtAuthFilter provideFilter(JwtTokenProvider tokenProvider) {
+    public ShiroJwtAuthFilter provideFilter(Provider<JwtTokenProvider> tokenProvider) {
         return new ShiroJwtAuthFilter(tokenProvider);
     }
 
