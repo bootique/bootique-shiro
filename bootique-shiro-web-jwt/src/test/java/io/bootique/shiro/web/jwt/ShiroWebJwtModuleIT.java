@@ -4,6 +4,7 @@ import io.bootique.BQRuntime;
 import io.bootique.Bootique;
 import io.bootique.jersey.JerseyModule;
 import io.bootique.jetty.junit5.JettyTester;
+import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -23,20 +24,20 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 
 @BQTest
-public abstract class ShiroWebJwtModuleIT {
+public class ShiroWebJwtModuleIT {
 
-    static BQRuntime getApp(JettyTester jetty, String ymlConfig) {
-        return Bootique
-                .app("-c", ymlConfig, "-s")
-                .module(jetty.moduleReplacingConnectors())
-                .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
-                .autoLoadModules()
-                .createRuntime();
+    private static final JettyTester jetty = JettyTester.create();
+    @BQApp
+    static final BQRuntime app = Bootique
+            .app("-c", "classpath:io/bootique/shiro/web/jwt/jwt-default.yml", "-s")
+            .module(jetty.moduleReplacingConnectors())
+            .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
+            .autoLoadModules()
+            .createRuntime();
+
+    private Map<String, ?> rolesMap(String... roles) {
+        return Map.of("roles", Arrays.asList(roles));
     }
-
-    abstract Map<String, ?> rolesMap(String... roles);
-
-    abstract JettyTester jetty();
 
     @Test
     public void testPublicAccess() {
@@ -94,7 +95,7 @@ public abstract class ShiroWebJwtModuleIT {
                 expiration = c.getTime();
             }
             String token = TokenGenerator.token(rolesClaim, expiration);
-            return jetty().getTarget()
+            return jetty.getTarget()
                     .path("/" + resource)
                     .request()
                     .header(HttpHeaders.AUTHORIZATION, token)
