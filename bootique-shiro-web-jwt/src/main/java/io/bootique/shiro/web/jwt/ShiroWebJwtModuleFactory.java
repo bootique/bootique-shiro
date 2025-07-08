@@ -21,6 +21,7 @@ package io.bootique.shiro.web.jwt;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.resource.ResourceFactory;
+import io.bootique.shiro.web.jwt.jjwt.JwtManager;
 import io.bootique.shiro.web.jwt.jjwt.JwtParserMaker;
 import io.bootique.shiro.web.jwt.authz.AuthzReaderFactory;
 import io.bootique.shiro.web.jwt.authz.JsonListAuthzReaderFactory;
@@ -29,6 +30,7 @@ import io.jsonwebtoken.JwtParser;
 
 import java.net.URL;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @since 4.0
@@ -41,6 +43,7 @@ public class ShiroWebJwtModuleFactory {
     private ResourceFactory jwkLocation;
     private Duration jwkExpiresIn;
     private AuthzReaderFactory roles;
+    private String audience;
 
     @BQConfigProperty("Jwks key file location")
     public ShiroWebJwtModuleFactory setJwkLocation(ResourceFactory jwkLocation) {
@@ -60,8 +63,14 @@ public class ShiroWebJwtModuleFactory {
         return this;
     }
 
-    public JwtParser createTokenParser() {
-        return JwtParserMaker.createParser(getJwkLocation(), getJwkExpiresIn());
+    @BQConfigProperty("Configures audience")
+    public ShiroWebJwtModuleFactory setAudience(String audience) {
+        this.audience = audience;
+        return this;
+    }
+
+    public JwtManager createTokenManager() {
+        return new JwtManager(JwtParserMaker.createParser(getJwkLocation(), getJwkExpiresIn()), this.audience);
     }
 
     public JwtRealm createRealm() {
