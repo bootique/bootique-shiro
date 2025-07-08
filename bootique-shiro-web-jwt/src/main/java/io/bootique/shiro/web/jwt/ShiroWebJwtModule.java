@@ -26,6 +26,7 @@ import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.shiro.ShiroModule;
 import io.bootique.shiro.web.ShiroWebModule;
+import io.bootique.shiro.web.jwt.jjwt.JwtManager;
 import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
@@ -54,8 +55,8 @@ public class ShiroWebJwtModule implements BQModule {
 
     @Provides
     @Singleton
-    public JwtParser provideJwtParser(ConfigurationFactory configFactory) {
-        return configFactory.config(ShiroWebJwtModuleFactory.class, CONFIG_PREFIX).createTokenParser();
+    public JwtManager provideJwtManager(ConfigurationFactory configFactory) {
+        return configFactory.config(ShiroWebJwtModuleFactory.class, CONFIG_PREFIX).createTokenManager();
     }
 
     @Provides
@@ -66,7 +67,7 @@ public class ShiroWebJwtModule implements BQModule {
 
     @Provides
     @Singleton
-    public JwtBearerFilter provideBearerFilter(Provider<JwtParser> tokenParser) {
-        return new JwtBearerFilter(tokenParser);
+    public JwtBearerFilter provideBearerFilter(Provider<JwtManager> tokenManager) {
+        return new JwtBearerFilter(tokenManager);
     }
 }

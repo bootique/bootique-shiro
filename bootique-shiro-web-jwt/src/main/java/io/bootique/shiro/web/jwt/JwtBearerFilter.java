@@ -18,6 +18,7 @@
  */
 package io.bootique.shiro.web.jwt;
 
+import io.bootique.shiro.web.jwt.jjwt.JwtManager;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
@@ -25,6 +26,7 @@ import jakarta.inject.Provider;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.BearerToken;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
@@ -38,10 +40,10 @@ import org.apache.shiro.web.util.WebUtils;
  */
 public class JwtBearerFilter extends BearerHttpAuthenticationFilter {
 
-    private final Provider<JwtParser> tokenParser;
+    private final Provider<JwtManager> jwtManager;
 
-    public JwtBearerFilter(Provider<JwtParser> tokenParser) {
-        this.tokenParser = tokenParser;
+    public JwtBearerFilter(Provider<JwtManager> jwtManager) {
+        this.jwtManager = jwtManager;
     }
 
     @Override
@@ -50,14 +52,14 @@ public class JwtBearerFilter extends BearerHttpAuthenticationFilter {
         return new JwtBearerToken(
                 bearer.getToken(),
                 bearer.getHost(),
-                tokenParser.get().parse(bearer.getToken()).accept(Jws.CLAIMS).getPayload());
+                jwtManager.get().parse(bearer.getToken()));
     }
 
     @Override
     protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
         try {
             return super.executeLogin(request, response);
-        } catch (JwtException e) {
+        } catch (JwtException | AuthenticationException e) {
             WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             return false;
         }
