@@ -66,8 +66,7 @@ public class ShiroWebJwtModule implements BQModule {
 
     @Provides
     @Singleton
-    public JwtBearerFilter provideBearerFilter(ConfigurationFactory configFactory,
-                                               Provider<JwtParser> jwtParser) {
+    public JwtBearerFilter provideBearerFilter(ConfigurationFactory configFactory, Provider<JwtParser> jwtParser) {
         return configFactory.config(ShiroWebJwtModuleFactory.class, CONFIG_PREFIX).createFilter(jwtParser);
     }
 }

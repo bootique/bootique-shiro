@@ -54,12 +54,14 @@ public class JwtBearerFilter extends BearerHttpAuthenticationFilter {
     @Override
     protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) {
         BearerToken bearer = (BearerToken) super.createToken(servletRequest, servletResponse);
-        Claims jwtClaims = tokenParser.get().parse(bearer.getToken()).accept(Jws.CLAIMS).getPayload();
-        validateAudience(jwtClaims.getAudience());
+        Claims claims = tokenParser.get().parse(bearer.getToken()).accept(Jws.CLAIMS).getPayload();
+
+        validateAudience(claims.getAudience());
+
         return new JwtBearerToken(
                 bearer.getToken(),
                 bearer.getHost(),
-                jwtClaims);
+                claims);
     }
 
     @Override

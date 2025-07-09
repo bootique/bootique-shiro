@@ -44,7 +44,7 @@ public class ShiroWebJwtModuleFactory {
     private AuthzReaderFactory roles;
     private String audience;
 
-    @BQConfigProperty("Jwks key file location")
+    @BQConfigProperty("JWKS key file location")
     public ShiroWebJwtModuleFactory setJwkLocation(ResourceFactory jwkLocation) {
         this.jwkLocation = jwkLocation;
         return this;
@@ -56,13 +56,13 @@ public class ShiroWebJwtModuleFactory {
         return this;
     }
 
-    @BQConfigProperty("Configures JWT roles parser")
+    @BQConfigProperty("JWT-originated roles parser configuration")
     public ShiroWebJwtModuleFactory setRoles(AuthzReaderFactory roles) {
         this.roles = roles;
         return this;
     }
 
-    @BQConfigProperty("Configures audience")
+    @BQConfigProperty("An optional audience. If specified, it will be compared with the 'aud' JWT claim, and fail the request if the two do not match")
     public ShiroWebJwtModuleFactory setAudience(String audience) {
         this.audience = audience;
         return this;
