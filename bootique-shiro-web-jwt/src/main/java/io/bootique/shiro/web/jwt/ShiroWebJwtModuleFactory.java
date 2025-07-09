@@ -21,16 +21,15 @@ package io.bootique.shiro.web.jwt;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.resource.ResourceFactory;
-import io.bootique.shiro.web.jwt.jjwt.JwtManager;
 import io.bootique.shiro.web.jwt.jjwt.JwtParserMaker;
 import io.bootique.shiro.web.jwt.authz.AuthzReaderFactory;
 import io.bootique.shiro.web.jwt.authz.JsonListAuthzReaderFactory;
 import io.bootique.value.Duration;
 import io.jsonwebtoken.JwtParser;
+import jakarta.inject.Provider;
 
 import java.net.URL;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @since 4.0
@@ -69,12 +68,16 @@ public class ShiroWebJwtModuleFactory {
         return this;
     }
 
-    public JwtManager createTokenManager() {
-        return new JwtManager(JwtParserMaker.createParser(getJwkLocation(), getJwkExpiresIn()), this.audience);
+    public JwtParser createTokenParser() {
+        return JwtParserMaker.createParser(getJwkLocation(), getJwkExpiresIn());
     }
 
     public JwtRealm createRealm() {
         return new JwtRealm(getRoles().createReader());
+    }
+
+    public JwtBearerFilter createFilter(Provider<JwtParser> tokenParser) {
+        return new JwtBearerFilter(tokenParser, this.audience);
     }
 
     private AuthzReaderFactory getRoles() {

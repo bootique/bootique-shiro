@@ -18,7 +18,7 @@
  */
 package io.bootique.shiro.web.jwt;
 
-import io.bootique.shiro.web.jwt.jjwt.JwtManager;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
@@ -32,6 +32,8 @@ import org.apache.shiro.authc.BearerToken;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 
+import java.util.Set;
+
 /**
  * Authenticates request based on a Bearer JWT authorization header. Doesn't check any roles or permissions itself,
  * instead parsing and validating the token, and passing it down to the downstream realms.
@@ -40,19 +42,24 @@ import org.apache.shiro.web.util.WebUtils;
  */
 public class JwtBearerFilter extends BearerHttpAuthenticationFilter {
 
-    private final Provider<JwtManager> jwtManager;
+    private final Provider<JwtParser> tokenParser;
 
-    public JwtBearerFilter(Provider<JwtManager> jwtManager) {
-        this.jwtManager = jwtManager;
+    private final String audience;
+
+    public JwtBearerFilter(Provider<JwtParser> tokenParser, String audience) {
+        this.tokenParser = tokenParser;
+        this.audience = audience;
     }
 
     @Override
     protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) {
         BearerToken bearer = (BearerToken) super.createToken(servletRequest, servletResponse);
+        Claims jwtClaims = tokenParser.get().parse(bearer.getToken()).accept(Jws.CLAIMS).getPayload();
+        validateAudience(jwtClaims.getAudience());
         return new JwtBearerToken(
                 bearer.getToken(),
                 bearer.getHost(),
-                jwtManager.get().parse(bearer.getToken()));
+                jwtClaims);
     }
 
     @Override
@@ -62,6 +69,14 @@ public class JwtBearerFilter extends BearerHttpAuthenticationFilter {
         } catch (JwtException | AuthenticationException e) {
             WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             return false;
+        }
+    }
+
+    private void validateAudience(Set<String> audienceJwtClaim) {
+        if (this.audience != null && !this.audience.isEmpty()) {
+            if (audienceJwtClaim == null || !audienceJwtClaim.contains(this.audience)) {
+                throw new AuthenticationException("Invalid audience");
+            }
         }
     }
 }
