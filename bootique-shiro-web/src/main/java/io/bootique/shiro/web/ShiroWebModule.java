@@ -43,11 +43,13 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 
 import jakarta.inject.Singleton;
+
 import java.util.Set;
 
 public class ShiroWebModule implements BQModule {
 
     private static final String CONFIG_PREFIX = "shiroweb";
+    private static final String ANY_ROLE_FILTER_IDENTIFIER = "anyRole";
 
     public static ShiroWebModuleExtender extend(Binder binder) {
         return new ShiroWebModuleExtender(binder);
@@ -64,7 +66,10 @@ public class ShiroWebModule implements BQModule {
 
     @Override
     public void configure(Binder binder) {
-        extend(binder).initAllExtensions();
+        extend(binder)
+                .initAllExtensions()
+                .setFilter(ANY_ROLE_FILTER_IDENTIFIER, AnyRoleAuthorizationFilter.class);
+
         JettyModule.extend(binder).addMappedFilter(new TypeLiteral<MappedFilter<ShiroFilter>>() {
         });
     }

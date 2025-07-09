@@ -3,6 +3,7 @@
 * #40 JWT Bearer Token Support
 * #41 Remove deprecated modules (javax flavor)
 * #42 Upgrade Shiro to 2.0.4
+* #45 "anyRole" filter
 
 ## 3.0-M3
 
