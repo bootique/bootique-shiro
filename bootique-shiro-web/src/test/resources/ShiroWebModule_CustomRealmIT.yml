@@ -12,15 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-shiro:
-  realms:
-    - users:
-        admin2u: "password, admin2r"
-      roles:
-        admin2r: "admin2p"
-
 shiroweb:
   urls:
-    # examples of quoted and unqouted permissions
-    "/admin1" : "authcBasic, perms[\"admin1p\"]"
-    "/admin2" : "authcBasic, perms[admin2p]"
+    "/anonymous"        : "anon"
+    "/login_on_demand"  : "anon"
