@@ -76,8 +76,8 @@ public class ShiroWebJwtModuleFactory {
         return new JwtRealm(getRoles().createReader());
     }
 
-    public JwtBearerFilter createFilter(Provider<JwtParser> tokenParser) {
-        return new JwtBearerFilter(tokenParser, this.audience);
+    public JwtBearerAuthenticationFilter createFilter(Provider<JwtParser> tokenParser) {
+        return new JwtBearerAuthenticationFilter(tokenParser, this.audience);
     }
 
     private AuthzReaderFactory getRoles() {

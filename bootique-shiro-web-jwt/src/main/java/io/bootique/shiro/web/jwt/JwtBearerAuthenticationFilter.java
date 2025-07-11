@@ -40,13 +40,12 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public class JwtBearerFilter extends BearerHttpAuthenticationFilter {
+public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilter {
 
     private final Provider<JwtParser> tokenParser;
-
     private final String audience;
 
-    public JwtBearerFilter(Provider<JwtParser> tokenParser, String audience) {
+    public JwtBearerAuthenticationFilter(Provider<JwtParser> tokenParser, String audience) {
         this.tokenParser = tokenParser;
         this.audience = audience;
     }
