@@ -21,6 +21,8 @@ package io.bootique.shiro.web.jwt;
 import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.BearerToken;
 
+import java.util.Objects;
+
 /**
  * @since 4.0
  */
@@ -30,7 +32,7 @@ public class JwtBearerToken extends BearerToken {
 
     public JwtBearerToken(String token, String host, Claims claims) {
         super(token, host);
-        this.claims = claims;
+        this.claims = Objects.requireNonNull(claims, "Null JWT Claims");
     }
 
     public Claims getClaims() {
