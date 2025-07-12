@@ -19,7 +19,6 @@
 package io.bootique.shiro.web.jwt;
 
 import io.bootique.shiro.web.jwt.authz.AuthzReader;
-import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -27,6 +26,7 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 
 /**
  * @since 4.0
@@ -36,7 +36,10 @@ public class JwtRealm extends AuthorizingRealm {
     private final AuthzReader rolesReader;
 
     public JwtRealm(AuthzReader rolesReader) {
-        this.setAuthenticationTokenClass(JwtBearerToken.class);
+
+        setName(JwtRealm.class.getSimpleName());
+        setAuthenticationTokenClass(JwtBearerToken.class);
+
         this.rolesReader = rolesReader;
     }
 
@@ -44,16 +47,18 @@ public class JwtRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         principals
-                .byType(Claims.class)
-                .forEach(c -> authorizationInfo.addRoles(rolesReader.readAuthz(c)));
+                .byType(JwtPrincipal.class)
+                .forEach(c -> authorizationInfo.addRoles(rolesReader.readAuthz(c.claims())));
         return authorizationInfo;
     }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
+
+        JwtPrincipal principal = new JwtPrincipal(((JwtBearerToken) token).getClaims());
+
         return new SimpleAuthenticationInfo(
-                token.getPrincipal(),
-                token.getCredentials(),
-                JwtRealm.class.getSimpleName());
+                new SimplePrincipalCollection(principal, getName()),
+                token.getCredentials());
     }
 }

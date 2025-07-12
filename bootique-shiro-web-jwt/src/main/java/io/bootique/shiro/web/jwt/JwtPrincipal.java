@@ -19,21 +19,24 @@
 package io.bootique.shiro.web.jwt;
 
 import io.jsonwebtoken.Claims;
-import org.apache.shiro.authc.BearerToken;
+
+import java.util.Objects;
 
 /**
+ * A Shiro "principal" based on JWT claims.
+ *
  * @since 4.0
  */
-public class JwtBearerToken extends BearerToken {
+public record JwtPrincipal(Claims claims) {
 
-    private final Claims claims;
-
-    public JwtBearerToken(String token, String host, Claims claims) {
-        super(token, host);
-        this.claims = claims;
+    public JwtPrincipal {
+        Objects.requireNonNull(claims, "Null JWT Claims");
     }
 
-    public Claims getClaims() {
-        return claims;
+    // defined primarily for MDC logging purposes to expose the token subject if present
+    @Override
+    public String toString() {
+        String subject = claims.getSubject();
+        return subject != null ? subject : "JwtPrincipal(?)";
     }
 }
