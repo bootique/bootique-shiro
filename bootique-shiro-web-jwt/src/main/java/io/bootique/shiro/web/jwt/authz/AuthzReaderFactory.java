@@ -26,13 +26,15 @@ import io.bootique.config.PolymorphicConfiguration;
 /**
  * @since 4.0
  */
-@BQConfig("JWT Token Claim parser")
+@BQConfig("JWT claim parser extracting authorization information")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = JsonListAuthzReaderFactory.class)
 public abstract class AuthzReaderFactory implements PolymorphicConfiguration {
 
     private String claim;
 
-    @BQConfigProperty("JWT claim name. If omitted, 'roles' is used as the default")
+    @BQConfigProperty("""
+            JWT claim name that will provide authorization information. If not set and the parser is reading roles, it \
+            will 'roles' as the claim name""")
     public void setClaim(String claim) {
         this.claim = claim;
     }

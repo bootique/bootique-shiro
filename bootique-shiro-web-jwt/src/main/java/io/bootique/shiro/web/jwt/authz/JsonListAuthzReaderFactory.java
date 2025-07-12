@@ -26,7 +26,9 @@ import java.util.List;
 /**
  * @since 4.0
  */
-@BQConfig("Configuration of JWT Token Claim")
+@BQConfig("""
+        JWT authorization claim parser expecting authorization information (e.g., roles) to be present as a JSON list \
+        in the token""")
 @JsonTypeName("jsonList")
 public class JsonListAuthzReaderFactory extends AuthzReaderFactory {
 
