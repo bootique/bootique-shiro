@@ -21,13 +21,12 @@ package io.bootique.shiro.web.mdc;
 
 import io.bootique.jetty.request.RequestMDCItem;
 import io.bootique.shiro.mdc.PrincipalMDC;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletRequest;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.eclipse.jetty.server.Request;
 
 import java.util.Objects;
 
@@ -45,14 +44,14 @@ public class ShiroWebPrincipalMDCItem implements RequestMDCItem, AuthenticationL
     }
 
     @Override
-    public void initMDC(ServletContext sc, ServletRequest request) {
+    public void initMDC(Request request) {
         // do nothing, wait for authentication ...
         // cleaning just in case the thread came in dirty
         principalMDC.clear();
     }
 
     @Override
-    public void cleanupMDC(ServletContext sc, ServletRequest request) {
+    public void cleanupMDC(Request request) {
         principalMDC.clear();
     }
 
