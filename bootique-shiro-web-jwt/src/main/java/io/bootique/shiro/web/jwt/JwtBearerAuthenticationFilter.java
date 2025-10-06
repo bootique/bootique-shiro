@@ -68,7 +68,7 @@ public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilte
         try {
             return super.executeLogin(request, response);
         } catch (JwtException | AuthenticationException e) {
-            WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            redirectIfNoAuth(request, response, e);
             return false;
         }
     }
@@ -79,5 +79,17 @@ public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilte
                 throw new AuthenticationException("Invalid audience");
             }
         }
+    }
+
+    protected void redirectIfNoAuth(ServletRequest request, ServletResponse response, Exception e) throws Exception {
+        if (e == null) {
+            WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    protected void redirectIfNoAuth(ServletRequest request, ServletResponse response) throws Exception {
+        redirectIfNoAuth(request, response, null);
     }
 }
