@@ -80,6 +80,10 @@ public class ShiroWebJwtModuleFactory {
         return new JwtBearerAuthenticationFilter(tokenParser, this.audience);
     }
 
+    public String provideAudience() {
+        return this.audience;
+    }
+
     private AuthzReaderFactory getRoles() {
         return roles != null ? roles : new JsonListAuthzReaderFactory();
     }
