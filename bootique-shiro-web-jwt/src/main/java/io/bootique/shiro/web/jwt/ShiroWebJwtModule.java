@@ -35,7 +35,7 @@ import jakarta.inject.Singleton;
  */
 public class ShiroWebJwtModule implements BQModule {
 
-    private static final String CONFIG_PREFIX = "shirowebjwt";
+    public static final String CONFIG_PREFIX = "shirowebjwt";
     private static final String JWT_BEARER_AUTHENTICATION_FILTER_NAME = "jwtBearer";
 
     @Override
