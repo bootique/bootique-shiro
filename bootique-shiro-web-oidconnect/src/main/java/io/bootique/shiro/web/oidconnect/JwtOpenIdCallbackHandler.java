@@ -1,13 +1,10 @@
 package io.bootique.shiro.web.oidconnect;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletRequest;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.*;
@@ -22,10 +19,8 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
-@Path("/bq-shiro-oauth-callback")
+@Path("_this_is_a_placeholder_that_will_be_replaced_dynamically_")
 public class JwtOpenIdCallbackHandler implements OidConnect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtOpenIdCallbackHandler.class);
@@ -73,18 +68,14 @@ public class JwtOpenIdCallbackHandler implements OidConnect {
     }
 
     @GET
-    public Response callback(@Context UriInfo uriInfo) {
-        // 1. Read query parameters
-        MultivaluedMap<String, String> params = uriInfo.getQueryParameters();
-        String code = params.getFirst(CODE_PARAMETER_NAME);
-        String originalUri = params.getFirst(ORIGINAL_URI_PARAMETER_NAME);
-        String state = params.getFirst(STATE_PARAMETER_NAME);
-        // 2. Validate parameters
-        ErrorHandler errorHandler = validateRequiredParameters(code, state);
-        if (errorHandler.hasError()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(errorHandler.get()).build();
+    public Response callback(@Context UriInfo uriInfo,
+                             @QueryParam(CODE_PARAMETER_NAME) String code,
+                             @QueryParam(ORIGINAL_URI_PARAMETER_NAME) String originalUri) {
+        // 1. Validate code parameter
+        if (code == null || code.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Parameter \"" + CODE_PARAMETER_NAME + "\" is required").build();
         }
-        // 3. Exchange auth code to token on JWT server
+        // 2. Exchange auth code to token on JWT server
         Response tokenResponse = exchange(code);
         try {
             if (tokenResponse.getStatus() == HttpStatus.OK_200) {
@@ -106,7 +97,7 @@ public class JwtOpenIdCallbackHandler implements OidConnect {
                 if (error != null && error.isTextual()) {
                     String errorCode = error.asText();
                     if (INVALID_GRANT_ERROR_CODE.equals(errorCode)) {
-                        String oidpUrl = this.oidpUrl + "?" + OidConnectUtils.getOidpParametersString(uriInfo.getBaseUri().toString(), originalUri, clientId, callbackUri, true);
+                        String oidpUrl = this.oidpUrl + "?" + getOidpParametersString(uriInfo.getBaseUri().toString(), originalUri, clientId, callbackUri);
                         LOGGER.warn("Auth server returns error code " + INVALID_GRANT_ERROR_CODE + ". Redirection to oidp URL " + oidpUrl);
                         return Response.status(Response.Status.FOUND).header(LOCATION_HEADER_NAME, oidpUrl).build();
                     } else {
@@ -141,20 +132,6 @@ public class JwtOpenIdCallbackHandler implements OidConnect {
         return redirectTarget;
     }
 
-    private ErrorHandler validateRequiredParameters(String code, String state) {
-        ErrorHandler errorHandler = new ErrorHandler();
-        boolean hasCode = code != null && !code.isEmpty();
-        boolean hasState = state != null && !state.isEmpty();
-        if (!hasCode && !hasState) {
-            errorHandler.append("Parameters \"code\" and \"state\" are required");
-        } else if (!hasCode) {
-            errorHandler.append("Parameter \"code\" is required");
-        } else if (!hasState) {
-            errorHandler.append("Parameter \"state\" is required");
-        }
-        return errorHandler;
-    }
-
     private Response exchange(String code) {
         Entity<Form> postForm = Entity.form(form(code));
         return tokenTarget
@@ -162,24 +139,9 @@ public class JwtOpenIdCallbackHandler implements OidConnect {
                 .post(postForm);
     }
 
-    private static class ErrorHandler {
-
-        private String error;
-
-        void append(String error) {
-            if (this.error == null || this.error.isEmpty()) {
-                this.error = error;
-            } else {
-                this.error += "\n" + error;
-            }
-        }
-
-        String get() {
-            return this.error;
-        }
-
-        boolean hasError() {
-            return this.error != null && !this.error.isEmpty();
-        }
+    static String getOidpParametersString(String baseUri, String originalUri, String clientId, String callbackUri) {
+        return OidConnect.RESPONSE_TYPE_PARAMETER_NAME + "=" + OidConnect.CODE_PARAMETER_NAME +
+                "&" + OidConnect.CLIENT_ID_PARAMETER_NAME + "=" + clientId +
+                "&" + OidConnect.REDIRECT_URI_PARAMETER_NAME + "=" + OidConnectUtils.getCallbackUri(baseUri, originalUri, callbackUri);
     }
 }
