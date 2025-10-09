@@ -23,9 +23,12 @@ import io.bootique.BQModule;
 import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
+import io.bootique.di.Key;
 import io.bootique.di.Provides;
+import io.bootique.di.TypeLiteral;
 import io.bootique.jackson.JacksonService;
 import io.bootique.jersey.JerseyModule;
+import io.bootique.jersey.MappedResource;
 import io.bootique.shiro.web.ShiroWebModule;
 import io.bootique.shiro.web.jwt.ShiroWebJwtModule;
 import io.bootique.shiro.web.jwt.ShiroWebJwtModuleFactory;
@@ -52,7 +55,8 @@ public class ShiroWebOidConnectModule implements BQModule {
     @Override
     public void configure(Binder binder) {
         ShiroWebModule.extend(binder).setFilter(OID_CONNECT_BEARER_AUTHENTICATION_FILTER_NAME, OidConnectFilter.class);
-        JerseyModule.extend(binder).addResource(JwtOpenIdCallbackHandler.class);
+        JerseyModule.extend(binder).addMappedResource(new TypeLiteral<MappedResource<JwtOpenIdCallbackHandler>>(){});
+//        JerseyModule.extend(binder).addResource(JwtOpenIdCallbackHandler.class);
     }
 
     @Provides
@@ -65,8 +69,8 @@ public class ShiroWebOidConnectModule implements BQModule {
 
     @Provides
     @Singleton
-    public JwtOpenIdCallbackHandler provideOpenIdCallbackHandler(ConfigurationFactory configFactory,
-                                                                 JacksonService jacksonService) {
+    public MappedResource<JwtOpenIdCallbackHandler> provideOpenIdCallbackHandler(ConfigurationFactory configFactory,
+                                                                                 JacksonService jacksonService) {
         String audience = configFactory.config(ShiroWebJwtModuleFactory.class, ShiroWebJwtModule.CONFIG_PREFIX).provideAudience();
         return configFactory.config(ShiroWebOidConnectModuleFactory.class, CONFIG_PREFIX)
                 .createJwtOpenIdCallbackHandler(jacksonService, audience);

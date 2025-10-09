@@ -37,6 +37,7 @@ public class OidConnectFilterIT extends OidConnectBaseTest {
             .module(jetty.moduleReplacingConnectors())
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", serverJetty.getUrl() + "/auth"))
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.oidpUrl", serverJetty.getUrl() + "/auth"))
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.callbackUri", "custom-oauth-callback"))
             .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
             .autoLoadModules()
             .createRuntime();

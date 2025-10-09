@@ -50,28 +50,15 @@ public class JwtOpenIdConnectCallbackHandlerIT extends OidConnectBaseTest {
             .createRuntime();
 
     @Test
-    public void testWithoutRequiredParameters() {
-        Response r = jetty.getTarget().path("bq-shiro-oauth-callback").request().get();
-        JettyTester.assertBadRequest(r).assertContent("Parameters \"code\" and \"state\" are required");
-    }
-
-    @Test
     public void testWithoutRequiredCodeParameter() {
-        Response r = jetty.getTarget().path("bq-shiro-oauth-callback").queryParam(OidConnect.STATE_PARAMETER_NAME, "xyz").request().get();
+        Response r = jetty.getTarget().path("bq-shiro-oauth-callback").request().get();
         JettyTester.assertBadRequest(r).assertContent("Parameter \"code\" is required");
     }
 
     @Test
-    public void testWithoutRequiredStateParameter() {
-        Response r = jetty.getTarget().path("bq-shiro-oauth-callback").queryParam(OidConnect.CODE_PARAMETER_NAME, "123").request().get();
-        JettyTester.assertBadRequest(r).assertContent("Parameter \"state\" is required");
-    }
-
-    @Test
-    public void testValidWithoutRedirectUrl() {
+    public void testValidWithoutOriginalUrl() {
         Response r = jetty.getTarget().path("bq-shiro-oauth-callback")
                 .queryParam(OidConnect.CODE_PARAMETER_NAME, "000")
-                .queryParam(OidConnect.STATE_PARAMETER_NAME, "xyz")
                 .request()
                 .get();
         JettyTester.assertOk(r);
@@ -86,7 +73,6 @@ public class JwtOpenIdConnectCallbackHandlerIT extends OidConnectBaseTest {
     public void testValidWithOriginalUrl() {
         Response r = jetty.getTarget().path("bq-shiro-oauth-callback")
                 .queryParam(OidConnect.CODE_PARAMETER_NAME, "000")
-                .queryParam(OidConnect.STATE_PARAMETER_NAME, "xyz")
                 .queryParam(OidConnect.ORIGINAL_URI_PARAMETER_NAME, Base64.getEncoder().encodeToString(URLEncoder.encode("/public", StandardCharsets.UTF_8).getBytes()))
                 .request()
                 .get();

@@ -21,6 +21,7 @@ package io.bootique.shiro.web.oidconnect;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.jackson.JacksonService;
+import io.bootique.jersey.MappedResource;
 import io.bootique.resource.ResourceFactory;
 import io.bootique.shiro.web.jwt.jjwt.JwtParserMaker;
 import io.bootique.shiro.web.jwt.authz.AuthzReaderFactory;
@@ -47,7 +48,7 @@ public class ShiroWebOidConnectModuleFactory {
     private String clientId;
     private String clientSecret;
     private String tokenCookie;
-    private String callbackUrl;
+    private String callbackUri;
 
 
     @BQConfigProperty("OpenId Connect Login Url")
@@ -75,9 +76,9 @@ public class ShiroWebOidConnectModuleFactory {
         this.tokenCookie = tokenCookie;
     }
 
-    @BQConfigProperty("Callback Url")
-    public void setCallbackUrl(String callbackUrl) {
-        this.callbackUrl = callbackUrl;
+    @BQConfigProperty("Callback Uri")
+    public void setCallbackUri(String callbackUri) {
+        this.callbackUri = callbackUri;
     }
 
     private String getOidpUrl() {
@@ -115,18 +116,27 @@ public class ShiroWebOidConnectModuleFactory {
         return this.clientSecret;
     }
 
-    private String getCallbackUrl() {
-        if (this.callbackUrl == null || callbackUrl.isEmpty()) {
+    private String getCallbackUri() {
+        if (this.callbackUri == null || callbackUri.isEmpty()) {
             return DEFAULT_CALLBACK_URL;
         }
-        return this.callbackUrl;
+        return this.callbackUri;
     }
 
     public OidConnectFilter createFilter(Provider<JwtParser> tokenParser, String audience) {
-        return new OidConnectFilter(tokenParser, audience, getOidpUrl(), getTokenCookie(), getClientId(), getCallbackUrl());
+        return new OidConnectFilter(tokenParser, audience, getOidpUrl(), getTokenCookie(), getClientId(), getCallbackUri());
     }
 
-    public JwtOpenIdCallbackHandler createJwtOpenIdCallbackHandler(JacksonService jacksonService, String audience) {
-        return new JwtOpenIdCallbackHandler(jacksonService.newObjectMapper(), getTokenCookie(), getTokenUrl(), getClientId(), getClientSecret(), audience, getOidpUrl(), getCallbackUrl());
+    public MappedResource<JwtOpenIdCallbackHandler> createJwtOpenIdCallbackHandler(JacksonService jacksonService, String audience) {
+        return new MappedResource<>(
+                new JwtOpenIdCallbackHandler(
+                        jacksonService.newObjectMapper(),
+                        getTokenCookie(),
+                        getTokenUrl(),
+                        getClientId(),
+                        getClientSecret(),
+                        audience,
+                        getOidpUrl(),
+                        getCallbackUri()), getCallbackUri());
     }
 }

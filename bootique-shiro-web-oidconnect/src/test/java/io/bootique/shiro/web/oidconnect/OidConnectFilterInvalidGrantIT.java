@@ -45,6 +45,8 @@ public class OidConnectFilterInvalidGrantIT extends OidConnectBaseTest {
     @Produces(MediaType.APPLICATION_JSON)
     public static class TokenApi {
 
+        private boolean authCodeAlreadyUsed = false;
+
         @POST
         public Response authToken() {
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"invalid_grant\"}").build();
@@ -52,16 +54,13 @@ public class OidConnectFilterInvalidGrantIT extends OidConnectBaseTest {
 
         @GET
         public Response authCode(@Context UriInfo uriInfo) {
-            String state = uriInfo.getQueryParameters().getFirst(OidConnect.STATE_PARAMETER_NAME);
-            if (state != null) {
-                if (Response.Status.OK.getReasonPhrase().equals(state)) {
-                    final String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "&code=123&state=xyz";
-                    return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
-                } else if (OidConnect.INVALID_GRANT_ERROR_CODE.equals(state)) {
-                    return Response.ok(state).build();
-                }
+            if (!authCodeAlreadyUsed) {
+                final String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "&code=123&state=xyz";
+                authCodeAlreadyUsed = true;
+                return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
+            } else {
+                return Response.ok(OidConnect.INVALID_GRANT_ERROR_CODE).build();
             }
-            return Response.status(Response.Status.BAD_REQUEST).entity("State parameter does not exist").build();
         }
     }
 
