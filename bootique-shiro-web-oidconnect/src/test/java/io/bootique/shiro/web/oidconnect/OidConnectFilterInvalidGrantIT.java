@@ -16,29 +16,38 @@ import jakarta.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.Test;
 
 @BQTest
-public class OidConnectFilterInvalidGrantIT extends OidConnectBaseTest {
+public class OidConnectFilterInvalidGrantIT {
 
-    private final JettyTester jetty = JettyTester.create();
-
-    private static final JettyTester serverJetty = JettyTester.create();
-
+    private static final JettyTester tokenServerTester = JettyTester.create();
 
     @BQApp
-    static final BQRuntime tokenServerApp = Bootique.app("-s")
+    static final BQRuntime tokenServer = Bootique.app("-s")
             .module(JettyModule.class)
             .module(JerseyModule.class)
-            .module(serverJetty.moduleReplacingConnectors())
+            .module(tokenServerTester.moduleReplacingConnectors())
             .module(b -> JerseyModule.extend(b).addResource(TokenApi.class))
             .createRuntime();
 
+    private final JettyTester appTester = JettyTester.create();
+
     @BQApp
     final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidconnect/oidconnect.yml", "-s")
-            .module(jetty.moduleReplacingConnectors())
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", serverJetty.getUrl() + "/auth"))
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.oidpUrl", serverJetty.getUrl() + "/auth"))
+            .module(appTester.moduleReplacingConnectors())
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", tokenServerTester.getUrl() + "/auth"))
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.oidpUrl", tokenServerTester.getUrl() + "/auth"))
             .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
             .autoLoadModules()
             .createRuntime();
+
+    @Test
+    public void testInvalidGrant() {
+        Response r = appTester.getTarget()
+                .path("/private")
+                .queryParam("aaa", "1").queryParam("bbb", 2)
+                .request()
+                .get();
+        JettyTester.assertOk(r).assertContent(OidConnect.INVALID_GRANT_ERROR_CODE);
+    }
 
     @Path("/auth")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -73,15 +82,5 @@ public class OidConnectFilterInvalidGrantIT extends OidConnectBaseTest {
         public String getPrivate() {
             return "private";
         }
-    }
-
-    @Test
-    public void testInvalidGrant() {
-        Response r = jetty.getTarget()
-                .path("/private")
-                .queryParam("aaa", "1").queryParam("bbb", 2)
-                .request()
-                .get();
-        JettyTester.assertOk(r).assertContent(OidConnect.INVALID_GRANT_ERROR_CODE);
     }
 }

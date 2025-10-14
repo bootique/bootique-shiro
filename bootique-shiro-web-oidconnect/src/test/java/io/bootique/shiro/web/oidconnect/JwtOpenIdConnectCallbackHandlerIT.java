@@ -19,46 +19,44 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @BQTest
-public class JwtOpenIdConnectCallbackHandlerIT extends OidConnectBaseTest {
+public class JwtOpenIdConnectCallbackHandlerIT {
 
-    private final JettyTester jetty = JettyTester.create();
-
-    private static final JettyTester serverJetty = JettyTester.create();
-
+    private static final JettyTester tokenServerTester = JettyTester.create();
 
     @BQApp
-    static final BQRuntime tokenServerApp = Bootique.app("-s")
+    static final BQRuntime tokenServer = Bootique.app("-s")
             .module(JettyModule.class)
             .module(JerseyModule.class)
-            .module(serverJetty.moduleReplacingConnectors())
+            .module(tokenServerTester.moduleReplacingConnectors())
             .module(b -> JerseyModule.extend(b).addResource(TokenApi.class))
             .createRuntime();
 
+    private final JettyTester appTester = JettyTester.create();
+
     @BQApp
     final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidconnect/oidconnect.yml", "-s")
-            .module(jetty.moduleReplacingConnectors())
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", serverJetty.getUrl() + "/auth"))
+            .module(appTester.moduleReplacingConnectors())
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", tokenServerTester.getUrl() + "/auth"))
             .module(b -> JerseyModule.extend(b).addResource(RedirectApi.class))
             .autoLoadModules()
             .createRuntime();
 
     @Test
     public void testWithoutRequiredCodeParameter() {
-        Response r = jetty.getTarget().path("bq-shiro-oauth-callback").request().get();
+        Response r = appTester.getTarget().path("bq-shiro-oauth-callback").request().get();
         JettyTester.assertBadRequest(r).assertContent("Parameter \"code\" is required");
     }
 
     @Test
     public void testValidWithoutOriginalUrl() {
-        Response r = jetty.getTarget().path("bq-shiro-oauth-callback")
-                .queryParam(OidConnect.CODE_PARAMETER_NAME, "000")
+        Response r = appTester.getTarget().path("bq-shiro-oauth-callback")
+                .queryParam(OidConnect.CODE_PARAM, "000")
                 .request()
                 .get();
         JettyTester.assertOk(r);
@@ -71,9 +69,9 @@ public class JwtOpenIdConnectCallbackHandlerIT extends OidConnectBaseTest {
 
     @Test
     public void testValidWithOriginalUrl() {
-        Response r = jetty.getTarget().path("bq-shiro-oauth-callback")
-                .queryParam(OidConnect.CODE_PARAMETER_NAME, "000")
-                .queryParam(OidConnect.ORIGINAL_URI_PARAMETER_NAME, Base64.getEncoder().encodeToString(URLEncoder.encode("/public", StandardCharsets.UTF_8).getBytes()))
+        Response r = appTester.getTarget().path("bq-shiro-oauth-callback")
+                .queryParam(OidConnect.CODE_PARAM, "000")
+                .queryParam(OidConnect.ORIGINAL_URI_PARAM, Base64.getEncoder().encodeToString(URLEncoder.encode("/public", StandardCharsets.UTF_8).getBytes()))
                 .request()
                 .get();
         JettyTester.assertOk(r).assertContent("public");

@@ -10,36 +10,41 @@ import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
-
 @BQTest
-public class OidConnectFilterUnauthorizedIT extends OidConnectBaseTest {
+public class OidConnectFilterUnauthorizedIT {
 
-    private final JettyTester jetty = JettyTester.create();
-
-    private static final JettyTester serverJetty = JettyTester.create();
-
+    private static final JettyTester tokenServerTester = JettyTester.create();
 
     @BQApp
-    static final BQRuntime tokenServerApp = Bootique.app("-s")
+    static final BQRuntime tokenServer = Bootique.app("-s")
             .module(JettyModule.class)
             .module(JerseyModule.class)
-            .module(serverJetty.moduleReplacingConnectors())
+            .module(tokenServerTester.moduleReplacingConnectors())
             .module(b -> JerseyModule.extend(b).addResource(TokenApi.class))
             .createRuntime();
 
+    private final JettyTester appTester = JettyTester.create();
+
     @BQApp
     final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidconnect/oidconnect.yml", "-s")
-            .module(jetty.moduleReplacingConnectors())
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", serverJetty.getUrl() + "/auth"))
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.oidpUrl", serverJetty.getUrl() + "/auth"))
+            .module(appTester.moduleReplacingConnectors())
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", tokenServerTester.getUrl() + "/auth"))
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.oidpUrl", tokenServerTester.getUrl() + "/auth"))
             .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
             .autoLoadModules()
             .createRuntime();
+
+    @Test
+    public void accessDenied() {
+        Response r = appTester.getTarget()
+                .path("/private")
+                .queryParam("aaa", "1").queryParam("bbb", 2)
+                .request()
+                .get();
+        JettyTester.assertUnauthorized(r);
+    }
 
     @Path("/auth")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -53,11 +58,10 @@ public class OidConnectFilterUnauthorizedIT extends OidConnectBaseTest {
 
         @GET
         public Response authCode(@Context UriInfo uriInfo) {
-            final String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "&code=123&state=xyz";
+            String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "&code=123&state=xyz";
             return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
         }
     }
-
 
     @Path("/")
     public static class TestApi {
@@ -67,15 +71,5 @@ public class OidConnectFilterUnauthorizedIT extends OidConnectBaseTest {
         public String getPrivate() {
             return "private";
         }
-    }
-
-    @Test
-    public void testAccessDenied() {
-        Response r = jetty.getTarget()
-                .path("/private")
-                .queryParam("aaa", "1").queryParam("bbb", 2)
-                .request()
-                .get();
-        JettyTester.assertUnauthorized(r);
     }
 }
