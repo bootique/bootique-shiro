@@ -12,7 +12,6 @@ import org.apache.shiro.web.util.WebUtils;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -67,48 +66,44 @@ public class OidConnectFilter extends JwtBearerAuthenticationFilter {
     }
 
     private void redirectToOpenIdLoginPage(ServletRequest request, ServletResponse response) throws Exception {
-        WebUtils.issueRedirect(request, response, oidpUrl, oidpParams(request));
-    }
-
-    private Map<String, Object> oidpParams(ServletRequest request) {
 
         // using a map with predictable entry order so we can test the URLs
         Map<String, Object> params = new LinkedHashMap<>();
         params.put(OidConnect.RESPONSE_TYPE_PARAM, OidConnect.CODE_PARAM);
         params.put(OidConnect.CLIENT_ID_PARAM, clientId);
-        params.put(OidConnect.REDIRECT_URI_PARAM, redirectUri((HttpServletRequest) request, callbackUri));
-        return params;
+        params.put(OidConnect.REDIRECT_URI_PARAM, redirectUrl((HttpServletRequest) request, callbackUri));
+
+        // TODO: just do raw redirects via the Servlet API, don't rely on non-transparent WebUtils.issueRedirect(..)
+        WebUtils.issueRedirect(request, response, oidpUrl, params);
     }
 
-    private static String redirectUri(HttpServletRequest request, String callbackUri) {
-        StringBuffer requestUrl = request.getRequestURL();
-        int requestUrlLen = requestUrl.length();
+    private static String redirectUrl(HttpServletRequest request, String callbackUri) {
 
-        //
-        String baseUri = requestUrl
-                .substring(0, requestUrlLen - request.getRequestURI().length())
-                + request.getContextPath();
+        StringBuffer url = request.getRequestURL();
 
-        StringBuilder postAuthRedirectUri = new StringBuilder();
-        Enumeration<String> parameters = request.getParameterNames();
-        while (parameters.hasMoreElements()) {
-            String parameter = parameters.nextElement();
-            if (postAuthRedirectUri.isEmpty()) {
-                postAuthRedirectUri.append(request.getRequestURI()).append("?");
-            } else {
-                postAuthRedirectUri.append("&");
-            }
-            postAuthRedirectUri.append(parameter).append("=").append(request.getParameter(parameter));
-        }
-        if (postAuthRedirectUri.isEmpty()) {
-            postAuthRedirectUri.append(request.getRequestURI());
+        // truncate the path from the URL. We'll replace it with a callbac path
+        url.setLength(url.length() - request.getRequestURI().length());
+
+        url.append(request.getContextPath());
+
+        // "callbackUri" is relative to the webapp context
+        if (!callbackUri.startsWith("/")) {
+            url.append("/");
         }
 
-        return baseUri + resolveCallbackUri(callbackUri) + "?" + OidConnect.ORIGINAL_URI_PARAM + "=" + URLEncoder.encode(
-                postAuthRedirectUri.toString(), StandardCharsets.UTF_8);
+        return url.append(callbackUri).append("?").append(OidConnect.ORIGINAL_URI_PARAM).append("=")
+                .append(URLEncoder.encode(postAuthRedirectUrl(request), StandardCharsets.UTF_8)).toString();
     }
 
-    private static String resolveCallbackUri(String callbackUri) {
-        return callbackUri.startsWith("/") ? callbackUri : "/" + callbackUri;
+    private static String postAuthRedirectUrl(HttpServletRequest request) {
+
+        StringBuffer url = request.getRequestURL();
+        String qs = request.getQueryString();
+
+        if (qs != null) {
+            url.append('?').append(qs);
+        }
+
+        return url.toString();
     }
 }

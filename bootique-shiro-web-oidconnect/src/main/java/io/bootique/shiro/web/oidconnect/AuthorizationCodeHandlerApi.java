@@ -93,6 +93,7 @@ public class AuthorizationCodeHandlerApi {
         String token = tokenJson.get(OidConnect.ACCESS_TOKEN_PARAM).asText();
 
         return originalUri != null && !originalUri.isEmpty()
+                // TODO: do not proxy the original URL response. Issue a redirect instead!!
                 ? prepareOriginalTarget(baseUri, originalUri).request().cookie(tokenCookie, token).get()
                 : Response.ok().cookie(new NewCookie.Builder(tokenCookie).value(token).build()).build();
     }

@@ -76,7 +76,10 @@ public class ShiroWebOidConnectModuleFactory {
         this.tokenCookie = tokenCookie;
     }
 
-    @BQConfigProperty("Callback Uri")
+    @BQConfigProperty("""
+            A URI of the authorization code handler. The handler itself is internally published by Bootique at this URL.
+            It should be relative to the application URL "context". The parameter is optional and if not specified 
+            it will be set to '/bq-shiro-oauth-callback'""")
     public void setCallbackUri(String callbackUri) {
         this.callbackUri = callbackUri;
     }
@@ -138,6 +141,8 @@ public class ShiroWebOidConnectModuleFactory {
     }
 
     private String getCallbackUri() {
+        // TODO: the default will only work if the JAX-RS context is "/"... Append Jersey servlet context to the default
+        //  to make it work universally
         return callbackUri == null || callbackUri.isEmpty() ? DEFAULT_CALLBACK_URL : callbackUri;
     }
 }
