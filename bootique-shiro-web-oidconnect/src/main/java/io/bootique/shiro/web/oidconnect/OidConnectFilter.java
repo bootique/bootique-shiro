@@ -12,7 +12,6 @@ import org.apache.shiro.web.util.WebUtils;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -106,7 +105,7 @@ public class OidConnectFilter extends JwtBearerAuthenticationFilter {
         }
 
         return baseUri + resolveCallbackUri(callbackUri) + "?" + OidConnect.ORIGINAL_URI_PARAM + "=" + URLEncoder.encode(
-                Base64.getEncoder().encodeToString(postAuthRedirectUri.toString().getBytes()), StandardCharsets.UTF_8);
+                postAuthRedirectUri.toString(), StandardCharsets.UTF_8);
     }
 
     private static String resolveCallbackUri(String callbackUri) {

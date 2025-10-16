@@ -16,13 +16,11 @@ import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 /**
  * A callback endpoint that processes authorization code sent back by an IDP after a user login.
@@ -119,7 +117,7 @@ public class AuthorizationCodeHandlerApi {
     private WebTarget prepareOriginalTarget(URI baseUri, String encodedOriginalUri) {
 
         // 1. Decode original uri
-        URI originalUri = URI.create(Base64Coder.decodeString(URLDecoder.decode(encodedOriginalUri, StandardCharsets.UTF_8)));
+        URI originalUri = URI.create(URLDecoder.decode(encodedOriginalUri, StandardCharsets.UTF_8));
 
         // 2. Parse path
         WebTarget redirectTarget = webClient.target(baseUri).path(originalUri.getPath());
@@ -166,12 +164,10 @@ public class AuthorizationCodeHandlerApi {
 
         if (originalUri != null && !originalUri.isEmpty()) {
 
-            String originalBase64 = Base64.getEncoder().encodeToString(originalUri.getBytes());
-
             redirectUri.append("?")
                     .append(OidConnect.ORIGINAL_URI_PARAM)
                     .append("=")
-                    .append(URLEncoder.encode(originalBase64, StandardCharsets.UTF_8));
+                    .append(URLEncoder.encode(originalUri, StandardCharsets.UTF_8));
         }
 
         return OidConnect.RESPONSE_TYPE_PARAM + "=" + OidConnect.CODE_PARAM +
