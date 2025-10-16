@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @BQTest
-public class JwtOpenIdConnectCallbackHandlerIT {
+public class AuthorizationCodeHandlerApiIT {
 
     private static final JettyTester tokenServerTester = JettyTester.create();
 
@@ -48,13 +48,13 @@ public class JwtOpenIdConnectCallbackHandlerIT {
             .createRuntime();
 
     @Test
-    public void testWithoutRequiredCodeParameter() {
+    public void noCodeParam() {
         Response r = appTester.getTarget().path("bq-shiro-oauth-callback").request().get();
-        JettyTester.assertBadRequest(r).assertContent("Parameter \"code\" is required");
+        JettyTester.assertBadRequest(r).assertContent("'code' parameter is required");
     }
 
     @Test
-    public void testValidWithoutOriginalUrl() {
+    public void validWithoutOriginalUrl() {
         Response r = appTester.getTarget().path("bq-shiro-oauth-callback")
                 .queryParam(OidConnect.CODE_PARAM, "000")
                 .request()
@@ -68,7 +68,7 @@ public class JwtOpenIdConnectCallbackHandlerIT {
     }
 
     @Test
-    public void testValidWithOriginalUrl() {
+    public void validWithOriginalUrl() {
         Response r = appTester.getTarget().path("bq-shiro-oauth-callback")
                 .queryParam(OidConnect.CODE_PARAM, "000")
                 .queryParam(OidConnect.ORIGINAL_URI_PARAM, Base64.getEncoder().encodeToString(URLEncoder.encode("/public", StandardCharsets.UTF_8).getBytes()))
@@ -91,7 +91,6 @@ public class JwtOpenIdConnectCallbackHandlerIT {
         public String auth() {
             return "{\"access_token\":\"123\"}";
         }
-
     }
 
     @Path("/")

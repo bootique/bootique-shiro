@@ -22,17 +22,9 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.jackson.JacksonService;
 import io.bootique.jersey.MappedResource;
-import io.bootique.resource.ResourceFactory;
-import io.bootique.shiro.web.jwt.jjwt.JwtParserMaker;
-import io.bootique.shiro.web.jwt.authz.AuthzReaderFactory;
-import io.bootique.shiro.web.jwt.authz.JsonListAuthzReaderFactory;
-import io.bootique.value.Duration;
 import io.jsonwebtoken.JwtParser;
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
-import java.net.URI;
-import java.net.URL;
-import java.util.Objects;
 
 /**
  * @since 4.0
@@ -50,6 +42,14 @@ public class ShiroWebOidConnectModuleFactory {
     private String tokenCookie;
     private String callbackUri;
 
+    private final Provider<JwtParser> tokenParser;
+    private final JacksonService jacksonService;
+
+    @Inject
+    public ShiroWebOidConnectModuleFactory(Provider<JwtParser> tokenParser, JacksonService jacksonService) {
+        this.tokenParser = tokenParser;
+        this.jacksonService = jacksonService;
+    }
 
     @BQConfigProperty("OpenId Connect Login Url")
     public void setOidpUrl(String oidpUrl) {
@@ -81,25 +81,44 @@ public class ShiroWebOidConnectModuleFactory {
         this.callbackUri = callbackUri;
     }
 
+    public OidConnectFilter createFilter(String audience) {
+        return new OidConnectFilter(tokenParser, audience, getOidpUrl(), getTokenCookie(), getClientId(), getCallbackUri());
+    }
+
+    public MappedResource<AuthorizationCodeHandlerApi> createAuthorizationCodeHandler(String audience) {
+        AuthorizationCodeHandlerApi api = new AuthorizationCodeHandlerApi(
+                jacksonService.newObjectMapper(),
+                getTokenCookie(),
+                getTokenUrl(),
+                getClientId(),
+                getClientSecret(),
+                audience,
+                getOidpUrl(),
+                getCallbackUri());
+
+        return new MappedResource<>(api, getCallbackUri());
+    }
+
     private String getOidpUrl() {
+
         if (this.oidpUrl == null || this.oidpUrl.isEmpty()) {
             throw new IllegalArgumentException("OpenId Connect Login Url property is not defined");
         }
+
         return this.oidpUrl;
     }
 
     private String getTokenUrl() {
+
         if (this.tokenUrl == null || this.tokenUrl.isEmpty()) {
             throw new IllegalArgumentException("Token Url property is not defined");
         }
+
         return this.tokenUrl;
     }
 
     private String getTokenCookie() {
-        if (this.tokenCookie == null || tokenCookie.isEmpty()) {
-            return DEFAULT_TOKEN_COOKIE;
-        }
-        return this.tokenCookie;
+        return tokenCookie == null || tokenCookie.isEmpty() ? DEFAULT_TOKEN_COOKIE : tokenCookie;
     }
 
     private String getClientId() {
@@ -110,33 +129,15 @@ public class ShiroWebOidConnectModuleFactory {
     }
 
     private String getClientSecret() {
+
         if (this.clientSecret == null || this.clientSecret.isEmpty()) {
             throw new IllegalArgumentException("Client Secret property is not defined");
         }
+
         return this.clientSecret;
     }
 
     private String getCallbackUri() {
-        if (this.callbackUri == null || callbackUri.isEmpty()) {
-            return DEFAULT_CALLBACK_URL;
-        }
-        return this.callbackUri;
-    }
-
-    public OidConnectFilter createFilter(Provider<JwtParser> tokenParser, String audience) {
-        return new OidConnectFilter(tokenParser, audience, getOidpUrl(), getTokenCookie(), getClientId(), getCallbackUri());
-    }
-
-    public MappedResource<JwtOpenIdCallbackHandler> createJwtOpenIdCallbackHandler(JacksonService jacksonService, String audience) {
-        return new MappedResource<>(
-                new JwtOpenIdCallbackHandler(
-                        jacksonService.newObjectMapper(),
-                        getTokenCookie(),
-                        getTokenUrl(),
-                        getClientId(),
-                        getClientSecret(),
-                        audience,
-                        getOidpUrl(),
-                        getCallbackUri()), getCallbackUri());
+        return callbackUri == null || callbackUri.isEmpty() ? DEFAULT_CALLBACK_URL : callbackUri;
     }
 }
