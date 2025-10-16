@@ -81,7 +81,7 @@ public class OidConnectFilterIT {
         String expectedRedirect = tokenServerTester.getUrl() +
                 "/auth?response_type=code&client_id=test-client&redirect_uri=" +
                 URLEncoder.encode(appTester.getUrl(), StandardCharsets.UTF_8) +
-                "%2Fcustom-oauth-callback%3Foriginal_uri%3DL3ByaXZhdGU%253D";
+                "%2Fcustom-oauth-callback%3Foriginal_uri%3D%252Fprivate";
 
         JettyTester.assertFound(r).assertHeader("Location", expectedRedirect);
     }

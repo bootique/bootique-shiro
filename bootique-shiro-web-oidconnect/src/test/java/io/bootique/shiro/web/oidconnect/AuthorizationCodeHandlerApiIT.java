@@ -9,14 +9,20 @@ import io.bootique.jetty.junit5.JettyTester;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +77,7 @@ public class AuthorizationCodeHandlerApiIT {
     public void validWithOriginalUrl() {
         Response r = appTester.getTarget().path("bq-shiro-oauth-callback")
                 .queryParam(OidConnect.CODE_PARAM, "000")
-                .queryParam(OidConnect.ORIGINAL_URI_PARAM, Base64.getEncoder().encodeToString(URLEncoder.encode("/public", StandardCharsets.UTF_8).getBytes()))
+                .queryParam(OidConnect.ORIGINAL_URI_PARAM, URLEncoder.encode("/public", StandardCharsets.UTF_8))
                 .request()
                 .get();
         JettyTester.assertOk(r).assertContent("public");
