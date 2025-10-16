@@ -14,7 +14,7 @@
 # limitations under the License.
 shiroweb:
   urls:
-    "/private" : "jwtBearerOidConnect, roles[role1]"
+    "/private" : "oidConnect, roles[role1]"
 
 shirowebjwt:
   jwkLocation: "classpath:io/bootique/shiro/web/oidconnect/jwks.json"

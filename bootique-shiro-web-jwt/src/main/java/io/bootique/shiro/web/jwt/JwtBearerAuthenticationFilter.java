@@ -30,7 +30,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.BearerToken;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
-import org.apache.shiro.web.util.WebUtils;
 
 import java.util.Set;
 
@@ -83,13 +82,9 @@ public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilte
 
     protected void redirectIfNoAuth(ServletRequest request, ServletResponse response, Exception e) throws Exception {
         if (e == null) {
-            WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
-    }
-
-    protected void redirectIfNoAuth(ServletRequest request, ServletResponse response) throws Exception {
-        redirectIfNoAuth(request, response, null);
     }
 }

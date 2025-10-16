@@ -24,12 +24,14 @@ public class OidConnectFilter extends JwtBearerAuthenticationFilter {
     private final String clientId;
     private final String callbackUri;
 
-    public OidConnectFilter(Provider<JwtParser> tokenParser,
-                            String audience,
-                            String oidpUrl,
-                            String tokenCookie,
-                            String clientId,
-                            String callbackUri) {
+    public OidConnectFilter(
+            Provider<JwtParser> tokenParser,
+            String audience,
+            String oidpUrl,
+            String tokenCookie,
+            String clientId,
+            String callbackUri) {
+
         super(tokenParser, audience);
         this.oidpUrl = oidpUrl;
         this.tokenCookie = tokenCookie;
@@ -39,21 +41,20 @@ public class OidConnectFilter extends JwtBearerAuthenticationFilter {
 
     @Override
     protected String getAuthzHeader(ServletRequest request) {
-        HttpServletRequest httpRequest = WebUtils.toHttp(request);
-        Cookie[] cookies = httpRequest.getCookies();
+        Cookie[] cookies = ((HttpServletRequest) request).getCookies();
         return cookies == null ? null : Arrays.stream(cookies)
                 .filter(c -> c.getName().equals(tokenCookie))
                 .findFirst()
+
+                // TODO: ugly... we take a token from the cookie and pretend it is a "Bearer" auth header. Wish Shiro
+                //  inheritance wasn't as deep and limiting
                 .map(c -> "Bearer " + c.getValue())
                 .orElse(null);
     }
 
+    @Override
     protected void redirectIfNoAuth(ServletRequest request, ServletResponse response, Exception e) throws Exception {
         redirectToOpenIdLoginPage(request, response);
-    }
-
-    private void redirectToOpenIdLoginPage(ServletRequest request, ServletResponse response) throws Exception {
-        WebUtils.issueRedirect(request, response, oidpUrl, oidpParams(request));
     }
 
     @Override
@@ -66,38 +67,46 @@ public class OidConnectFilter extends JwtBearerAuthenticationFilter {
         }
     }
 
+    private void redirectToOpenIdLoginPage(ServletRequest request, ServletResponse response) throws Exception {
+        WebUtils.issueRedirect(request, response, oidpUrl, oidpParams(request));
+    }
+
     private Map<String, Object> oidpParams(ServletRequest request) {
 
         // using a map with predictable entry order so we can test the URLs
         Map<String, Object> params = new LinkedHashMap<>();
         params.put(OidConnect.RESPONSE_TYPE_PARAM, OidConnect.CODE_PARAM);
         params.put(OidConnect.CLIENT_ID_PARAM, clientId);
-        params.put(OidConnect.REDIRECT_URI_PARAM, callbackUri((HttpServletRequest) request, callbackUri));
+        params.put(OidConnect.REDIRECT_URI_PARAM, redirectUri((HttpServletRequest) request, callbackUri));
         return params;
     }
 
-    private static String callbackUri(HttpServletRequest request, String callbackUri) {
-        String baseUri = request.getRequestURL()
-                .substring(0, request.getRequestURL().length() - request.getRequestURI().length())
+    private static String redirectUri(HttpServletRequest request, String callbackUri) {
+        StringBuffer requestUrl = request.getRequestURL();
+        int requestUrlLen = requestUrl.length();
+
+        //
+        String baseUri = requestUrl
+                .substring(0, requestUrlLen - request.getRequestURI().length())
                 + request.getContextPath();
 
-        StringBuilder originalUri = new StringBuilder();
+        StringBuilder postAuthRedirectUri = new StringBuilder();
         Enumeration<String> parameters = request.getParameterNames();
         while (parameters.hasMoreElements()) {
             String parameter = parameters.nextElement();
-            if (originalUri.isEmpty()) {
-                originalUri.append(request.getRequestURI()).append("?");
+            if (postAuthRedirectUri.isEmpty()) {
+                postAuthRedirectUri.append(request.getRequestURI()).append("?");
             } else {
-                originalUri.append("&");
+                postAuthRedirectUri.append("&");
             }
-            originalUri.append(parameter).append("=").append(request.getParameter(parameter));
+            postAuthRedirectUri.append(parameter).append("=").append(request.getParameter(parameter));
         }
-        if (originalUri.isEmpty()) {
-            originalUri.append(request.getRequestURI());
+        if (postAuthRedirectUri.isEmpty()) {
+            postAuthRedirectUri.append(request.getRequestURI());
         }
 
         return baseUri + resolveCallbackUri(callbackUri) + "?" + OidConnect.ORIGINAL_URI_PARAM + "=" + URLEncoder.encode(
-                Base64.getEncoder().encodeToString(originalUri.toString().getBytes()), StandardCharsets.UTF_8);
+                Base64.getEncoder().encodeToString(postAuthRedirectUri.toString().getBytes()), StandardCharsets.UTF_8);
     }
 
     private static String resolveCallbackUri(String callbackUri) {
