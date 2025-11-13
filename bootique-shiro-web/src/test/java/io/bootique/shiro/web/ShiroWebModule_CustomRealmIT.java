@@ -44,7 +44,6 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter;
-import org.apache.shiro.web.util.WebUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -132,7 +131,7 @@ public class ShiroWebModule_CustomRealmIT {
 
         @Override
         protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws IOException {
-            WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
     }

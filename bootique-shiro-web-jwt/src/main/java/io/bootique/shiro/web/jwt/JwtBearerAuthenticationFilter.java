@@ -30,7 +30,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.BearerToken;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
-import org.apache.shiro.web.util.WebUtils;
 
 import java.util.Set;
 
@@ -68,7 +67,7 @@ public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilte
         try {
             return super.executeLogin(request, response);
         } catch (JwtException | AuthenticationException e) {
-            WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            redirectIfNoAuth(request, response, e);
             return false;
         }
     }
@@ -78,6 +77,14 @@ public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilte
             if (audienceJwtClaim == null || !audienceJwtClaim.contains(this.audience)) {
                 throw new AuthenticationException("Invalid audience");
             }
+        }
+    }
+
+    protected void redirectIfNoAuth(ServletRequest request, ServletResponse response, Exception e) throws Exception {
+        if (e == null) {
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
     }
 }
