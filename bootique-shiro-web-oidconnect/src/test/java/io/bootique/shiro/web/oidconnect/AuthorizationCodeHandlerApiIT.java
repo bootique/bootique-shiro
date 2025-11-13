@@ -14,17 +14,15 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -66,26 +64,36 @@ public class AuthorizationCodeHandlerApiIT {
                 .request()
                 .get();
         JettyTester.assertOk(r);
-        Map<String, NewCookie> cookies = r.getCookies();
-        assertNotNull(cookies);
-        NewCookie tokenCookie = cookies.get("bq-shiro-oid");
-        assertNotNull(tokenCookie);
-        assertEquals("123", tokenCookie.getValue());
+        
+        Cookie c = r.getCookies().get("bq-shiro-oid");
+        assertNotNull(c);
+        assertEquals("123", c.getValue());
     }
 
     @Test
     public void validWithOriginalUrl() {
-        Response r = appTester.getTarget().path("bq-shiro-oauth-callback")
+        Client client = OidTests.clientNoRedirects();
+
+        Response r1Callback = client.target(appTester.getUrl())
+                .path("bq-shiro-oauth-callback")
                 .queryParam(OidConnect.CODE_PARAM, "000")
                 .queryParam(OidConnect.ORIGINAL_URI_PARAM, URLEncoder.encode("/public", StandardCharsets.UTF_8))
                 .request()
                 .get();
-        JettyTester.assertOk(r).assertContent("public");
-        Map<String, NewCookie> cookies = r.getCookies();
-        assertNotNull(cookies);
-        NewCookie tokenCookie = cookies.get("bq-shiro-oid");
-        assertNotNull(tokenCookie);
-        assertEquals("123", tokenCookie.getValue());
+
+        JettyTester.assertTempRedirect(r1Callback);
+
+        Cookie c = r1Callback.getCookies().get("bq-shiro-oid");
+        assertNotNull(c, () -> "No access cookie for redirect to: " + r1Callback.getHeaderString("Location"));
+        assertEquals("123", c.getValue());
+
+        // test that we got redirected to the right place
+        Response r2ResourceAccessCookies = client
+                .target(r1Callback.getHeaderString("Location"))
+                .request()
+                .get();
+
+        JettyTester.assertOk(r2ResourceAccessCookies).assertContent("public");
     }
 
     @Path("/auth")
@@ -105,20 +113,13 @@ public class AuthorizationCodeHandlerApiIT {
         @GET
         @Path("public")
         public Response getPublic(@Context HttpServletRequest request) {
-            return response(request, "public");
+            return Response.ok("public").build();
         }
 
         @GET
         @Path("private")
         public Response getPrivate(@Context HttpServletRequest request) {
-            return response(request, "private");
-        }
-
-        private Response response(HttpServletRequest request, String entity) {
-            List<NewCookie> oidTokenCookie = Arrays.stream(request.getCookies()).map(c -> new NewCookie.Builder(c.getName()).value(c.getValue()).build()).toList();
-            Response.ResponseBuilder r = Response.ok(entity);
-            oidTokenCookie.forEach(r::cookie);
-            return r.build();
+            return Response.ok("private").build();
         }
     }
 }

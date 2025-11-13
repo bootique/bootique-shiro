@@ -84,17 +84,17 @@ public class AuthorizationCodeHandlerApi {
         }
 
         return tokenResponse.getStatus() == Response.Status.OK.getStatusCode()
-                ? onTokenSuccess(tokenJson, uriInfo.getBaseUri(), originalUri)
+                ? onTokenSuccess(tokenJson, originalUri)
                 : onTokenFailure(tokenResponse, tokenJson, uriInfo.getBaseUri(), originalUri);
     }
 
-    private Response onTokenSuccess(JsonNode tokenJson, URI baseUri, String originalUri) {
+    private Response onTokenSuccess(JsonNode tokenJson, String originalUri) {
 
         String token = tokenJson.get(OidConnect.ACCESS_TOKEN_PARAM).asText();
+        NewCookie cookie = new NewCookie.Builder(tokenCookie).value(token).build();
 
         return originalUri != null && !originalUri.isEmpty()
-                // TODO: do not proxy the original URL response. Issue a redirect instead!!
-                ? prepareOriginalTarget(baseUri, originalUri).request().cookie(tokenCookie, token).get()
+                ? Response.temporaryRedirect(decodeUri(originalUri)).cookie(cookie).build()
                 : Response.ok().cookie(new NewCookie.Builder(tokenCookie).value(token).build()).build();
     }
 
@@ -115,24 +115,8 @@ public class AuthorizationCodeHandlerApi {
         return tokenResponse;
     }
 
-    private WebTarget prepareOriginalTarget(URI baseUri, String encodedOriginalUri) {
-
-        // 1. Decode original uri
-        URI originalUri = URI.create(URLDecoder.decode(encodedOriginalUri, StandardCharsets.UTF_8));
-
-        // 2. Parse path
-        WebTarget redirectTarget = webClient.target(baseUri).path(originalUri.getPath());
-
-        // 3. Parse params
-        String query = originalUri.getQuery();
-        if (query != null && !query.isEmpty()) {
-            String[] params = query.split("&");
-            for (String p : params) {
-                String[] pair = p.split("=");
-                redirectTarget = redirectTarget.queryParam(pair[0], pair[1]);
-            }
-        }
-        return redirectTarget;
+    private static URI decodeUri(String encodedUri) {
+        return URI.create(URLDecoder.decode(encodedUri, StandardCharsets.UTF_8));
     }
 
     private Response requestToken(String code) {

@@ -8,9 +8,6 @@ import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.junit5.JettyTester;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -18,24 +15,22 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
-import org.glassfish.jersey.client.ClientProperties;
+import jakarta.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.Test;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @BQTest
 public class OidConnectFilterIT {
@@ -47,33 +42,26 @@ public class OidConnectFilterIT {
             .module(JettyModule.class)
             .module(JerseyModule.class)
             .module(tokenServerTester.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(TokenApi.class))
+            .module(b -> JerseyModule.extend(b).addResource(AuthApi.class).addResource(TokenApi.class))
             .createRuntime();
 
     private final JettyTester appTester = JettyTester.create();
 
     @BQApp
-    final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidconnect/oidconnect.yml", "-s")
+    final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidconnect/oidconnect-filter.yml", "-s")
             .module(appTester.moduleReplacingConnectors())
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", tokenServerTester.getUrl() + "/auth"))
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", tokenServerTester.getUrl() + "/token"))
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.oidpUrl", tokenServerTester.getUrl() + "/auth"))
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.callbackUri", "custom-oauth-callback"))
             .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
             .autoLoadModules()
             .createRuntime();
 
-    private WebTarget appTargetNoRedirects() {
-        Client client = ClientBuilder.newBuilder()
-                .property(ClientProperties.FOLLOW_REDIRECTS, false)
-                .build();
-
-        return client.target(appTester.getUrl());
-    }
-
     @Test
     public void noAuth() {
 
-        Response r = appTargetNoRedirects()
+        Response r = OidTests.clientNoRedirects()
+                .target(appTester.getUrl())
                 .path("/private")
                 .request()
                 .get();
@@ -91,19 +79,45 @@ public class OidConnectFilterIT {
 
     @Test
     public void noAuthWithIDPRedirects() {
-        Response r = appTester.getTarget()
+        Client client = OidTests.clientNoRedirects();
+
+        Response r1ResourceNoAccess = client
+                .target(appTester.getUrl())
                 .path("/private")
                 .request()
                 .get();
-        JettyTester.assertOk(r).assertContent("private");
+        JettyTester.assertFound(r1ResourceNoAccess);
+
+        Response r2Login = client
+                .target(r1ResourceNoAccess.getHeaderString("Location"))
+                .request()
+                .get();
+        JettyTester.assertFound(r2Login);
+
+        Response r3Callback = client
+                .target(r2Login.getHeaderString("Location"))
+                .request()
+                .get();
+        JettyTester.assertTempRedirect(r3Callback);
+
+        Cookie c = r3Callback.getCookies().get("bq-shiro-oid");
+        assertNotNull(c, () -> "No access cookie for redirect to: " + r3Callback.getHeaderString("Location"));
+
+        Response r4ResourceAccessCookies = client
+                .target(r3Callback.getHeaderString("Location"))
+                .request()
+                .cookie(c)
+                .get();
+
+        JettyTester.assertOk(r4ResourceAccessCookies).assertContent("private");
     }
 
     @Test
     public void authCookie() throws Exception {
 
-        Map<String, ?> map = Map.of("roles", List.of("role1"));
-        String authToken = TokenApi.authToken(map);
-        Response r = appTargetNoRedirects()
+        String authToken = OidTests.jwt(Map.of("roles", List.of("role1")));
+        Response r = OidTests.clientNoRedirects()
+                .target(appTester.getUrl())
                 .path("/private")
                 .request()
                 .cookie(new NewCookie.Builder("bq-shiro-oid").value(authToken).build())
@@ -122,44 +136,43 @@ public class OidConnectFilterIT {
     }
 
     @Path("/auth")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
+    public static class AuthApi {
+
+        @GET
+        public Response authCode(
+                @QueryParam("response_type") String responseType,
+                @QueryParam("client_id") String clientId,
+                @QueryParam("redirect_uri") String redirectUri,
+                @Context UriInfo uriInfo) {
+
+            assertEquals("code", responseType);
+            assertEquals("test-client", clientId);
+            assertNotNull(redirectUri);
+
+            String callbackUrl = redirectUri + "&code=123&state=xyz";
+            return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
+        }
+    }
+
+    @Path("/token")
     public static class TokenApi {
 
         @POST
-        public Response authToken() {
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        @Produces(MediaType.APPLICATION_JSON)
+        public Response token(MultivaluedMap<String, String> data) {
+
+            assertEquals("123", data.getFirst("code"));
+            assertEquals("authorization_code", data.getFirst("grant_type"));
+            assertEquals("test-client", data.getFirst("client_id"));
+            assertEquals("test-password", data.getFirst("client_secret"));
+
             try {
-                Map<String, ?> map = Map.of("roles", List.of("role1"));
-                String authToken = authToken(map);
+                String authToken = OidTests.jwt(Map.of("roles", List.of("role1")));
                 return Response.ok("{\"access_token\":\"" + authToken + "\"}").build();
             } catch (Exception e) {
                 return Response.serverError().entity("Unable to generate auth token: " + e.getMessage()).build();
             }
-        }
-
-        @GET
-        public Response authCode(@QueryParam("redirect_uri") String redirectUri) {
-            String callbackUrl = redirectUri + "&code=123&state=xyz";
-            return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
-        }
-
-        static String authToken(Map<String, ?> rolesClaim) throws Exception {
-
-            String key = Files.readString(Paths.get(ClassLoader.getSystemResource("io/bootique/shiro/web/oidconnect/jwks-private-key.pem").toURI()));
-            String privateKeyPEM = key
-                    .replace("-----BEGIN PRIVATE KEY-----", "")
-                    .replaceAll(System.lineSeparator(), "")
-                    .replace("-----END PRIVATE KEY-----", "");
-
-            byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
-            PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-            JwtBuilder builder = Jwts.builder()
-                    .header().add("kid", "xGpTsw0DJs0vbe5CEcKMl5oZc7nKzAC9sF7kx1nQu1I")
-                    .and()
-                    .claims(rolesClaim).signWith(SignatureAlgorithm.RS256, privateKey);
-            return builder.compact();
         }
     }
 }
