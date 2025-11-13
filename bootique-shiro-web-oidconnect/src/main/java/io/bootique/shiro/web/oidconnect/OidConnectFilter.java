@@ -7,13 +7,11 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.shiro.web.util.WebUtils;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class OidConnectFilter extends JwtBearerAuthenticationFilter {
 
@@ -52,29 +50,32 @@ public class OidConnectFilter extends JwtBearerAuthenticationFilter {
 
     @Override
     protected void redirectIfNoAuth(ServletRequest request, ServletResponse response, Exception e) throws Exception {
-        redirectToOpenIdLoginPage(request, response);
+        redirectToOpenIdLoginPage((HttpServletRequest) request, (HttpServletResponse) response);
     }
 
     @Override
     protected boolean sendChallenge(ServletRequest request, ServletResponse response) {
         try {
-            redirectToOpenIdLoginPage(request, response);
+            redirectToOpenIdLoginPage((HttpServletRequest) request, (HttpServletResponse) response);
             return false;
         } catch (Exception e) {
             return super.sendChallenge(request, response);
         }
     }
 
-    private void redirectToOpenIdLoginPage(ServletRequest request, ServletResponse response) throws Exception {
+    private void redirectToOpenIdLoginPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        // using a map with predictable entry order so we can test the URLs
-        Map<String, Object> params = new LinkedHashMap<>();
-        params.put(OidConnect.RESPONSE_TYPE_PARAM, OidConnect.CODE_PARAM);
-        params.put(OidConnect.CLIENT_ID_PARAM, clientId);
-        params.put(OidConnect.REDIRECT_URI_PARAM, redirectUrl((HttpServletRequest) request, callbackUri));
+        StringBuilder redirectUrl = new StringBuilder();
+        if (oidpUrl.startsWith("/")) {
+            redirectUrl.append(request.getContextPath());
+        }
 
-        // TODO: just do raw redirects via the Servlet API, don't rely on non-transparent WebUtils.issueRedirect(..)
-        WebUtils.issueRedirect(request, response, oidpUrl, params);
+        redirectUrl.append(oidpUrl)
+                .append('?').append(OidConnect.RESPONSE_TYPE_PARAM).append('=').append(OidConnect.CODE_PARAM)
+                .append('&').append(OidConnect.CLIENT_ID_PARAM).append('=').append(URLEncoder.encode(clientId, StandardCharsets.UTF_8))
+                .append('&').append(OidConnect.REDIRECT_URI_PARAM).append('=').append(URLEncoder.encode(redirectUrl(request, callbackUri), StandardCharsets.UTF_8));
+
+        response.sendRedirect(redirectUrl.toString());
     }
 
     private static String redirectUrl(HttpServletRequest request, String callbackUri) {
