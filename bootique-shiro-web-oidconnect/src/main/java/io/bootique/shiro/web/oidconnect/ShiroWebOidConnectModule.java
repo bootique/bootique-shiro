@@ -56,24 +56,33 @@ public class ShiroWebOidConnectModule implements BQModule {
 
     @Provides
     @Singleton
-    public OidConnectFilter provideOidConnectFilter(ConfigurationFactory configFactory) {
-        String audience = configFactory
-                .config(ShiroWebJwtModuleFactory.class, ShiroWebJwtModule.CONFIG_PREFIX)
-                .provideAudience();
-
-        return configFactory.config(ShiroWebOidConnectModuleFactory.class, CONFIG_PREFIX).createFilter(audience);
+    OidpRouter provideOidpClient(ConfigurationFactory configFactory) {
+        return configFactory.config(ShiroWebOidConnectModuleFactory.class, CONFIG_PREFIX).createOidpClient();
     }
 
     @Provides
     @Singleton
-    public MappedResource<AuthorizationCodeHandlerApi> provideAuthorizationCodeHandlerApi(ConfigurationFactory configFactory) {
-
+    OidConnectFilter provideOidConnectFilter(ConfigurationFactory configFactory, OidpRouter oidpRouter) {
+        // TODO: clean this up. Audience should come from our own config, not someone else's
         String audience = configFactory
                 .config(ShiroWebJwtModuleFactory.class, ShiroWebJwtModule.CONFIG_PREFIX)
                 .provideAudience();
 
         return configFactory
                 .config(ShiroWebOidConnectModuleFactory.class, CONFIG_PREFIX)
-                .createAuthorizationCodeHandler(audience);
+                .createFilter(oidpRouter, audience);
+    }
+
+    @Provides
+    @Singleton
+    MappedResource<AuthorizationCodeHandlerApi> provideAuthorizationCodeHandlerApi(ConfigurationFactory configFactory, OidpRouter oidpRouter) {
+        // TODO: clean this up. Audience should come from our own config, not someone else's
+        String audience = configFactory
+                .config(ShiroWebJwtModuleFactory.class, ShiroWebJwtModule.CONFIG_PREFIX)
+                .provideAudience();
+
+        return configFactory
+                .config(ShiroWebOidConnectModuleFactory.class, CONFIG_PREFIX)
+                .createAuthorizationCodeHandler(oidpRouter, audience);
     }
 }

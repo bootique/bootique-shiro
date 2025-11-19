@@ -52,7 +52,7 @@ public class OidConnectFilterIT {
             .module(appTester.moduleReplacingConnectors())
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", tokenServerTester.getUrl() + "/token"))
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.oidpUrl", tokenServerTester.getUrl() + "/auth"))
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.callbackUri", "custom-oauth-callback"))
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.callbackUri", "cb"))
             .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
             .autoLoadModules()
             .createRuntime();
@@ -70,7 +70,7 @@ public class OidConnectFilterIT {
         String expectedRedirect = tokenServerTester.getUrl() +
                 "/auth?response_type=code&client_id=test-client&redirect_uri=" +
                 URLEncoder.encode(appTester.getUrl(), StandardCharsets.UTF_8) +
-                "%2Fcustom-oauth-callback%3Fstart_uri%3D" +
+                "%2Fcb%3Finitial_uri%3D" +
                 // double URL-encode the origin URL, as it is a parameter of an already URL-encoded URL parameter
                 URLEncoder.encode(URLEncoder.encode(expectedOriginalUrl, StandardCharsets.UTF_8), StandardCharsets.UTF_8);
 
@@ -84,6 +84,7 @@ public class OidConnectFilterIT {
         Response r1ResourceNoAccess = client
                 .target(appTester.getUrl())
                 .path("/private")
+                .queryParam("pq", "X")
                 .request()
                 .get();
         JettyTester.assertFound(r1ResourceNoAccess);
@@ -109,7 +110,7 @@ public class OidConnectFilterIT {
                 .cookie(c)
                 .get();
 
-        JettyTester.assertOk(r4ResourceAccessCookies).assertContent("private");
+        JettyTester.assertOk(r4ResourceAccessCookies).assertContent("private:pq=X");
     }
 
     @Test
@@ -130,8 +131,8 @@ public class OidConnectFilterIT {
 
         @GET
         @Path("private")
-        public String getPrivate() {
-            return "private";
+        public String getPrivate(@QueryParam("pq") String pq) {
+            return "private" + (pq != null ? ":pq=" + pq : "");
         }
     }
 

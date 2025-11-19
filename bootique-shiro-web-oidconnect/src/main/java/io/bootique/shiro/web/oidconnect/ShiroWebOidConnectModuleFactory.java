@@ -22,6 +22,7 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.jackson.JacksonService;
 import io.bootique.jersey.MappedResource;
+import io.bootique.jetty.servlet.ServletEnvironment;
 import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -42,11 +43,16 @@ public class ShiroWebOidConnectModuleFactory {
     private String tokenCookie;
     private String callbackUri;
 
+    private final ServletEnvironment servletEnv;
     private final Provider<JwtParser> tokenParser;
     private final JacksonService jacksonService;
 
     @Inject
-    public ShiroWebOidConnectModuleFactory(Provider<JwtParser> tokenParser, JacksonService jacksonService) {
+    public ShiroWebOidConnectModuleFactory(
+            ServletEnvironment servletEnv,
+            Provider<JwtParser> tokenParser,
+            JacksonService jacksonService) {
+        this.servletEnv = servletEnv;
         this.tokenParser = tokenParser;
         this.jacksonService = jacksonService;
     }
@@ -77,27 +83,30 @@ public class ShiroWebOidConnectModuleFactory {
     }
 
     @BQConfigProperty("""
-            A URI of the authorization code handler. The handler itself is internally published by Bootique at this URL.
-            It should be relative to the application URL "context". The parameter is optional and if not specified 
-            it will be set to '/bq-shiro-oauth-callback'""")
+            An optional path of the authorization code handler. If specified, the handler will be internally published
+            at that path by "bootique-shiro" within the current app. It should be relative to the application "context". 
+            The parameter is optional and by default will be set to '/bq-shiro-oauth-callback'""")
     public void setCallbackUri(String callbackUri) {
         this.callbackUri = callbackUri;
     }
 
-    public OidConnectFilter createFilter(String audience) {
-        return new OidConnectFilter(tokenParser, audience, getOidpUrl(), getTokenCookie(), getClientId(), getCallbackUri());
+    public OidpRouter createOidpClient() {
+        return new OidpRouter(servletEnv, getOidpUrl(), getClientId(), getCallbackUri());
     }
 
-    public MappedResource<AuthorizationCodeHandlerApi> createAuthorizationCodeHandler(String audience) {
+    public OidConnectFilter createFilter(OidpRouter oidpRouter, String audience) {
+        return new OidConnectFilter(tokenParser, audience, oidpRouter, getTokenCookie());
+    }
+
+    public MappedResource<AuthorizationCodeHandlerApi> createAuthorizationCodeHandler(OidpRouter oidpRouter, String audience) {
         AuthorizationCodeHandlerApi api = new AuthorizationCodeHandlerApi(
                 jacksonService.newObjectMapper(),
+                oidpRouter,
                 getTokenCookie(),
                 getTokenUrl(),
                 getClientId(),
                 getClientSecret(),
-                audience,
-                getOidpUrl(),
-                getCallbackUri());
+                audience);
 
         return new MappedResource<>(api, getCallbackUri());
     }
@@ -143,6 +152,11 @@ public class ShiroWebOidConnectModuleFactory {
     private String getCallbackUri() {
         // TODO: the default will only work if the JAX-RS context is "/"... Append Jersey servlet context to the default
         //  to make it work universally
-        return callbackUri == null || callbackUri.isEmpty() ? DEFAULT_CALLBACK_URL : callbackUri;
+        if (callbackUri == null || callbackUri.isEmpty()) {
+            return DEFAULT_CALLBACK_URL;
+        }
+
+        // attempt at URL normalization
+        return callbackUri.startsWith("/") ? callbackUri : "/" + callbackUri;
     }
 }

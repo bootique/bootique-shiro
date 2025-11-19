@@ -25,12 +25,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
-import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,42 +48,37 @@ public class AuthorizationCodeHandlerApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationCodeHandlerApi.class);
 
     private final ObjectMapper mapper;
-
-    private final JerseyClient webClient;
+    private final OidpRouter oidpRouter;
     private final WebTarget tokenTarget;
     private final String tokenCookie;
-    private final String clientId;
-    private final String clientSecretKey;
-    private final String oidpUrl;
-    private final String callbackUri;
+    private final String clientIdEnc;
+    private final String clientSecretKeyEnc;
     private final String scope;
 
     public AuthorizationCodeHandlerApi(
-            ObjectMapper objectMapper,
+            ObjectMapper mapper,
+            OidpRouter oidpRouter,
             String tokenCookie,
             String tokenUrl,
             String clientId,
             String clientSecretKey,
-            String scope,
-            String oidpUrl,
-            String callbackUri) {
+            String scope) {
 
-        this.mapper = objectMapper;
+        this.mapper = mapper;
+        this.oidpRouter = oidpRouter;
         this.tokenCookie = tokenCookie;
-        this.clientId = clientId;
-        this.clientSecretKey = URLEncoder.encode(clientSecretKey, StandardCharsets.UTF_8);
+        this.clientIdEnc = URLEncoder.encode(clientId, StandardCharsets.UTF_8);
+        this.clientSecretKeyEnc = URLEncoder.encode(clientSecretKey, StandardCharsets.UTF_8);
         this.scope = scope;
-        this.webClient = JerseyClientBuilder.createClient();
-        this.tokenTarget = webClient.target(tokenUrl);
-        this.oidpUrl = oidpUrl;
-        this.callbackUri = callbackUri;
+
+        // TODO: client must originate in Bootique
+        this.tokenTarget = JerseyClientBuilder.createClient().target(tokenUrl);
     }
 
     @GET
     public Response onAuthCodeCallback(
-            @Context UriInfo uriInfo,
-            @QueryParam(OidConnect.CODE_PARAM) String code,
-            @QueryParam(OidConnect.START_URI_PARAM) String originalUri) {
+            @QueryParam("code") String code,
+            @QueryParam(OidpRouter.INITIAL_URI_PARAM) String initialUrl) {
 
         if (code == null || code.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("'code' parameter is required").build();
@@ -104,8 +96,8 @@ public class AuthorizationCodeHandlerApi {
         }
 
         return tokenResponse.getStatus() == Response.Status.OK.getStatusCode()
-                ? onTokenSuccess(tokenJson, originalUri)
-                : onTokenFailure(tokenResponse, tokenJson, uriInfo.getBaseUri(), originalUri);
+                ? onTokenSuccess(tokenJson, initialUrl)
+                : onTokenFailure(tokenResponse, tokenJson, initialUrl);
     }
 
     private Response onTokenSuccess(JsonNode tokenJson, String originalUri) {
@@ -115,15 +107,15 @@ public class AuthorizationCodeHandlerApi {
 
         return originalUri != null && !originalUri.isEmpty()
                 ? Response.temporaryRedirect(decodeUri(originalUri)).cookie(cookie).build()
-                : Response.ok().cookie(new NewCookie.Builder(tokenCookie).value(token).build()).build();
+                : Response.ok().cookie(cookie).build();
     }
 
-    private Response onTokenFailure(Response tokenResponse, JsonNode tokenJson, URI baseUri, String originalUri) {
+    private Response onTokenFailure(Response tokenResponse, JsonNode tokenJson, String initialUrl) {
         JsonNode error = tokenJson.get("error");
         if (error != null) {
             String errorCode = error.asText();
             if ("invalid_grant".equals(errorCode)) {
-                String oidpUrl = this.oidpUrl + "?" + getOidpParametersString(baseUri.toString(), originalUri, clientId, callbackUri);
+                String oidpUrl = oidpRouter.oidpUrlReturningToUrl(initialUrl);
                 LOGGER.warn("Auth server returned 'invalid_grant'. Redirecting back to OIDP at {}", oidpUrl);
                 return Response.status(Response.Status.FOUND).header("Location", oidpUrl).build();
             } else {
@@ -146,9 +138,9 @@ public class AuthorizationCodeHandlerApi {
 
         Form form = new Form()
                 .param("grant_type", "authorization_code")
-                .param(OidConnect.CLIENT_ID_PARAM, clientId)
-                .param(OidConnect.CLIENT_SECRET_KEY_PARAM, clientSecretKey)
-                .param(OidConnect.CODE_PARAM, code);
+                .param("client_id", clientIdEnc)
+                .param("client_secret", clientSecretKeyEnc)
+                .param("code", code);
 
         if (scope != null && !scope.isEmpty()) {
             form = form.param("scope", scope);
@@ -158,25 +150,5 @@ public class AuthorizationCodeHandlerApi {
         return tokenTarget
                 .request()
                 .post(postForm);
-    }
-
-    static String getOidpParametersString(String baseUri, String originalUri, String clientId, String callbackUri) {
-        StringBuilder redirectUri = new StringBuilder(baseUri);
-        if (!callbackUri.startsWith("/")) {
-            redirectUri.append("/");
-        }
-        redirectUri.append(callbackUri);
-
-        if (originalUri != null && !originalUri.isEmpty()) {
-
-            redirectUri.append("?")
-                    .append(OidConnect.START_URI_PARAM)
-                    .append("=")
-                    .append(URLEncoder.encode(originalUri, StandardCharsets.UTF_8));
-        }
-
-        return OidConnect.RESPONSE_TYPE_PARAM + "=" + OidConnect.CODE_PARAM +
-                "&" + OidConnect.CLIENT_ID_PARAM + "=" + clientId +
-                "&" + OidConnect.REDIRECT_URI_PARAM + "=" + redirectUri;
     }
 }

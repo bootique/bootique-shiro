@@ -27,8 +27,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -36,24 +34,18 @@ import java.util.Arrays;
  */
 public class OidConnectFilter extends JwtBearerAuthenticationFilter {
 
-    private final String oidpUrl;
+    private final OidpRouter oidpRouter;
     private final String tokenCookie;
-    private final String clientId;
-    private final String callbackUri;
 
     public OidConnectFilter(
             Provider<JwtParser> tokenParser,
             String audience,
-            String oidpUrl,
-            String tokenCookie,
-            String clientId,
-            String callbackUri) {
+            OidpRouter oidpRouter,
+            String tokenCookie) {
 
         super(tokenParser, audience);
-        this.oidpUrl = oidpUrl;
+        this.oidpRouter = oidpRouter;
         this.tokenCookie = tokenCookie;
-        this.clientId = clientId;
-        this.callbackUri = callbackUri;
     }
 
     @Override
@@ -71,61 +63,16 @@ public class OidConnectFilter extends JwtBearerAuthenticationFilter {
 
     @Override
     protected void redirectIfNoAuth(ServletRequest request, ServletResponse response, Exception e) throws Exception {
-        redirectToOpenIdLoginPage((HttpServletRequest) request, (HttpServletResponse) response);
+        ((HttpServletResponse) response).sendRedirect(oidpRouter.oidpUrlReturningToCurrentRequest());
     }
 
     @Override
     protected boolean sendChallenge(ServletRequest request, ServletResponse response) {
         try {
-            redirectToOpenIdLoginPage((HttpServletRequest) request, (HttpServletResponse) response);
+            ((HttpServletResponse) response).sendRedirect(oidpRouter.oidpUrlReturningToCurrentRequest());
             return false;
         } catch (Exception e) {
             return super.sendChallenge(request, response);
         }
-    }
-
-    private void redirectToOpenIdLoginPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        StringBuilder redirectUrl = new StringBuilder();
-        if (oidpUrl.startsWith("/")) {
-            redirectUrl.append(request.getContextPath());
-        }
-
-        redirectUrl.append(oidpUrl)
-                .append('?').append(OidConnect.RESPONSE_TYPE_PARAM).append('=').append(OidConnect.CODE_PARAM)
-                .append('&').append(OidConnect.CLIENT_ID_PARAM).append('=').append(URLEncoder.encode(clientId, StandardCharsets.UTF_8))
-                .append('&').append(OidConnect.REDIRECT_URI_PARAM).append('=').append(URLEncoder.encode(redirectUrl(request, callbackUri), StandardCharsets.UTF_8));
-
-        response.sendRedirect(redirectUrl.toString());
-    }
-
-    private static String redirectUrl(HttpServletRequest request, String callbackUri) {
-
-        StringBuffer url = request.getRequestURL();
-
-        // truncate the path from the URL. We'll replace it with a callbac path
-        url.setLength(url.length() - request.getRequestURI().length());
-
-        url.append(request.getContextPath());
-
-        // "callbackUri" is relative to the webapp context
-        if (!callbackUri.startsWith("/")) {
-            url.append("/");
-        }
-
-        return url.append(callbackUri).append("?").append(OidConnect.START_URI_PARAM).append("=")
-                .append(URLEncoder.encode(postAuthRedirectUrl(request), StandardCharsets.UTF_8)).toString();
-    }
-
-    private static String postAuthRedirectUrl(HttpServletRequest request) {
-
-        StringBuffer url = request.getRequestURL();
-        String qs = request.getQueryString();
-
-        if (qs != null) {
-            url.append('?').append(qs);
-        }
-
-        return url.toString();
     }
 }

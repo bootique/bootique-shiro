@@ -60,7 +60,7 @@ public class AuthorizationCodeHandlerApiIT {
     @Test
     public void validWithoutOriginalUrl() {
         Response r = appTester.getTarget().path("bq-shiro-oauth-callback")
-                .queryParam(OidConnect.CODE_PARAM, "000")
+                .queryParam("code", "000")
                 .request()
                 .get();
         JettyTester.assertOk(r);
@@ -76,8 +76,8 @@ public class AuthorizationCodeHandlerApiIT {
 
         Response r1Callback = client.target(appTester.getUrl())
                 .path("bq-shiro-oauth-callback")
-                .queryParam(OidConnect.CODE_PARAM, "000")
-                .queryParam(OidConnect.START_URI_PARAM, URLEncoder.encode("/public", StandardCharsets.UTF_8))
+                .queryParam("code", "000")
+                .queryParam(OidpRouter.INITIAL_URI_PARAM, URLEncoder.encode("/public", StandardCharsets.UTF_8))
                 .request()
                 .get();
 
