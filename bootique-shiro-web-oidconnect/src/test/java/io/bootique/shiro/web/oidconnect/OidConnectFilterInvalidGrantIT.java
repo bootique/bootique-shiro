@@ -46,7 +46,7 @@ public class OidConnectFilterInvalidGrantIT {
                 .queryParam("aaa", "1").queryParam("bbb", 2)
                 .request()
                 .get();
-        JettyTester.assertOk(r).assertContent(OidConnect.INVALID_GRANT_ERROR_CODE);
+        JettyTester.assertOk(r).assertContent("invalid_grant");
     }
 
     @Path("/auth")
@@ -68,7 +68,7 @@ public class OidConnectFilterInvalidGrantIT {
                 authCodeAlreadyUsed = true;
                 return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
             } else {
-                return Response.ok(OidConnect.INVALID_GRANT_ERROR_CODE).build();
+                return Response.ok("invalid_grant").build();
             }
         }
     }

@@ -1,3 +1,21 @@
+/*
+ * Licensed to ObjectStyle LLC under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ObjectStyle LLC licenses
+ * this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package io.bootique.shiro.web.oidconnect;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,6 +42,8 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * A callback endpoint that processes authorization code sent back by an IDP after a user login.
+ *
+ * @since 4.0
  */
 @Path("_oauth_authorization_code_handler_url_placeholder_that_will_be_replaced_dynamically_")
 public class AuthorizationCodeHandlerApi {
@@ -66,7 +86,7 @@ public class AuthorizationCodeHandlerApi {
     public Response onAuthCodeCallback(
             @Context UriInfo uriInfo,
             @QueryParam(OidConnect.CODE_PARAM) String code,
-            @QueryParam(OidConnect.ORIGINAL_URI_PARAM) String originalUri) {
+            @QueryParam(OidConnect.START_URI_PARAM) String originalUri) {
 
         if (code == null || code.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("'code' parameter is required").build();
@@ -90,7 +110,7 @@ public class AuthorizationCodeHandlerApi {
 
     private Response onTokenSuccess(JsonNode tokenJson, String originalUri) {
 
-        String token = tokenJson.get(OidConnect.ACCESS_TOKEN_PARAM).asText();
+        String token = tokenJson.get("access_token").asText();
         NewCookie cookie = new NewCookie.Builder(tokenCookie).value(token).build();
 
         return originalUri != null && !originalUri.isEmpty()
@@ -99,15 +119,15 @@ public class AuthorizationCodeHandlerApi {
     }
 
     private Response onTokenFailure(Response tokenResponse, JsonNode tokenJson, URI baseUri, String originalUri) {
-        JsonNode error = tokenJson.get(OidConnect.ERROR_PROPERTY);
-        if (error != null && error.isTextual()) {
+        JsonNode error = tokenJson.get("error");
+        if (error != null) {
             String errorCode = error.asText();
-            if (OidConnect.INVALID_GRANT_ERROR_CODE.equals(errorCode)) {
+            if ("invalid_grant".equals(errorCode)) {
                 String oidpUrl = this.oidpUrl + "?" + getOidpParametersString(baseUri.toString(), originalUri, clientId, callbackUri);
-                LOGGER.warn("Auth server returns error code {}. Redirection to oidp URL {}", OidConnect.INVALID_GRANT_ERROR_CODE, oidpUrl);
-                return Response.status(Response.Status.FOUND).header(OidConnect.LOCATION_HEADER_NAME, oidpUrl).build();
+                LOGGER.warn("Auth server returned 'invalid_grant'. Redirecting back to OIDP at {}", oidpUrl);
+                return Response.status(Response.Status.FOUND).header("Location", oidpUrl).build();
             } else {
-                LOGGER.warn("Auth server returns error code {}. Unauthorized", errorCode);
+                LOGGER.warn("Auth server returned '{}'. Unauthorized", errorCode);
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(), "Auth server error: " + errorCode).build();
             }
         }
@@ -125,13 +145,13 @@ public class AuthorizationCodeHandlerApi {
         //   Though a parameter flavor should also be ok with most IDPs
 
         Form form = new Form()
-                .param(OidConnect.GRANT_TYPE_PARAM, OidConnect.GRANT_TYPE_AUTH_CODE)
+                .param("grant_type", "authorization_code")
                 .param(OidConnect.CLIENT_ID_PARAM, clientId)
                 .param(OidConnect.CLIENT_SECRET_KEY_PARAM, clientSecretKey)
                 .param(OidConnect.CODE_PARAM, code);
 
         if (scope != null && !scope.isEmpty()) {
-            form = form.param(OidConnect.SCOPE_PARAM, scope);
+            form = form.param("scope", scope);
         }
 
         Entity<Form> postForm = Entity.form(form);
@@ -150,7 +170,7 @@ public class AuthorizationCodeHandlerApi {
         if (originalUri != null && !originalUri.isEmpty()) {
 
             redirectUri.append("?")
-                    .append(OidConnect.ORIGINAL_URI_PARAM)
+                    .append(OidConnect.START_URI_PARAM)
                     .append("=")
                     .append(URLEncoder.encode(originalUri, StandardCharsets.UTF_8));
         }

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package io.bootique.shiro.web.oidconnect;
 
 import io.bootique.BQModule;
