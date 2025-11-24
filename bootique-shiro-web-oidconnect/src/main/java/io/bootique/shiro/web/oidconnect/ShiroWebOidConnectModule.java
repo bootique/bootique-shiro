@@ -27,8 +27,6 @@ import io.bootique.di.TypeLiteral;
 import io.bootique.jersey.JerseyModule;
 import io.bootique.jersey.MappedResource;
 import io.bootique.shiro.web.ShiroWebModule;
-import io.bootique.shiro.web.jwt.ShiroWebJwtModule;
-import io.bootique.shiro.web.jwt.ShiroWebJwtModuleFactory;
 import jakarta.inject.Singleton;
 
 /**
@@ -63,26 +61,16 @@ public class ShiroWebOidConnectModule implements BQModule {
     @Provides
     @Singleton
     OidConnectFilter provideOidConnectFilter(ConfigurationFactory configFactory, OidpRouter oidpRouter) {
-        // TODO: clean this up. Audience should come from our own config, not someone else's
-        String audience = configFactory
-                .config(ShiroWebJwtModuleFactory.class, ShiroWebJwtModule.CONFIG_PREFIX)
-                .provideAudience();
-
         return configFactory
                 .config(ShiroWebOidConnectModuleFactory.class, CONFIG_PREFIX)
-                .createFilter(oidpRouter, audience);
+                .createFilter(oidpRouter);
     }
 
     @Provides
     @Singleton
     MappedResource<AuthorizationCodeHandlerApi> provideAuthorizationCodeHandlerApi(ConfigurationFactory configFactory, OidpRouter oidpRouter) {
-        // TODO: clean this up. Audience should come from our own config, not someone else's
-        String audience = configFactory
-                .config(ShiroWebJwtModuleFactory.class, ShiroWebJwtModule.CONFIG_PREFIX)
-                .provideAudience();
-
         return configFactory
                 .config(ShiroWebOidConnectModuleFactory.class, CONFIG_PREFIX)
-                .createAuthorizationCodeHandler(oidpRouter, audience);
+                .createAuthorizationCodeHandler(oidpRouter);
     }
 }

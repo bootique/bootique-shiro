@@ -44,6 +44,7 @@ public class ShiroWebOidConnectModuleFactory {
     private String clientSecret;
     private String tokenCookie;
     private String callbackUri;
+    private String audience;
 
     private final ServletEnvironment servletEnv;
     private final Provider<MappedServlet<ServletContainer>> jerseyServlet;
@@ -62,29 +63,34 @@ public class ShiroWebOidConnectModuleFactory {
         this.jacksonService = jacksonService;
     }
 
-    @BQConfigProperty("OpenId Connect Login Url")
-    public void setOidpUrl(String oidpUrl) {
+    @BQConfigProperty("OpenId Connect login URL")
+    public ShiroWebOidConnectModuleFactory setOidpUrl(String oidpUrl) {
         this.oidpUrl = oidpUrl;
+        return this;
     }
 
-    @BQConfigProperty("JWT Token Url")
-    public void setTokenUrl(String tokenUrl) {
+    @BQConfigProperty("An OAuth token server used internally to obtain an access token in exchange for an authorization code")
+    public ShiroWebOidConnectModuleFactory setTokenUrl(String tokenUrl) {
         this.tokenUrl = tokenUrl;
+        return this;
     }
 
-    @BQConfigProperty("Client Id")
-    public void setClientId(String clientId) {
+    @BQConfigProperty("OAuth client id used to request authorization code and then exchange it for an access token")
+    public ShiroWebOidConnectModuleFactory setClientId(String clientId) {
         this.clientId = clientId;
+        return this;
     }
 
-    @BQConfigProperty("Client Secret")
-    public void setClientSecret(String clientSecret) {
+    @BQConfigProperty("OAuth client secret used to obtain an access token in exchange for an authorization code")
+    public ShiroWebOidConnectModuleFactory setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
+        return this;
     }
 
     @BQConfigProperty("Token Cookie Name")
-    public void setTokenCookie(String tokenCookie) {
+    public ShiroWebOidConnectModuleFactory setTokenCookie(String tokenCookie) {
         this.tokenCookie = tokenCookie;
+        return this;
     }
 
     @BQConfigProperty("""
@@ -92,19 +98,26 @@ public class ShiroWebOidConnectModuleFactory {
             at that path by "bootique-shiro" within the current app. It should be relative to the JAX-RS base "context"
             (the context may be something like "/myapp/api"; 'callbackUri' should be the part that follows that). The 
             parameter is optional and by default will be set to '/bq-shiro-oauth-callback'""")
-    public void setCallbackUri(String callbackUri) {
+    public ShiroWebOidConnectModuleFactory setCallbackUri(String callbackUri) {
         this.callbackUri = callbackUri;
+        return this;
+    }
+
+    @BQConfigProperty("An optional audience. If specified, it will be compared with the 'aud' JWT claim, and fail the request if the two do not match")
+    public ShiroWebOidConnectModuleFactory setAudience(String audience) {
+        this.audience = audience;
+        return this;
     }
 
     public OidpRouter createOidpClient() {
         return new OidpRouter(servletEnv, jerseyServlet, getOidpUrl(), getClientId(), getAuthCodeHandlerPath());
     }
 
-    public OidConnectFilter createFilter(OidpRouter oidpRouter, String audience) {
+    public OidConnectFilter createFilter(OidpRouter oidpRouter) {
         return new OidConnectFilter(tokenParser, audience, oidpRouter, getTokenCookie());
     }
 
-    public MappedResource<AuthorizationCodeHandlerApi> createAuthorizationCodeHandler(OidpRouter oidpRouter, String audience) {
+    public MappedResource<AuthorizationCodeHandlerApi> createAuthorizationCodeHandler(OidpRouter oidpRouter) {
         AuthorizationCodeHandlerApi api = new AuthorizationCodeHandlerApi(
                 jacksonService.newObjectMapper(),
                 oidpRouter,
