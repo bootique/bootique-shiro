@@ -1,3 +1,7 @@
+## 4.0-M2
+
+* #46 OidcFilter - a filter for OpenID Connect flow
+
 ## 4.0-M1
 
 * #40 JWT Bearer Token Support
