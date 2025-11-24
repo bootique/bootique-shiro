@@ -8,14 +8,12 @@ import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.junit5.JettyTester;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -47,7 +45,7 @@ public class AuthorizationCodeHandlerApiIT {
     final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidconnect/oidconnect.yml", "-s")
             .module(appTester.moduleReplacingConnectors())
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", tokenServerTester.getUrl() + "/auth"))
-            .module(b -> JerseyModule.extend(b).addResource(RedirectApi.class))
+            .module(b -> JerseyModule.extend(b).addResource(Api.class))
             .autoLoadModules()
             .createRuntime();
 
@@ -108,17 +106,17 @@ public class AuthorizationCodeHandlerApiIT {
     }
 
     @Path("/")
-    public static class RedirectApi {
+    public static class Api {
 
         @GET
         @Path("public")
-        public Response getPublic(@Context HttpServletRequest request) {
+        public Response getPublic() {
             return Response.ok("public").build();
         }
 
         @GET
         @Path("private")
-        public Response getPrivate(@Context HttpServletRequest request) {
+        public Response getPrivate() {
             return Response.ok("private").build();
         }
     }

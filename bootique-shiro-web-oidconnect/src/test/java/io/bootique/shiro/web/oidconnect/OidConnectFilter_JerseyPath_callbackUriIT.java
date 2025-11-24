@@ -1,3 +1,21 @@
+/*
+ * Licensed to ObjectStyle LLC under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ObjectStyle LLC licenses
+ * this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package io.bootique.shiro.web.oidconnect;
 
 import io.bootique.BQCoreModule;
@@ -15,24 +33,19 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @BQTest
-public class OidConnectFilterIT {
+public class OidConnectFilter_JerseyPath_callbackUriIT {
 
     private static final JettyTester tokenServerTester = JettyTester.create();
 
@@ -47,32 +60,18 @@ public class OidConnectFilterIT {
     private final JettyTester appTester = JettyTester.create();
 
     @BQApp
-    final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidconnect/oidconnect-filter.yml", "-s")
+    final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidconnect/oidconnect-filter-jersey-path.yml", "-s")
             .module(appTester.moduleReplacingConnectors())
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.tokenUrl", tokenServerTester.getUrl() + "/token"))
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.oidpUrl", tokenServerTester.getUrl() + "/auth"))
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.callbackUri", "cb"))
             .module(b -> JerseyModule.extend(b).addResource(Api.class))
+
+            // map Jersey servle to a custom path. This will affect the URLs of the user APIs as well as auth code callback
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.jersey.urlPattern", "/api/*"))
+            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidconnect.callbackUri", "cb"))
+
             .autoLoadModules()
             .createRuntime();
-
-    @Test
-    public void noAuth() {
-
-        WebTarget target = OidTests.clientNoRedirects()
-                .target(appTester.getUrl())
-                .path("/private");
-
-        String expectedRedirect = tokenServerTester.getUrl() +
-                "/auth?response_type=code&client_id=test-client&redirect_uri=" +
-                URLEncoder.encode(appTester.getUrl(), StandardCharsets.UTF_8) +
-                "%2Fcb%3Finitial_uri%3D" +
-                // double URL-encode the origin URL, as it is a parameter of an already URL-encoded URL parameter
-                URLEncoder.encode(URLEncoder.encode(target.getUri().toString(), StandardCharsets.UTF_8), StandardCharsets.UTF_8);
-
-        Response r = target.request().get();
-        JettyTester.assertFound(r).assertHeader("Location", expectedRedirect);
-    }
 
     @Test
     public void noAuthWithIDPRedirects() {
@@ -80,7 +79,7 @@ public class OidConnectFilterIT {
 
         Response r1ResourceNoAccess = client
                 .target(appTester.getUrl())
-                .path("/private")
+                .path("/api/private")
                 .queryParam("pq", "X")
                 .request()
                 .get();
@@ -110,19 +109,6 @@ public class OidConnectFilterIT {
         JettyTester.assertOk(r4ResourceAccessCookies).assertContent("private:pq=X");
     }
 
-    @Test
-    public void authCookie() throws Exception {
-
-        String authToken = OidTests.jwt(Map.of("roles", List.of("role1")));
-        Response r = OidTests.clientNoRedirects()
-                .target(appTester.getUrl())
-                .path("/private")
-                .request()
-                .cookie(new NewCookie.Builder("bq-shiro-oid").value(authToken).build())
-                .get();
-        JettyTester.assertOk(r).assertContent("private");
-    }
-
     @Path("/")
     public static class Api {
 
@@ -141,11 +127,6 @@ public class OidConnectFilterIT {
                 @QueryParam("response_type") String responseType,
                 @QueryParam("client_id") String clientId,
                 @QueryParam("redirect_uri") String redirectUri) {
-
-            assertEquals("code", responseType);
-            assertEquals("test-client", clientId);
-            assertNotNull(redirectUri);
-
             String callbackUrl = redirectUri + "&code=123&state=xyz";
             return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
         }
@@ -158,12 +139,6 @@ public class OidConnectFilterIT {
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         @Produces(MediaType.APPLICATION_JSON)
         public Response token(MultivaluedMap<String, String> data) {
-
-            assertEquals("123", data.getFirst("code"));
-            assertEquals("authorization_code", data.getFirst("grant_type"));
-            assertEquals("test-client", data.getFirst("client_id"));
-            assertEquals("test-password", data.getFirst("client_secret"));
-
             try {
                 String authToken = OidTests.jwt(Map.of("roles", List.of("role1")));
                 return Response.ok("{\"access_token\":\"" + authToken + "\"}").build();

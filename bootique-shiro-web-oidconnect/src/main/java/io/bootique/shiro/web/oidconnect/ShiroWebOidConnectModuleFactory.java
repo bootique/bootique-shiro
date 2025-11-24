@@ -22,10 +22,12 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.jackson.JacksonService;
 import io.bootique.jersey.MappedResource;
+import io.bootique.jetty.MappedServlet;
 import io.bootique.jetty.servlet.ServletEnvironment;
 import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 /**
  * @since 4.0
@@ -34,7 +36,7 @@ import jakarta.inject.Provider;
 public class ShiroWebOidConnectModuleFactory {
 
     private static final String DEFAULT_TOKEN_COOKIE = "bq-shiro-oid";
-    private static final String DEFAULT_CALLBACK_URL = "/bq-shiro-oauth-callback";
+    private static final String DEFAULT_AUTH_HANDLER_PATH = "/bq-shiro-oauth-callback";
 
     private String oidpUrl;
     private String tokenUrl;
@@ -44,15 +46,18 @@ public class ShiroWebOidConnectModuleFactory {
     private String callbackUri;
 
     private final ServletEnvironment servletEnv;
+    private final Provider<MappedServlet<ServletContainer>> jerseyServlet;
     private final Provider<JwtParser> tokenParser;
     private final JacksonService jacksonService;
 
     @Inject
     public ShiroWebOidConnectModuleFactory(
             ServletEnvironment servletEnv,
+            Provider<MappedServlet<ServletContainer>> jerseyServlet,
             Provider<JwtParser> tokenParser,
             JacksonService jacksonService) {
         this.servletEnv = servletEnv;
+        this.jerseyServlet = jerseyServlet;
         this.tokenParser = tokenParser;
         this.jacksonService = jacksonService;
     }
@@ -84,14 +89,15 @@ public class ShiroWebOidConnectModuleFactory {
 
     @BQConfigProperty("""
             An optional path of the authorization code handler. If specified, the handler will be internally published
-            at that path by "bootique-shiro" within the current app. It should be relative to the application "context". 
-            The parameter is optional and by default will be set to '/bq-shiro-oauth-callback'""")
+            at that path by "bootique-shiro" within the current app. It should be relative to the JAX-RS base "context"
+            (the context may be something like "/myapp/api"; 'callbackUri' should be the part that follows that). The 
+            parameter is optional and by default will be set to '/bq-shiro-oauth-callback'""")
     public void setCallbackUri(String callbackUri) {
         this.callbackUri = callbackUri;
     }
 
     public OidpRouter createOidpClient() {
-        return new OidpRouter(servletEnv, getOidpUrl(), getClientId(), getCallbackUri());
+        return new OidpRouter(servletEnv, jerseyServlet, getOidpUrl(), getClientId(), getAuthCodeHandlerPath());
     }
 
     public OidConnectFilter createFilter(OidpRouter oidpRouter, String audience) {
@@ -108,7 +114,7 @@ public class ShiroWebOidConnectModuleFactory {
                 getClientSecret(),
                 audience);
 
-        return new MappedResource<>(api, getCallbackUri());
+        return new MappedResource<>(api, getAuthCodeHandlerPath());
     }
 
     private String getOidpUrl() {
@@ -149,11 +155,11 @@ public class ShiroWebOidConnectModuleFactory {
         return this.clientSecret;
     }
 
-    private String getCallbackUri() {
-        // TODO: the default will only work if the JAX-RS context is "/"... Append Jersey servlet context to the default
-        //  to make it work universally
+    private String getAuthCodeHandlerPath() {
+
         if (callbackUri == null || callbackUri.isEmpty()) {
-            return DEFAULT_CALLBACK_URL;
+            // callbackUri is expected to be relative to the Jersey servlet, so no need to prepend the default with anything
+            return DEFAULT_AUTH_HANDLER_PATH;
         }
 
         // attempt at URL normalization

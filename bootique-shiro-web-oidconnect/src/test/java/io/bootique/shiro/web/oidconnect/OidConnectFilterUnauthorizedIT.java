@@ -57,8 +57,8 @@ public class OidConnectFilterUnauthorizedIT {
         }
 
         @GET
-        public Response authCode(@Context UriInfo uriInfo) {
-            String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "&code=123&state=xyz";
+        public Response authCode(@QueryParam("redirect_uri") String redirectUri) {
+            String callbackUrl = redirectUri + "&code=123&state=xyz";
             return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
         }
     }
