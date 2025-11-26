@@ -35,13 +35,14 @@ import java.util.Map;
 
 class WebJwtTests {
 
-    static String jwt(Map<String, ?> rolesClaim, List<String> audience, LocalDateTime expiresAt) {
+    static String jwt(Map<String, ?> claims, List<String> audience, LocalDateTime expiresAt) {
         PrivateKey privateKey = privateKey();
 
         JwtBuilder builder = Jwts.builder()
                 .header().add("kid", "xGpTsw0DJs0vbe5CEcKMl5oZc7nKzAC9sF7kx1nQu1I")
                 .and()
-                .claims(rolesClaim).signWith(privateKey, Jwts.SIG.RS256);
+                .claims(claims)
+                .signWith(privateKey, Jwts.SIG.RS256);
 
         if (expiresAt != null) {
             builder.expiration(Date.from(expiresAt.atZone(ZoneId.systemDefault()).toInstant()));

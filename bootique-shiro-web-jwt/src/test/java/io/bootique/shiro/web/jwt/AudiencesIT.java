@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @BQTest
-public class AudienceValidationIT extends ShiroWebJwtModuleIT {
+public class AudiencesIT extends ShiroWebJwtModuleIT {
 
     private static final JettyTester jetty = JettyTester.create();
 
@@ -32,7 +32,7 @@ public class AudienceValidationIT extends ShiroWebJwtModuleIT {
     }
 
     @Test
-    public void collectionOfAudiences() {
+    public void multipleAudiences() {
         Map<String, ?> map = Map.of("roles", List.of("role1", "role2", "role3"));
         List<String> audience = List.of("aud-1", "aud-2");
         JettyTester.assertOk(requestWithToken("/private-one", map, audience));

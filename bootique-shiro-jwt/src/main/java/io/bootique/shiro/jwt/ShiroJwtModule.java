@@ -38,7 +38,7 @@ public class ShiroJwtModule implements BQModule {
     @Override
     public ModuleCrate crate() {
         return ModuleCrate.of(this)
-                .description("Provides JWT realm in the Shiro environment")
+                .description("Provides JWT parser and JWT realm for the Shiro environment")
                 .config(CONFIG_PREFIX, ShiroJwtModuleFactory.class)
                 .build();
     }

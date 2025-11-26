@@ -40,13 +40,14 @@ class OidTests {
                 .build();
     }
 
-    static String jwt(Map<String, ?> rolesClaim) {
+    static String jwt(Map<String, ?> claims) {
         PrivateKey privateKey = privateKey();
 
         JwtBuilder builder = Jwts.builder()
                 .header().add("kid", "xGpTsw0DJs0vbe5CEcKMl5oZc7nKzAC9sF7kx1nQu1I")
                 .and()
-                .claims(rolesClaim).signWith(privateKey, Jwts.SIG.RS256);
+                .claims(claims)
+                .signWith(privateKey, Jwts.SIG.RS256);
 
         return builder.compact();
     }
