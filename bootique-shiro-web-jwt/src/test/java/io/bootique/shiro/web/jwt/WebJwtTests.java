@@ -16,31 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.oidc;
+package io.bootique.shiro.web.jwt;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import org.glassfish.jersey.client.ClientProperties;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
-class OidTests {
+class WebJwtTests {
 
-    public static Client clientNoRedirects() {
-        return ClientBuilder.newBuilder()
-                .property(ClientProperties.FOLLOW_REDIRECTS, false)
-                .build();
-    }
-
-    static String jwt(Map<String, ?> rolesClaim) {
+    static String jwt(Map<String, ?> rolesClaim, List<String> audience, LocalDateTime expiresAt) {
         PrivateKey privateKey = privateKey();
 
         JwtBuilder builder = Jwts.builder()
@@ -48,11 +43,19 @@ class OidTests {
                 .and()
                 .claims(rolesClaim).signWith(privateKey, Jwts.SIG.RS256);
 
+        if (expiresAt != null) {
+            builder.expiration(Date.from(expiresAt.atZone(ZoneId.systemDefault()).toInstant()));
+        }
+
+        if (audience != null && !audience.isEmpty()) {
+            builder.audience().add(audience);
+        }
+
         return builder.compact();
     }
 
     private static PrivateKey privateKey() {
-        try (InputStream keyIn = OidTests.class.getResourceAsStream("jwks-private-key.pem")) {
+        try (InputStream keyIn = WebJwtTests.class.getResourceAsStream("jwks-private-key.pem")) {
             String privateKeyPEM = new String(keyIn.readAllBytes(), StandardCharsets.UTF_8)
                     .replace("-----BEGIN PRIVATE KEY-----", "")
                     .replaceAll(System.lineSeparator(), "")

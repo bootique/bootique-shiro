@@ -1,6 +1,7 @@
 ## 4.0-M2
 
 * #46 OidcFilter - a filter for OpenID Connect flow
+* #48 Extract JWT configuration into "bootique-shiro-jwt"
 
 ## 4.0-M1
 

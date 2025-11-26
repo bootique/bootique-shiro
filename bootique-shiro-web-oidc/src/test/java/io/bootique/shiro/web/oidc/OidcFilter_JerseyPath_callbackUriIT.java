@@ -139,12 +139,8 @@ public class OidcFilter_JerseyPath_callbackUriIT {
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         @Produces(MediaType.APPLICATION_JSON)
         public Response token(MultivaluedMap<String, String> data) {
-            try {
-                String authToken = OidTests.jwt(Map.of("roles", List.of("role1")));
-                return Response.ok("{\"access_token\":\"" + authToken + "\"}").build();
-            } catch (Exception e) {
-                return Response.serverError().entity("Unable to generate auth token: " + e.getMessage()).build();
-            }
+            String authToken = OidTests.jwt(Map.of("roles", List.of("role1")));
+            return Response.ok("{\"access_token\":\"" + authToken + "\"}").build();
         }
     }
 }

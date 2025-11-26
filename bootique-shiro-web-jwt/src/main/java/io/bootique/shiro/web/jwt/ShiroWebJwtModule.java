@@ -34,14 +34,12 @@ import jakarta.inject.Singleton;
  */
 public class ShiroWebJwtModule implements BQModule {
 
-    public static final String CONFIG_PREFIX = "shirowebjwt";
     private static final String JWT_BEARER_AUTHENTICATION_FILTER = "jwtBearer";
 
     @Override
     public ModuleCrate crate() {
         return ModuleCrate.of(this)
-                .description("Integrates JWT to Shiro")
-                .config(CONFIG_PREFIX, ShiroWebJwtModuleFactory.class)
+                .description("Provides 'jwtBearer' Shiro filter")
                 .build();
     }
 
@@ -53,6 +51,6 @@ public class ShiroWebJwtModule implements BQModule {
     @Provides
     @Singleton
     public JwtBearerAuthenticationFilter provideBearerFilter(ConfigurationFactory configFactory, Provider<JwtParser> jwtParser) {
-        return configFactory.config(ShiroWebJwtModuleFactory.class, CONFIG_PREFIX).createFilter(jwtParser);
+        return new JwtBearerAuthenticationFilter(jwtParser);
     }
 }
