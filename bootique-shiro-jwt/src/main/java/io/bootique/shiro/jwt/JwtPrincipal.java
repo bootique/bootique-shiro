@@ -16,27 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt.jjwt;
+package io.bootique.shiro.jwt;
 
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Claims;
 
-import java.net.URL;
-import java.time.Duration;
+import java.util.Objects;
 
 /**
- * A helper class that creates JWT parser given JWKS location.
+ * A Shiro "principal" based on JWT claims.
  *
  * @since 4.0
  */
-public class JwtParserMaker {
+public record JwtPrincipal(Claims claims) {
 
-    public static JwtParser createParser(URL jwkLocation, Duration jwkExpiresIn) {
-        // manager is created once and will be reused by the lambda below to parse every token
-        JwksManager jwksManager = new JwksManager(jwkLocation, jwkExpiresIn);
-        
-        return Jwts.parser()
-                .keyLocator(jwksManager::readKey)
-                .build();
+    public JwtPrincipal {
+        Objects.requireNonNull(claims, "Null JWT Claims");
+    }
+
+    // defined primarily for MDC logging purposes to expose the token subject if present
+    @Override
+    public String toString() {
+        String subject = claims.getSubject();
+        return subject != null ? subject : "JwtPrincipal(?)";
     }
 }

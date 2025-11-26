@@ -18,6 +18,7 @@
  */
 package io.bootique.shiro.web.jwt;
 
+import io.bootique.shiro.jwt.ShiroJsonWebToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -28,7 +29,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.BearerToken;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
 
 import java.util.Set;
@@ -50,16 +50,10 @@ public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilte
     }
 
     @Override
-    protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) {
-        BearerToken bearer = (BearerToken) super.createToken(servletRequest, servletResponse);
-        Claims claims = tokenParser.get().parse(bearer.getToken()).accept(Jws.CLAIMS).getPayload();
-
+    protected AuthenticationToken createBearerToken(String token, ServletRequest request) {
+        Claims claims = tokenParser.get().parse(token).accept(Jws.CLAIMS).getPayload();
         validateAudience(claims.getAudience());
-
-        return new JwtBearerToken(
-                bearer.getToken(),
-                bearer.getHost(),
-                claims);
+        return new ShiroJsonWebToken(token, claims);
     }
 
     @Override

@@ -18,7 +18,7 @@
  */
 package io.bootique.shiro.web.oidc;
 
-import io.bootique.shiro.web.jwt.JwtBearerToken;
+import io.bootique.shiro.jwt.ShiroJsonWebToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -85,9 +85,8 @@ public class OidcFilter extends AuthenticatingFilter {
 
         validateAudience(claims.getAudience());
 
-        return new JwtBearerToken(
+        return new ShiroJsonWebToken(
                 token,
-                request.getRemoteHost(),
                 claims);
     }
 

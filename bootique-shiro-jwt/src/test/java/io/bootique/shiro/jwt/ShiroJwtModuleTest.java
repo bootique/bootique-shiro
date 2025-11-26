@@ -16,24 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt.authz;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.bootique.annotation.BQConfig;
+package io.bootique.shiro.jwt;
 
-import java.util.List;
+import io.bootique.junit5.BQModuleTester;
+import org.junit.jupiter.api.Test;
 
-/**
- * @since 4.0
- */
-@BQConfig("""
-        JWT authorization claim parser expecting authorization information (e.g., roles) to be present as a JSON list \
-        in the token""")
-@JsonTypeName("jsonList")
-public class JsonListAuthzReaderFactory extends AuthzReaderFactory {
+public class ShiroJwtModuleTest {
 
-    @Override
-    public AuthzReader createReader() {
-        return new NamedClaimReader(getClaim(), o -> o != null ? (List<String>) o : List.of());
+    @Test
+    public void check() {
+        BQModuleTester.of(ShiroJwtModule.class).testAutoLoadable().testConfig();
     }
 }

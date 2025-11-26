@@ -1,0 +1,2 @@
+io.bootique.shiro.jwt.authz.AuthzReaderFactory
+io.bootique.shiro.jwt.authz.JsonListAuthzReaderFactory

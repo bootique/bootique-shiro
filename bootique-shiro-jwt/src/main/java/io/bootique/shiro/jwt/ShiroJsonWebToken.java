@@ -16,26 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt;
+package io.bootique.shiro.jwt;
 
 import io.jsonwebtoken.Claims;
-import org.apache.shiro.authc.BearerToken;
+import org.apache.shiro.authc.AuthenticationToken;
 
 import java.util.Objects;
 
 /**
  * @since 4.0
  */
-public class JwtBearerToken extends BearerToken {
+public class ShiroJsonWebToken implements AuthenticationToken {
 
+    private final String token;
     private final Claims claims;
 
-    public JwtBearerToken(String token, String host, Claims claims) {
-        super(token, host);
+    public ShiroJsonWebToken(String token, Claims claims) {
+        this.token = Objects.requireNonNull(token, "Null token");
         this.claims = Objects.requireNonNull(claims, "Null JWT Claims");
     }
 
     public Claims getClaims() {
         return claims;
+    }
+
+    @Override
+    public Object getCredentials() {
+        return token;
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return token;
     }
 }

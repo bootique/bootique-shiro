@@ -12,13 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+shirojwt:
+  jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
+  jwkExpiresIn: "100 sec"
+
 shiroweb:
   urls:
     "/private-one" : "jwtBearer, roles[role1]"
     "/private-two" : "jwtBearer, roles[role2]"
     "/private-three" : "jwtBearer, roles[role3]"
-
-shirowebjwt:
-  jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
-  jwkExpiresIn: "100 sec"
 

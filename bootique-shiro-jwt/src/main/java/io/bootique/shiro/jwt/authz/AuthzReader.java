@@ -16,27 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt;
+package io.bootique.shiro.jwt.authz;
 
 import io.jsonwebtoken.Claims;
 
-import java.util.Objects;
+import java.util.List;
 
 /**
- * A Shiro "principal" based on JWT claims.
- *
  * @since 4.0
  */
-public record JwtPrincipal(Claims claims) {
+public interface AuthzReader {
 
-    public JwtPrincipal {
-        Objects.requireNonNull(claims, "Null JWT Claims");
-    }
-
-    // defined primarily for MDC logging purposes to expose the token subject if present
-    @Override
-    public String toString() {
-        String subject = claims.getSubject();
-        return subject != null ? subject : "JwtPrincipal(?)";
-    }
+    List<String> readAuthz(Claims claims);
 }

@@ -12,12 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+shirojwt:
+  jwkLocation: "classpath:io/bootique/shiro/web/oidc/jwks.json"
+
 shiroweb:
   urls:
     "/private" : "oidc, roles[role1]"
-
-shirowebjwt:
-  jwkLocation: "classpath:io/bootique/shiro/web/oidc/jwks.json"
 
 shiroweboidc:
   oidpUrl: "https://www.example.org/"

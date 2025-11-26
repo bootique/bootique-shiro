@@ -27,37 +27,17 @@
         <version>4.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bootique-shiro-web-jwt</artifactId>
+    <artifactId>bootique-shiro-jwt</artifactId>
     <packaging>jar</packaging>
 
-    <name>bootique-shiro-web-jwt: Bootique Shiro JWT</name>
-    <description>Integration of JWT to Bootique Shiro</description>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.bootique.jersey</groupId>
-                <artifactId>bootique-jersey</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.bootique.jetty</groupId>
-                <artifactId>bootique-jetty-junit5</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <name>bootique-shiro-jwt: Bootique Shiro JWT</name>
+    <description>Integration of Java web tokens and a corresponding realm to Bootique Shiro</description>
 
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>
             <groupId>io.bootique.shiro</groupId>
-            <artifactId>bootique-shiro-web</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bootique.shiro</groupId>
-            <artifactId>bootique-shiro-jwt</artifactId>
+            <artifactId>bootique-shiro</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -80,18 +60,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.bootique.jetty</groupId>
-            <artifactId>bootique-jetty-junit5</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.bootique.jersey</groupId>
-            <artifactId>bootique-jersey</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.bootique</groupId>
+            <artifactId>bootique-junit5</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

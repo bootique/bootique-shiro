@@ -43,11 +43,11 @@
     <modules>
         <module>bootique-shiro</module>
         <module>bootique-shiro-jdbc</module>
-
+        <module>bootique-shiro-jwt</module>
         <module>bootique-shiro-web</module>
-        <module>bootique-shiro-web-mdc</module>
         <module>bootique-shiro-web-jwt</module>
         <module>bootique-shiro-web-oidc</module>
+        <module>bootique-shiro-web-mdc</module>
     </modules>
 
     <scm>

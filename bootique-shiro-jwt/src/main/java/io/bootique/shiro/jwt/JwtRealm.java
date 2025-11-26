@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt;
+package io.bootique.shiro.jwt;
 
-import io.bootique.shiro.web.jwt.authz.AuthzReader;
+import io.bootique.shiro.jwt.authz.AuthzReader;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -38,7 +38,7 @@ public class JwtRealm extends AuthorizingRealm {
     public JwtRealm(AuthzReader rolesReader) {
 
         setName(JwtRealm.class.getSimpleName());
-        setAuthenticationTokenClass(JwtBearerToken.class);
+        setAuthenticationTokenClass(ShiroJsonWebToken.class);
 
         this.rolesReader = rolesReader;
     }
@@ -55,7 +55,7 @@ public class JwtRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
 
-        JwtPrincipal principal = new JwtPrincipal(((JwtBearerToken) token).getClaims());
+        JwtPrincipal principal = new JwtPrincipal(((ShiroJsonWebToken) token).getClaims());
 
         return new SimpleAuthenticationInfo(
                 new SimplePrincipalCollection(principal, getName()),

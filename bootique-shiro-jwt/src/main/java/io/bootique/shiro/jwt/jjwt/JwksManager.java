@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt.jjwt;
+package io.bootique.shiro.jwt.jjwt;
 
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.io.IOException;

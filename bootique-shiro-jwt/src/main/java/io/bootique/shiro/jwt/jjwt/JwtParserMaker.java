@@ -16,28 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt;
+package io.bootique.shiro.jwt.jjwt;
 
-import io.bootique.annotation.BQConfig;
-import io.bootique.annotation.BQConfigProperty;
 import io.jsonwebtoken.JwtParser;
-import jakarta.inject.Provider;
+import io.jsonwebtoken.Jwts;
+
+import java.net.URL;
+import java.time.Duration;
 
 /**
+ * A helper class that creates JWT parser given JWKS location.
+ *
  * @since 4.0
  */
-@BQConfig("JWT Configuration")
-public class ShiroWebJwtModuleFactory {
+public class JwtParserMaker {
 
-    private String audience;
-
-    @BQConfigProperty("An optional audience. If specified, it will be compared with the 'aud' JWT claim, and fail the request if the two do not match")
-    public ShiroWebJwtModuleFactory setAudience(String audience) {
-        this.audience = audience;
-        return this;
-    }
-
-    public JwtBearerAuthenticationFilter createFilter(Provider<JwtParser> tokenParser) {
-        return new JwtBearerAuthenticationFilter(tokenParser, this.audience);
+    public static JwtParser createParser(URL jwkLocation, Duration jwkExpiresIn) {
+        // manager is created once and will be reused by the lambda below to parse every token
+        JwksManager jwksManager = new JwksManager(jwkLocation, jwkExpiresIn);
+        
+        return Jwts.parser()
+                .keyLocator(jwksManager::readKey)
+                .build();
     }
 }

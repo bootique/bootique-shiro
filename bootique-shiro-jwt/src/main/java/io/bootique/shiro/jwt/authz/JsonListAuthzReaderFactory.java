@@ -16,16 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt.authz;
+package io.bootique.shiro.jwt.authz;
 
-import io.jsonwebtoken.Claims;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import io.bootique.annotation.BQConfig;
 
 import java.util.List;
 
 /**
  * @since 4.0
  */
-public interface AuthzReader {
+@BQConfig("""
+        JWT authorization claim parser expecting authorization information (e.g., roles) to be present as a JSON list \
+        in the token""")
+@JsonTypeName("jsonList")
+public class JsonListAuthzReaderFactory extends AuthzReaderFactory {
 
-    List<String> readAuthz(Claims claims);
+    @Override
+    public AuthzReader createReader() {
+        return new NamedClaimReader(getClaim(), o -> o != null ? (List<String>) o : List.of());
+    }
 }

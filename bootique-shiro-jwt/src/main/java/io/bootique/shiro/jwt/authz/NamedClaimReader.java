@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.web.jwt.authz;
+package io.bootique.shiro.jwt.authz;
 
 import io.jsonwebtoken.Claims;
 
