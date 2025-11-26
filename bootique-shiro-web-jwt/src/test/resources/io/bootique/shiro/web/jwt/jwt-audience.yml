@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 shirojwt:
+  audience: "aud-1"
   jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
   jwkExpiresIn: "100 sec"
 
@@ -21,7 +22,3 @@ shiroweb:
     "/private-one" : "jwtBearer, roles[role1]"
     "/private-two" : "jwtBearer, roles[role2]"
     "/private-three" : "jwtBearer, roles[role3]"
-
-shirowebjwt:
-  audience: "aud-1"
-

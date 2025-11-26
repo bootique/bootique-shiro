@@ -31,8 +31,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
 
-import java.util.Set;
-
 /**
  * Authenticates request based on a Bearer JWT authorization header. Doesn't check any roles or permissions itself,
  * instead parsing and validating the token, and passing it down to the downstream realms.
@@ -42,17 +40,14 @@ import java.util.Set;
 public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilter {
 
     private final Provider<JwtParser> tokenParser;
-    private final String audience;
 
-    public JwtBearerAuthenticationFilter(Provider<JwtParser> tokenParser, String audience) {
+    public JwtBearerAuthenticationFilter(Provider<JwtParser> tokenParser) {
         this.tokenParser = tokenParser;
-        this.audience = audience;
     }
 
     @Override
     protected AuthenticationToken createBearerToken(String token, ServletRequest request) {
         Claims claims = tokenParser.get().parse(token).accept(Jws.CLAIMS).getPayload();
-        validateAudience(claims.getAudience());
         return new ShiroJsonWebToken(token, claims);
     }
 
@@ -63,14 +58,6 @@ public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilte
         } catch (JwtException | AuthenticationException e) {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             return false;
-        }
-    }
-
-    private void validateAudience(Set<String> audienceJwtClaim) {
-        if (this.audience != null && !this.audience.isEmpty()) {
-            if (audienceJwtClaim == null || !audienceJwtClaim.contains(this.audience)) {
-                throw new AuthenticationException("Invalid audience");
-            }
         }
     }
 }

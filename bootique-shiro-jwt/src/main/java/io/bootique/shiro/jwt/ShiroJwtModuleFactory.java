@@ -41,6 +41,15 @@ public class ShiroJwtModuleFactory {
     private ResourceFactory jwkLocation;
     private Duration jwkExpiresIn;
     private AuthzReaderFactory roles;
+    private String audience;
+
+    @BQConfigProperty("""
+            An optional audience. If specified, it will be compared with the 'aud' JWT claim, and fail authentication \
+            if the two do not match""")
+    public ShiroJwtModuleFactory setAudience(String audience) {
+        this.audience = audience;
+        return this;
+    }
 
     @BQConfigProperty("JWKS key file location")
     public ShiroJwtModuleFactory setJwkLocation(ResourceFactory jwkLocation) {
@@ -65,7 +74,7 @@ public class ShiroJwtModuleFactory {
     }
 
     public JwtRealm createRealm() {
-        return new JwtRealm(getRoles().createReader());
+        return new JwtRealm(getRoles().createReader(), this.audience);
     }
 
     private AuthzReaderFactory getRoles() {

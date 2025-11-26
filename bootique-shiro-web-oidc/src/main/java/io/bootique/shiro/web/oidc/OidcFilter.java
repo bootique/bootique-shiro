@@ -34,7 +34,6 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 
 import java.util.Arrays;
-import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -43,18 +42,15 @@ import java.util.stream.Stream;
 public class OidcFilter extends AuthenticatingFilter {
 
     private final Provider<JwtParser> tokenParser;
-    private final String audience;
     private final OidpRouter oidpRouter;
     private final String tokenCookie;
 
     public OidcFilter(
             Provider<JwtParser> tokenParser,
-            String audience,
             OidpRouter oidpRouter,
             String tokenCookie) {
 
         this.tokenParser = tokenParser;
-        this.audience = audience;
         this.oidpRouter = oidpRouter;
         this.tokenCookie = tokenCookie;
     }
@@ -83,8 +79,6 @@ public class OidcFilter extends AuthenticatingFilter {
         String token = authz != null && authz.length() != 0 ? authz : "";
         Claims claims = tokenParser.get().parse(token).accept(Jws.CLAIMS).getPayload();
 
-        validateAudience(claims.getAudience());
-
         return new ShiroJsonWebToken(
                 token,
                 claims);
@@ -103,13 +97,5 @@ public class OidcFilter extends AuthenticatingFilter {
     private boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
         Cookie[] cookies = ((HttpServletRequest) request).getCookies();
         return cookies != null && Stream.of(cookies).anyMatch(c -> c.getName().equals(tokenCookie));
-    }
-
-    private void validateAudience(Set<String> audienceJwtClaim) {
-        if (this.audience != null && !this.audience.isEmpty()) {
-            if (audienceJwtClaim == null || !audienceJwtClaim.contains(this.audience)) {
-                throw new AuthenticationException("Invalid audience");
-            }
-        }
     }
 }

@@ -19,6 +19,8 @@
 package io.bootique.shiro.jwt;
 
 import io.bootique.shiro.jwt.authz.AuthzReader;
+import io.jsonwebtoken.Claims;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -28,19 +30,27 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 
+import java.util.Set;
+
 /**
  * @since 4.0
  */
 public class JwtRealm extends AuthorizingRealm {
 
     private final AuthzReader rolesReader;
+    private final String audience;
 
-    public JwtRealm(AuthzReader rolesReader) {
+    public JwtRealm(AuthzReader rolesReader, String audience) {
 
         setName(JwtRealm.class.getSimpleName());
         setAuthenticationTokenClass(ShiroJsonWebToken.class);
 
         this.rolesReader = rolesReader;
+        this.audience = audience;
+    }
+
+    public String getAudience() {
+        return audience;
     }
 
     @Override
@@ -54,11 +64,24 @@ public class JwtRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
+        Claims claims = ((ShiroJsonWebToken) token).getClaims();
+        validateAudience(claims.getAudience());
 
-        JwtPrincipal principal = new JwtPrincipal(((ShiroJsonWebToken) token).getClaims());
-
+        JwtPrincipal principal = new JwtPrincipal(claims);
         return new SimpleAuthenticationInfo(
                 new SimplePrincipalCollection(principal, getName()),
                 token.getCredentials());
+    }
+
+    private void validateAudience(Set<String> audienceJwtClaim) {
+        if (this.audience != null && !this.audience.isEmpty()) {
+            if (audienceJwtClaim == null || audienceJwtClaim.isEmpty()) {
+                throw new AuthenticationException("Token has no audience");
+            }
+
+            if (!audienceJwtClaim.contains(this.audience)) {
+                throw new AuthenticationException("Token has invalid audience: " + audienceJwtClaim);
+            }
+        }
     }
 }

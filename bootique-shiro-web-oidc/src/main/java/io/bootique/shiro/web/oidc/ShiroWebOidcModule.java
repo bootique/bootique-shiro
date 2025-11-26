@@ -55,7 +55,7 @@ public class ShiroWebOidcModule implements BQModule {
     @Provides
     @Singleton
     OidpRouter provideOidpClient(ConfigurationFactory configFactory) {
-        return configFactory.config(ShiroWebOidcModuleFactory.class, CONFIG_PREFIX).createOidpClient();
+        return configFactory.config(ShiroWebOidcModuleFactory.class, CONFIG_PREFIX).createOidpRouter();
     }
 
     @Provides
@@ -68,7 +68,9 @@ public class ShiroWebOidcModule implements BQModule {
 
     @Provides
     @Singleton
-    MappedResource<AuthorizationCodeHandlerApi> provideAuthorizationCodeHandlerApi(ConfigurationFactory configFactory, OidpRouter oidpRouter) {
+    MappedResource<AuthorizationCodeHandlerApi> provideAuthorizationCodeHandlerApi(
+            ConfigurationFactory configFactory,
+            OidpRouter oidpRouter) {
         return configFactory
                 .config(ShiroWebOidcModuleFactory.class, CONFIG_PREFIX)
                 .createAuthorizationCodeHandler(oidpRouter);

@@ -19,7 +19,6 @@
 package io.bootique.shiro.web.jwt;
 
 import io.bootique.annotation.BQConfig;
-import io.bootique.annotation.BQConfigProperty;
 import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Provider;
 
@@ -29,15 +28,7 @@ import jakarta.inject.Provider;
 @BQConfig("JWT Configuration")
 public class ShiroWebJwtModuleFactory {
 
-    private String audience;
-
-    @BQConfigProperty("An optional audience. If specified, it will be compared with the 'aud' JWT claim, and fail the request if the two do not match")
-    public ShiroWebJwtModuleFactory setAudience(String audience) {
-        this.audience = audience;
-        return this;
-    }
-
     public JwtBearerAuthenticationFilter createFilter(Provider<JwtParser> tokenParser) {
-        return new JwtBearerAuthenticationFilter(tokenParser, this.audience);
+        return new JwtBearerAuthenticationFilter(tokenParser);
     }
 }
