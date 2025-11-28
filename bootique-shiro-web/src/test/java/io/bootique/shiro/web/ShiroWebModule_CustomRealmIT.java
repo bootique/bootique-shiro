@@ -51,7 +51,7 @@ import java.io.IOException;
 @BQTest
 public class ShiroWebModule_CustomRealmIT {
 
-    private static final JettyTester jetty = JettyTester.create();
+    static final JettyTester jetty = JettyTester.create();
 
     @BQApp
     static final BQRuntime app = Bootique

@@ -38,7 +38,7 @@ import java.util.Base64;
 @BQTest
 public class ShiroWebModuleIT {
 
-    private static final JettyTester jetty = JettyTester.create();
+    static final JettyTester jetty = JettyTester.create();
 
     @BQApp
     static final BQRuntime app = Bootique

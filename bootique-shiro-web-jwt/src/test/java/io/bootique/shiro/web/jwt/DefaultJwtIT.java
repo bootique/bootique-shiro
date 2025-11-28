@@ -14,7 +14,8 @@ import java.util.*;
 @BQTest
 public class DefaultJwtIT extends ShiroWebJwtModuleIT {
 
-    private static final JettyTester jetty = JettyTester.create();
+    static final JettyTester jetty = JettyTester.create();
+
     @BQApp
     static final BQRuntime app = runtime(jetty, "classpath:io/bootique/shiro/web/jwt/jwt-default.yml");
 

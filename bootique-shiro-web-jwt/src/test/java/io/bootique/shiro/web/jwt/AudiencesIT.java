@@ -15,7 +15,7 @@ import java.util.Map;
 @BQTest
 public class AudiencesIT extends ShiroWebJwtModuleIT {
 
-    private static final JettyTester jetty = JettyTester.create();
+    static final JettyTester jetty = JettyTester.create();
 
     @BQApp
     static final BQRuntime app = runtime(jetty, "classpath:io/bootique/shiro/web/jwt/jwt-audience.yml");

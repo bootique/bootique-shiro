@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @BQTest
 public class OidcFilterIT {
 
-    private static final JettyTester tokenServerTester = JettyTester.create();
+    static final JettyTester tokenServerTester = JettyTester.create();
 
     @BQApp
     static final BQRuntime tokenServer = Bootique.app("-s")
