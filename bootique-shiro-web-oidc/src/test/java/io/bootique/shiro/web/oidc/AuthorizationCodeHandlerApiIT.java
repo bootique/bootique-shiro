@@ -62,7 +62,7 @@ public class AuthorizationCodeHandlerApiIT {
                 .request()
                 .get();
         JettyTester.assertOk(r);
-        
+
         Cookie c = r.getCookies().get("bq-shiro-oidc");
         assertNotNull(c);
         assertEquals("123", c.getValue());
@@ -70,9 +70,8 @@ public class AuthorizationCodeHandlerApiIT {
 
     @Test
     public void validWithOriginalUrl() {
-        Client client = OidTests.clientNoRedirects();
 
-        Response r1Callback = client.target(appTester.getUrl())
+        Response r1Callback = appTester.getTarget(false)
                 .path("bq-shiro-oauth-callback")
                 .queryParam("code", "000")
                 .queryParam(OidpRouter.INITIAL_URI_PARAM, URLEncoder.encode("/public", StandardCharsets.UTF_8))
@@ -85,13 +84,15 @@ public class AuthorizationCodeHandlerApiIT {
         assertNotNull(c, () -> "No access cookie for redirect to: " + r1Callback.getHeaderString("Location"));
         assertEquals("123", c.getValue());
 
-        // test that we got redirected to the right place
-        Response r2ResourceAccessCookies = client
-                .target(r1Callback.getHeaderString("Location"))
-                .request()
-                .get();
+        try (Client client = OidTests.clientNoRedirects()) {
+            // test that we got redirected to the right place
+            Response r2ResourceAccessCookies = client
+                    .target(r1Callback.getHeaderString("Location"))
+                    .request()
+                    .get();
 
-        JettyTester.assertOk(r2ResourceAccessCookies).assertContent("public");
+            JettyTester.assertOk(r2ResourceAccessCookies).assertContent("public");
+        }
     }
 
     @Path("/auth")

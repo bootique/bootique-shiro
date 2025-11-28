@@ -59,9 +59,7 @@ public class OidcFilterIT {
     @Test
     public void noAuth() {
 
-        WebTarget target = OidTests.clientNoRedirects()
-                .target(appTester.getUrl())
-                .path("/private");
+        WebTarget target = appTester.getTarget(false).path("/private");
 
         String expectedRedirect = tokenServerTester.getUrl() +
                 "/auth?response_type=code&client_id=test-client&redirect_uri=" +
@@ -76,46 +74,45 @@ public class OidcFilterIT {
 
     @Test
     public void noAuthWithIDPRedirects() {
-        Client client = OidTests.clientNoRedirects();
 
-        Response r1ResourceNoAccess = client
-                .target(appTester.getUrl())
+        Response r1ResourceNoAccess = appTester.getTarget(false)
                 .path("/private")
                 .queryParam("pq", "X")
                 .request()
                 .get();
         JettyTester.assertFound(r1ResourceNoAccess);
 
-        Response r2Login = client
-                .target(r1ResourceNoAccess.getHeaderString("Location"))
-                .request()
-                .get();
-        JettyTester.assertFound(r2Login);
+        try (Client client = OidTests.clientNoRedirects()) {
+            Response r2Login = client
+                    .target(r1ResourceNoAccess.getHeaderString("Location"))
+                    .request()
+                    .get();
+            JettyTester.assertFound(r2Login);
 
-        Response r3Callback = client
-                .target(r2Login.getHeaderString("Location"))
-                .request()
-                .get();
-        JettyTester.assertTempRedirect(r3Callback);
+            Response r3Callback = client
+                    .target(r2Login.getHeaderString("Location"))
+                    .request()
+                    .get();
+            JettyTester.assertTempRedirect(r3Callback);
 
-        Cookie c = r3Callback.getCookies().get("bq-shiro-oidc");
-        assertNotNull(c, () -> "No access cookie for redirect to: " + r3Callback.getHeaderString("Location"));
+            Cookie c = r3Callback.getCookies().get("bq-shiro-oidc");
+            assertNotNull(c, () -> "No access cookie for redirect to: " + r3Callback.getHeaderString("Location"));
 
-        Response r4ResourceAccessCookies = client
-                .target(r3Callback.getHeaderString("Location"))
-                .request()
-                .cookie(c)
-                .get();
+            Response r4ResourceAccessCookies = client
+                    .target(r3Callback.getHeaderString("Location"))
+                    .request()
+                    .cookie(c)
+                    .get();
 
-        JettyTester.assertOk(r4ResourceAccessCookies).assertContent("private:pq=X");
+            JettyTester.assertOk(r4ResourceAccessCookies).assertContent("private:pq=X");
+        }
     }
 
     @Test
     public void authCookie() {
 
         String authToken = OidTests.jwt(Map.of("roles", List.of("role1")));
-        Response r = OidTests.clientNoRedirects()
-                .target(appTester.getUrl())
+        Response r = appTester.getTarget(false)
                 .path("/private")
                 .request()
                 .cookie(new NewCookie.Builder("bq-shiro-oidc").value(authToken).build())
