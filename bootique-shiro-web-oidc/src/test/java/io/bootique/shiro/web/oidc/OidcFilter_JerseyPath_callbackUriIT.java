@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @BQTest
 public class OidcFilter_JerseyPath_callbackUriIT {
 
-    private static final JettyTester tokenServerTester = JettyTester.create();
+    static final JettyTester tokenServerTester = JettyTester.create();
 
     @BQApp
     static final BQRuntime tokenServer = Bootique.app("-s")
@@ -57,16 +57,16 @@ public class OidcFilter_JerseyPath_callbackUriIT {
             .module(b -> JerseyModule.extend(b).addResource(AuthApi.class).addResource(TokenApi.class))
             .createRuntime();
 
-    private final JettyTester appTester = JettyTester.create();
+    static final JettyTester appTester = JettyTester.create();
 
     @BQApp
-    final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidc/oidc-filter-jersey-path.yml", "-s")
+    static final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidc/oidc-filter-jersey-path.yml", "-s")
             .module(appTester.moduleReplacingConnectors())
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidc.tokenUrl", tokenServerTester.getUrl() + "/token"))
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidc.oidpUrl", tokenServerTester.getUrl() + "/auth"))
+            .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.tokenUrl", () -> tokenServerTester.getUrl() + "/token"))
+            .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.oidpUrl", () -> tokenServerTester.getUrl() + "/auth"))
             .module(b -> JerseyModule.extend(b).addResource(Api.class))
 
-            // map Jersey servle to a custom path. This will affect the URLs of the user APIs as well as auth code callback
+            // map Jersey servlet to a custom path. This will affect the URLs of the user APIs as well as auth code callback
             .module(b -> BQCoreModule.extend(b).setProperty("bq.jersey.urlPattern", "/api/*"))
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidc.callbackUri", "cb"))
 

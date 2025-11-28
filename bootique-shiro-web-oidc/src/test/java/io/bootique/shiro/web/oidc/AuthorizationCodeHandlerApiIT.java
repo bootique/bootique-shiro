@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @BQTest
 public class AuthorizationCodeHandlerApiIT {
 
-    private static final JettyTester tokenServerTester = JettyTester.create();
+    static final JettyTester tokenServerTester = JettyTester.create();
 
     @BQApp
     static final BQRuntime tokenServer = Bootique.app("-s")
@@ -39,12 +39,12 @@ public class AuthorizationCodeHandlerApiIT {
             .module(b -> JerseyModule.extend(b).addResource(TokenApi.class))
             .createRuntime();
 
-    private final JettyTester appTester = JettyTester.create();
+    static final JettyTester appTester = JettyTester.create();
 
     @BQApp
-    final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidc/oidc.yml", "-s")
+    static final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidc/oidc.yml", "-s")
             .module(appTester.moduleReplacingConnectors())
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidc.tokenUrl", tokenServerTester.getUrl() + "/auth"))
+            .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.tokenUrl", () -> tokenServerTester.getUrl() + "/auth"))
             .module(b -> JerseyModule.extend(b).addResource(Api.class))
             .autoLoadModules()
             .createRuntime();

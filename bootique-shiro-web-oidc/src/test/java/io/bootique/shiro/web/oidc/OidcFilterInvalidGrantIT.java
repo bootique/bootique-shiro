@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 @BQTest
 public class OidcFilterInvalidGrantIT {
 
-    private static final JettyTester tokenServerTester = JettyTester.create();
+    static final JettyTester tokenServerTester = JettyTester.create();
 
     @BQApp
     static final BQRuntime tokenServer = Bootique.app("-s")
@@ -28,13 +28,13 @@ public class OidcFilterInvalidGrantIT {
             .module(b -> JerseyModule.extend(b).addResource(TokenApi.class))
             .createRuntime();
 
-    private final JettyTester appTester = JettyTester.create();
+    static final JettyTester appTester = JettyTester.create();
 
     @BQApp
-    final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidc/oidc.yml", "-s")
+    static final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidc/oidc.yml", "-s")
             .module(appTester.moduleReplacingConnectors())
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidc.tokenUrl", tokenServerTester.getUrl() + "/auth"))
-            .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidc.oidpUrl", tokenServerTester.getUrl() + "/auth"))
+            .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.tokenUrl", () -> tokenServerTester.getUrl() + "/auth"))
+            .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.oidpUrl", () -> tokenServerTester.getUrl() + "/auth"))
             .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
             .autoLoadModules()
             .createRuntime();
