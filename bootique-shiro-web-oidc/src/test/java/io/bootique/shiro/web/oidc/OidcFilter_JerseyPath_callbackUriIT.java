@@ -126,8 +126,9 @@ public class OidcFilter_JerseyPath_callbackUriIT {
         public Response authCode(
                 @QueryParam("response_type") String responseType,
                 @QueryParam("client_id") String clientId,
-                @QueryParam("redirect_uri") String redirectUri) {
-            String callbackUrl = redirectUri + "&code=123&state=xyz";
+                @QueryParam("redirect_uri") String redirectUri,
+                @QueryParam("state") String state) {
+            String callbackUrl = redirectUri + "?code=123&state="+state;
             return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
         }
     }

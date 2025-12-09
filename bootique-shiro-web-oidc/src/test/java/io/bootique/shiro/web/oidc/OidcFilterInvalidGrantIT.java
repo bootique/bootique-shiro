@@ -64,7 +64,7 @@ public class OidcFilterInvalidGrantIT {
         @GET
         public Response authCode(@Context UriInfo uriInfo) {
             if (!authCodeAlreadyUsed) {
-                final String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "&code=123&state=xyz";
+                final String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "?code=123&state=xyz";
                 authCodeAlreadyUsed = true;
                 return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
             } else {

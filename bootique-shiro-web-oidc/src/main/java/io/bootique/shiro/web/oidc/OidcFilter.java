@@ -76,7 +76,7 @@ public class OidcFilter extends AuthenticatingFilter {
                 .map(Cookie::getValue)
                 .orElse(null);
 
-        String token = authz != null && authz.length() != 0 ? authz : "";
+        String token = authz != null && !authz.isEmpty() ? authz : "";
         Claims claims = tokenParser.get().parse(token).accept(Jws.CLAIMS).getPayload();
 
         return new ShiroJsonWebToken(

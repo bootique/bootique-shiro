@@ -64,9 +64,8 @@ public class OidcFilterIT {
         String expectedRedirect = tokenServerTester.getUrl() +
                 "/auth?response_type=code&client_id=test-client&redirect_uri=" +
                 URLEncoder.encode(appTester.getUrl(), StandardCharsets.UTF_8) +
-                "%2Fcb%3Finitial_uri%3D" +
-                // double URL-encode the origin URL, as it is a parameter of an already URL-encoded URL parameter
-                URLEncoder.encode(URLEncoder.encode(target.getUri().toString(), StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+                "%2Fcb&state=" +
+                URLEncoder.encode(target.getUri().toString(), StandardCharsets.UTF_8);
 
         Response r = target.request().get();
         JettyTester.assertFound(r).assertHeader("Location", expectedRedirect);
@@ -137,13 +136,14 @@ public class OidcFilterIT {
         public Response authCode(
                 @QueryParam("response_type") String responseType,
                 @QueryParam("client_id") String clientId,
-                @QueryParam("redirect_uri") String redirectUri) {
+                @QueryParam("redirect_uri") String redirectUri,
+                @QueryParam("state") String state) {
 
             assertEquals("code", responseType);
             assertEquals("test-client", clientId);
             assertNotNull(redirectUri);
 
-            String callbackUrl = redirectUri + "&code=123&state=xyz";
+            String callbackUrl = redirectUri + "?code=123&state="+state;
             return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
         }
     }

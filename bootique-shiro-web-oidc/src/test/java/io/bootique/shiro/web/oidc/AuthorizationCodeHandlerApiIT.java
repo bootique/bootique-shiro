@@ -74,7 +74,7 @@ public class AuthorizationCodeHandlerApiIT {
         Response r1Callback = appTester.getTarget(false)
                 .path("bq-shiro-oauth-callback")
                 .queryParam("code", "000")
-                .queryParam(OidpRouter.INITIAL_URI_PARAM, URLEncoder.encode("/public", StandardCharsets.UTF_8))
+                .queryParam("state", URLEncoder.encode("/public", StandardCharsets.UTF_8))
                 .request()
                 .get();
 

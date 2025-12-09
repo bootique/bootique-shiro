@@ -35,32 +35,28 @@ import java.util.Objects;
  */
 public class OidpRouter {
 
-    /**
-     * The URI of the application request that originated the OID sequence. Not a part of the OAuth standard, it is
-     * appended to the "redirect_uri" when OID authentication flow is initially triggered. It is passed through all the
-     * redirects, and is finally used by the {@link AuthorizationCodeHandlerApi} to send the user to where they started from.
-     */
-    static final String INITIAL_URI_PARAM = "initial_uri";
-
     private final ServletEnvironment env;
     private final Provider<MappedServlet<ServletContainer>> jerseyServlet;
     private final String oidpBaseUrl;
     private final String clientIdEnc;
     // a path relative to the Jersey servlet context
     private final String authCodeHandlerPath;
+    private final String scope;
 
     public OidpRouter(
             ServletEnvironment env,
             Provider<MappedServlet<ServletContainer>> jerseyServlet,
             String oidpBaseUrl,
             String clientId,
-            String authCodeHandlerPath) {
+            String authCodeHandlerPath,
+            String scope) {
 
         this.env = env;
         this.jerseyServlet = jerseyServlet;
         this.oidpBaseUrl = oidpBaseUrl;
         this.clientIdEnc = URLEncoder.encode(clientId, StandardCharsets.UTF_8);
         this.authCodeHandlerPath = authCodeHandlerPath;
+        this.scope = scope;
     }
 
     public String oidpUrlReturningToCurrentRequest() {
@@ -69,20 +65,23 @@ public class OidpRouter {
 
     public String oidpUrlReturningToUrl(String initialUrl) {
 
-        // "authCodeHandlerUrl" assumes that auth code callback endpoint is deployed in the same webapp as the filter
-        String authCodeHandlerUrlEnc = URLEncoder.encode(authCodeHandlerUrl(initialUrl), StandardCharsets.UTF_8);
+        String initialUrlEnc = URLEncoder.encode(initialUrl, StandardCharsets.UTF_8);
 
-        return new StringBuilder(oidpBaseUrl)
+        // "authCodeHandlerUrl" assumes that auth code callback endpoint is deployed in the same webapp as the filter
+        String authCodeHandlerUrlEnc = URLEncoder.encode(authCodeHandlerUrl(), StandardCharsets.UTF_8);
+
+        StringBuilder builder = new StringBuilder(oidpBaseUrl)
                 .append("?response_type=code")
                 .append("&client_id=").append(clientIdEnc)
                 .append("&redirect_uri=").append(authCodeHandlerUrlEnc)
-                .toString();
+                .append("&state=").append(initialUrlEnc);
+        if (scope != null && !scope.isEmpty()) {
+            builder.append("&scope=").append(scope);
+        }
+        return builder.toString();
     }
 
-    private String authCodeHandlerUrl(String initialUrl) {
-
-        String initialUrlEnc = URLEncoder.encode(initialUrl, StandardCharsets.UTF_8);
-
+    private String authCodeHandlerUrl() {
         HttpServletRequest request = requestInProgress();
         StringBuffer url = request.getRequestURL();
 
@@ -96,8 +95,6 @@ public class OidpRouter {
                 .append(request.getContextPath())
                 .append(getJerseyServletPrefix())
                 .append(authCodeHandlerPath)
-                .append("?")
-                .append(OidpRouter.INITIAL_URI_PARAM).append("=").append(initialUrlEnc)
                 .toString();
     }
 
