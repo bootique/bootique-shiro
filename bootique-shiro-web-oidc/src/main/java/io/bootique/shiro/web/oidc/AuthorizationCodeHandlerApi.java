@@ -51,7 +51,7 @@ public class AuthorizationCodeHandlerApi {
     private final WebTarget tokenTarget;
     private final String tokenCookie;
     private final String clientId;
-    private final String clientSecretKey;
+    private final String clientSecret;
 
     public AuthorizationCodeHandlerApi(
             ObjectMapper mapper,
@@ -59,21 +59,22 @@ public class AuthorizationCodeHandlerApi {
             String tokenCookie,
             String tokenUrl,
             String clientId,
-            String clientSecretKey) {
+            String clientSecret) {
 
         this.mapper = mapper;
         this.oidpRouter = oidpRouter;
         this.tokenCookie = tokenCookie;
         this.clientId = clientId;
-        this.clientSecretKey = clientSecretKey;
+        this.clientSecret = clientSecret;
 
         // TODO: client must originate in Bootique
         this.tokenTarget = JerseyClientBuilder.createClient().target(tokenUrl);
     }
 
     @GET
-    public Response onAuthCodeCallback(@QueryParam("code") String code,
-                                       @QueryParam("state") String initialUrl) {
+    public Response onAuthCodeCallback(
+            @QueryParam("code") String code,
+            @QueryParam("state") String initialUrl) {
 
         if (code == null || code.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("'code' parameter is required").build();
@@ -134,7 +135,7 @@ public class AuthorizationCodeHandlerApi {
         Form form = new Form()
                 .param("grant_type", "authorization_code")
                 .param("client_id", clientId)
-                .param("client_secret", clientSecretKey)
+                .param("client_secret", clientSecret)
                 .param("code", code)
                 .param("redirect_uri", oidpRouter.authCodeHandlerUrl());
 
