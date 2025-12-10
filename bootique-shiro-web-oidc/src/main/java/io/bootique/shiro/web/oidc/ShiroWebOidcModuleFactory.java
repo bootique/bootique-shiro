@@ -125,8 +125,7 @@ public class ShiroWebOidcModuleFactory {
                 getTokenCookie(),
                 getTokenUrl(),
                 getClientId(),
-                getClientSecret(),
-                getAuthCodeHandlerPath());
+                getClientSecret());
 
         return new MappedResource<>(api, getAuthCodeHandlerPath());
     }

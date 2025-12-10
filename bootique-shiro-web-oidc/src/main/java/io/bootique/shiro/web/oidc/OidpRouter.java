@@ -81,7 +81,7 @@ public class OidpRouter {
         return builder.toString();
     }
 
-    private String authCodeHandlerUrl() {
+    public String authCodeHandlerUrl() {
         HttpServletRequest request = requestInProgress();
         StringBuffer url = request.getRequestURL();
 

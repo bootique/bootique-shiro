@@ -25,7 +25,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.*;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +50,8 @@ public class AuthorizationCodeHandlerApi {
     private final OidpRouter oidpRouter;
     private final WebTarget tokenTarget;
     private final String tokenCookie;
-    private final String clientIdEnc;
-    private final String clientSecretKeyEnc;
-    private final String callbackUri;
+    private final String clientId;
+    private final String clientSecretKey;
 
     public AuthorizationCodeHandlerApi(
             ObjectMapper mapper,
@@ -58,31 +59,28 @@ public class AuthorizationCodeHandlerApi {
             String tokenCookie,
             String tokenUrl,
             String clientId,
-            String clientSecretKey,
-            String callbackUri) {
+            String clientSecretKey) {
 
         this.mapper = mapper;
         this.oidpRouter = oidpRouter;
         this.tokenCookie = tokenCookie;
-        this.clientIdEnc = clientId;
-        this.clientSecretKeyEnc = clientSecretKey;
-        this.callbackUri = callbackUri;
+        this.clientId = clientId;
+        this.clientSecretKey = clientSecretKey;
 
         // TODO: client must originate in Bootique
         this.tokenTarget = JerseyClientBuilder.createClient().target(tokenUrl);
     }
 
     @GET
-    public Response onAuthCodeCallback(@Context UriInfo uriInfo,
-            @QueryParam("code") String code,
-            @QueryParam("state") String initialUrl) {
+    public Response onAuthCodeCallback(@QueryParam("code") String code,
+                                       @QueryParam("state") String initialUrl) {
 
         if (code == null || code.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("'code' parameter is required").build();
         }
 
         // Exchange auth code to token on JWT server
-        Response tokenResponse = requestToken(uriInfo, code);
+        Response tokenResponse = requestToken(code);
         JsonNode tokenJson;
 
         try {
@@ -128,18 +126,17 @@ public class AuthorizationCodeHandlerApi {
         return URI.create(URLDecoder.decode(encodedUri, StandardCharsets.UTF_8));
     }
 
-    private Response requestToken(UriInfo uriInfo, String code) {
+    private Response requestToken(String code) {
 
         // TODO: a more classic form of OAuth request would pass client id / secret as an Authorization header.
         //   Though a parameter flavor should also be ok with most IDPs
 
-        String redirectUri = uriInfo.getBaseUriBuilder().path(this.callbackUri).build().toString();
         Form form = new Form()
                 .param("grant_type", "authorization_code")
-                .param("client_id", clientIdEnc)
-                .param("client_secret", clientSecretKeyEnc)
+                .param("client_id", clientId)
+                .param("client_secret", clientSecretKey)
                 .param("code", code)
-                .param("redirect_uri", redirectUri);
+                .param("redirect_uri", oidpRouter.authCodeHandlerUrl());
 
         Entity<Form> postForm = Entity.form(form);
         return tokenTarget
