@@ -28,12 +28,15 @@ import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class JdbcRealmFactoryTest {
 
@@ -48,12 +51,30 @@ public class JdbcRealmFactoryTest {
     @Test
     public void createRealm() throws NoSuchFieldException, IllegalAccessException {
 
-        DataSource ds = mock(DataSource.class);
+        DataSource ds = new TestDataSource();
 
-        DataSourceFactory mockDSFactory = mock((DataSourceFactory.class));
-        when(mockDSFactory.forName("testDS")).thenReturn(ds);
+        DataSourceFactory dsFactory = new DataSourceFactory() {
+            @Override
+            public DataSource forName(String name) {
+                if (name.equals("testDS")) {
+                    return ds;
+                }
 
-        JdbcRealmFactory factory = new JdbcRealmFactory(mockDSFactory);
+                throw new IllegalArgumentException(name);
+            }
+
+            @Override
+            public Collection<String> allNames() {
+                return List.of("testDS");
+            }
+
+            @Override
+            public boolean isStarted(String name) {
+                return false;
+            }
+        };
+
+        JdbcRealmFactory factory = new JdbcRealmFactory(dsFactory);
         factory.setName("testName");
         factory.setDatasource("testDS");
 
@@ -63,5 +84,52 @@ public class JdbcRealmFactoryTest {
         Field dsField = JdbcRealm.class.getDeclaredField("dataSource");
         dsField.setAccessible(true);
         assertSame(ds, dsField.get(realm));
+    }
+
+    static class TestDataSource implements DataSource {
+        @Override
+        public Connection getConnection() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Connection getConnection(String username, String password) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public PrintWriter getLogWriter() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setLogWriter(PrintWriter out) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setLoginTimeout(int seconds) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getLoginTimeout() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> T unwrap(Class<T> iface) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isWrapperFor(Class<?> iface) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Logger getParentLogger() {
+            throw new UnsupportedOperationException();
+        }
     }
 }

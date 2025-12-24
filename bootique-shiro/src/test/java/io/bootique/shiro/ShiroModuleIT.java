@@ -24,17 +24,22 @@ import io.bootique.junit5.BQTest;
 import io.bootique.junit5.BQTestFactory;
 import io.bootique.junit5.BQTestTool;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationListener;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @BQTest
 public class ShiroModuleIT {
@@ -42,34 +47,34 @@ public class ShiroModuleIT {
     @BQTestTool
     final BQTestFactory testFactory = new BQTestFactory();
 
-    protected Realm mockRealm() {
-        Realm mockRealm = mock(Realm.class);
-        when(mockRealm.getName()).thenReturn("TestRealm");
-        when(mockRealm.supports(any(AuthenticationToken.class))).then(invocation -> {
-            AuthenticationToken token = invocation.getArgument(0);
-            return token instanceof UsernamePasswordToken;
-        });
+    @BeforeEach
+    public void beforeEach() {
+        TestAuthListener.reset();
+    }
 
-        when(mockRealm.getAuthenticationInfo(any(AuthenticationToken.class))).then(invocation -> {
+    protected Realm realm() {
+        SimpleAccountRealm realm = new SimpleAccountRealm("TestRealm") {
+            @Override
+            protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+                if (!"password".equals(new String(((UsernamePasswordToken) token).getPassword()))) {
+                    throw new AuthenticationException("Bad password");
+                }
 
-            UsernamePasswordToken token = invocation.getArgument(0);
-            if (!"password".equals(new String(token.getPassword()))) {
-                throw new AuthenticationException("Bad password");
+                return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), "TestRealm");
             }
+        };
+        realm.setAuthenticationTokenClass(UsernamePasswordToken.class);
 
-            return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), "TestRealm");
-        });
-
-        return mockRealm;
+        return realm;
     }
 
     @Test
     public void fullStack() {
 
-        Realm mockRealm = mockRealm();
+        Realm realm = realm();
 
         BQRuntime runtime = testFactory.app()
-                .module(b -> ShiroModule.extend(b).addRealm(mockRealm))
+                .module(b -> ShiroModule.extend(b).addRealm(realm))
                 .autoLoadModules()
                 .createRuntime();
 
@@ -92,7 +97,7 @@ public class ShiroModuleIT {
 
     @Test
     public void fullStack_SecurityUtils() {
-        Realm mockRealm = mockRealm();
+        Realm mockRealm = realm();
 
         BQRuntime runtime = testFactory.app()
                 .module(b -> ShiroModule.extend(b).addRealm(mockRealm))
@@ -110,14 +115,13 @@ public class ShiroModuleIT {
     @Test
     public void fullStack_AuthListener() {
 
-        Realm mockRealm = mockRealm();
-        AuthenticationListener mockListener = mock(AuthenticationListener.class);
+        Realm mockRealm = realm();
 
         BQRuntime runtime = testFactory.app()
                 .module(b -> ShiroModule
                         .extend(b)
                         .addRealm(mockRealm)
-                        .addAuthListener(mockListener))
+                        .addAuthListener(new TestAuthListener()))
                 .autoLoadModules()
                 .createRuntime();
 
@@ -129,25 +133,29 @@ public class ShiroModuleIT {
             subject.login(new UsernamePasswordToken("uname", "badpassword"));
             fail("Should have thrown on bad auth");
         } catch (AuthenticationException authEx) {
-            verify(mockListener).onFailure(any(AuthenticationToken.class), any(AuthenticationException.class));
+            assertFalse(TestAuthListener.onSuccess);
+            assertFalse(TestAuthListener.onLogout);
+            assertTrue(TestAuthListener.onFailure);
         }
+
+        TestAuthListener.reset();
 
         // try good login
         subject.login(new UsernamePasswordToken("uname", "password"));
-        verify(mockListener).onSuccess(any(AuthenticationToken.class), any(AuthenticationInfo.class));
+        assertTrue(TestAuthListener.onSuccess);
+        assertFalse(TestAuthListener.onLogout);
+        assertFalse(TestAuthListener.onFailure);
     }
 
     @Test
     public void fullStack_AuthListenerType() {
 
-        TestAuthListener.reset();
-
-        Realm mockRealm = mockRealm();
+        Realm realm = realm();
 
         BQRuntime runtime = testFactory.app()
                 .module(b -> ShiroModule
                         .extend(b)
-                        .addRealm(mockRealm)
+                        .addRealm(realm)
                         .addAuthListener(TestAuthListener.class))
                 .autoLoadModules()
                 .createRuntime();
@@ -195,4 +203,5 @@ public class ShiroModuleIT {
             onLogout = true;
         }
     }
+
 }

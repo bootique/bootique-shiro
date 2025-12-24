@@ -21,8 +21,8 @@ package io.bootique.shiro;
 
 import io.bootique.shiro.realm.RealmFactory;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.SimpleAccountRealm;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.HashSet;
 import java.util.List;
@@ -36,8 +36,8 @@ public class ShiroConfiguratorFactoryTest {
     @Test
     public void createRealms_NoConfig() {
 
-        Realm r1 = Mockito.mock(Realm.class);
-        Realm r2 = Mockito.mock(Realm.class);
+        Realm r1 = new SimpleAccountRealm();
+        Realm r2 = new SimpleAccountRealm();
 
         Set<Realm> diRealms = new HashSet<>(asList(r1, r2));
 
@@ -53,14 +53,22 @@ public class ShiroConfiguratorFactoryTest {
     @Test
     public void createRealms_NoDi() {
 
-        Realm r1 = Mockito.mock(Realm.class);
-        Realm r2 = Mockito.mock(Realm.class);
+        Realm r1 = new SimpleAccountRealm();
+        Realm r2 = new SimpleAccountRealm();
 
-        RealmFactory rf1 = Mockito.mock(RealmFactory.class);
-        Mockito.when(rf1.createRealm()).thenReturn(r1);
+        RealmFactory rf1 = new RealmFactory() {
+            @Override
+            public Realm createRealm() {
+                return r1;
+            }
+        };
 
-        RealmFactory rf2 = Mockito.mock(RealmFactory.class);
-        Mockito.when(rf2.createRealm()).thenReturn(r2);
+        RealmFactory rf2 = new RealmFactory() {
+            @Override
+            public Realm createRealm() {
+                return r2;
+            }
+        };
 
         List<RealmFactory> configFactories = asList(rf1, rf2);
 
@@ -77,19 +85,27 @@ public class ShiroConfiguratorFactoryTest {
     @Test
     public void createRealms_DiAndConfig() {
 
-        Realm rdi1 = Mockito.mock(Realm.class);
-        Realm rdi2 = Mockito.mock(Realm.class);
+        Realm rdi1 = new SimpleAccountRealm();
+        Realm rdi2 = new SimpleAccountRealm();
 
         Set<Realm> diRealms = new HashSet<>(asList(rdi1, rdi2));
 
-        Realm r1 = Mockito.mock(Realm.class);
-        Realm r2 = Mockito.mock(Realm.class);
+        Realm r1 = new SimpleAccountRealm();
+        Realm r2 = new SimpleAccountRealm();
 
-        RealmFactory rf1 = Mockito.mock(RealmFactory.class);
-        Mockito.when(rf1.createRealm()).thenReturn(r1);
+        RealmFactory rf1 = new RealmFactory() {
+            @Override
+            public Realm createRealm() {
+                return r1;
+            }
+        };
 
-        RealmFactory rf2 = Mockito.mock(RealmFactory.class);
-        Mockito.when(rf2.createRealm()).thenReturn(r2);
+        RealmFactory rf2 = new RealmFactory() {
+            @Override
+            public Realm createRealm() {
+                return r2;
+            }
+        };
 
         List<RealmFactory> configFactories = asList(rf1, rf2);
 

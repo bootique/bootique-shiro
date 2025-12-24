@@ -28,11 +28,11 @@ import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.SimpleAccountRealm;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 @BQTest
 public class ShiroWebMDCModuleIT {
@@ -42,7 +42,7 @@ public class ShiroWebMDCModuleIT {
 
     @Test
     public void containerState_InitializerListener() {
-        Realm mockRealm = mock(Realm.class);
+        Realm mockRealm = new SimpleAccountRealm();
         BQRuntime runtime = testFactory.app()
                 .module(b -> ShiroModule.extend(b).addRealm(mockRealm))
                 .autoLoadModules()

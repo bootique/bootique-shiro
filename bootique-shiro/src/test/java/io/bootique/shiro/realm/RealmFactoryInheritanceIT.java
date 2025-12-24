@@ -27,8 +27,8 @@ import io.bootique.junit5.BQTest;
 import io.bootique.junit5.PolymorphicConfigurationChecker;
 import io.bootique.shiro.ShiroConfigurator;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.SimpleAccountRealm;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -67,9 +67,7 @@ public class RealmFactoryInheritanceIT {
 
         @Override
         public Realm createRealm() {
-            Realm realm = Mockito.mock(Realm.class);
-            Mockito.when(realm.getName()).thenReturn("Created by RealmFactory1");
-            return realm;
+            return new SimpleAccountRealm("Created by RealmFactory1");
         }
     }
 
@@ -78,9 +76,7 @@ public class RealmFactoryInheritanceIT {
 
         @Override
         public Realm createRealm() {
-            Realm realm = Mockito.mock(Realm.class);
-            Mockito.when(realm.getName()).thenReturn("Created by RealmFactory2");
-            return realm;
+            return new SimpleAccountRealm("Created by RealmFactory2");
         }
     }
 }

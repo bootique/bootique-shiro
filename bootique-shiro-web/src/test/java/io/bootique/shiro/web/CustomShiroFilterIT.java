@@ -28,17 +28,15 @@ import io.bootique.jetty.MappedFilter;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import io.bootique.shiro.ShiroModule;
+import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
-import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import jakarta.inject.Inject;
 import java.util.Map;
-
-import static org.mockito.Mockito.mock;
 
 @BQTest
 public class CustomShiroFilterIT {
@@ -47,7 +45,7 @@ public class CustomShiroFilterIT {
     static final BQRuntime app = Bootique
             .app("-c", "classpath:CustomShiroFilterIT.yml")
             .autoLoadModules()
-            .module(b -> ShiroModule.extend(b).addRealm(mock(Realm.class)))
+            .module(b -> ShiroModule.extend(b).addRealm(new SimpleAccountRealm()))
             .createRuntime();
 
     @Test
