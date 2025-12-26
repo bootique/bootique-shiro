@@ -44,7 +44,7 @@ public class ShiroWebModuleIT {
     static final BQRuntime app = Bootique
             .app("-c", "classpath:ShiroWebModuleIT.yml", "-s")
             .module(jetty.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(Api.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(Api.class))
             .autoLoadModules()
             .createRuntime();
 

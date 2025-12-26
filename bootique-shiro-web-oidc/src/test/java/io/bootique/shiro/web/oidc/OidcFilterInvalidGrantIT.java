@@ -25,7 +25,7 @@ public class OidcFilterInvalidGrantIT {
             .module(JettyModule.class)
             .module(JerseyModule.class)
             .module(tokenServerTester.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(TokenApi.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(TokenApi.class))
             .createRuntime();
 
     static final JettyTester appTester = JettyTester.create();
@@ -35,7 +35,7 @@ public class OidcFilterInvalidGrantIT {
             .module(appTester.moduleReplacingConnectors())
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.tokenUrl", () -> tokenServerTester.getUrl() + "/auth"))
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.oidpUrl", () -> tokenServerTester.getUrl() + "/auth"))
-            .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(TestApi.class))
             .autoLoadModules()
             .createRuntime();
 

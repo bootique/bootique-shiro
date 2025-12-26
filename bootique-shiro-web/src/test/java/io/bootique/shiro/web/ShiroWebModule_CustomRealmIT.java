@@ -57,7 +57,7 @@ public class ShiroWebModule_CustomRealmIT {
     static final BQRuntime app = Bootique
             .app("-c", "classpath:ShiroWebModule_CustomRealmIT.yml", "-s")
             .module(jetty.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(Api.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(Api.class))
             .module(b -> ShiroModule.extend(b).addRealm(new TestRealm()))
             // overriding standard "perms" filter to avoid being sent to the login form
             .module(b -> ShiroWebModule.extend(b).setFilter("perms", PermissionsFilter.class))

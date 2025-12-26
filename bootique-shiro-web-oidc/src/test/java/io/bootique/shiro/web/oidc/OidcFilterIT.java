@@ -41,7 +41,7 @@ public class OidcFilterIT {
             .module(JettyModule.class)
             .module(JerseyModule.class)
             .module(tokenServerTester.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(AuthApi.class).addResource(TokenApi.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(AuthApi.class).addApiResource(TokenApi.class))
             .createRuntime();
 
     static final JettyTester appTester = JettyTester.create();
@@ -52,7 +52,7 @@ public class OidcFilterIT {
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.tokenUrl", () -> tokenServerTester.getUrl() + "/token"))
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.oidpUrl", () -> tokenServerTester.getUrl() + "/auth"))
             .module(b -> BQCoreModule.extend(b).setProperty("bq.shiroweboidc.callbackUri", "cb"))
-            .module(b -> JerseyModule.extend(b).addResource(Api.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(Api.class))
             .autoLoadModules()
             .createRuntime();
 

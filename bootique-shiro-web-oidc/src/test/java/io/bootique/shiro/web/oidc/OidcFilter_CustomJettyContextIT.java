@@ -54,7 +54,7 @@ public class OidcFilter_CustomJettyContextIT {
             .module(JettyModule.class)
             .module(JerseyModule.class)
             .module(tokenServerTester.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(AuthApi.class).addResource(TokenApi.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(AuthApi.class).addApiResource(TokenApi.class))
             .createRuntime();
 
     static final JettyTester appTester = JettyTester.create();
@@ -64,7 +64,7 @@ public class OidcFilter_CustomJettyContextIT {
             .module(appTester.moduleReplacingConnectors())
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.tokenUrl", () -> tokenServerTester.getUrl() + "/token"))
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.oidpUrl", () -> tokenServerTester.getUrl() + "/auth"))
-            .module(b -> JerseyModule.extend(b).addResource(Api.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(Api.class))
 
             // map Jetty to a custom path
             .module(b -> BQCoreModule.extend(b).setProperty("bq.jetty.context", "/app"))

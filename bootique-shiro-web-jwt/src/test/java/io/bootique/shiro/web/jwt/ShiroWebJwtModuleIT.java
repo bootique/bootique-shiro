@@ -13,7 +13,7 @@ public abstract class ShiroWebJwtModuleIT {
         return Bootique
                 .app("-c", yml, "-s")
                 .module(jetty.moduleReplacingConnectors())
-                .module(b -> JerseyModule.extend(b).addResource(TestApi.class))
+                .module(b -> JerseyModule.extend(b).addApiResource(TestApi.class))
                 .autoLoadModules()
                 .createRuntime();
     }

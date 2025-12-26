@@ -43,7 +43,7 @@ public class AnyRoleAuthorizationFilterIT {
     static final BQRuntime app = Bootique
             .app("-c", "classpath:AnyRoleAuthorizationFilterIT.yml", "-s")
             .module(jetty.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(Api.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(Api.class))
             .autoLoadModules()
             .createRuntime();
 

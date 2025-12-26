@@ -36,7 +36,7 @@ public class AuthorizationCodeHandlerApiIT {
             .module(JettyModule.class)
             .module(JerseyModule.class)
             .module(tokenServerTester.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(TokenApi.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(TokenApi.class))
             .createRuntime();
 
     static final JettyTester appTester = JettyTester.create();
@@ -45,7 +45,7 @@ public class AuthorizationCodeHandlerApiIT {
     static final BQRuntime app = Bootique.app("-c", "classpath:io/bootique/shiro/web/oidc/oidc.yml", "-s")
             .module(appTester.moduleReplacingConnectors())
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.tokenUrl", () -> tokenServerTester.getUrl() + "/auth"))
-            .module(b -> JerseyModule.extend(b).addResource(Api.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(Api.class))
             .autoLoadModules()
             .createRuntime();
 

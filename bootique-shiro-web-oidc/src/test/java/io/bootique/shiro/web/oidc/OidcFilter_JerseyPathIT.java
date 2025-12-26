@@ -54,7 +54,7 @@ public class OidcFilter_JerseyPathIT {
             .module(JettyModule.class)
             .module(JerseyModule.class)
             .module(tokenServerTester.moduleReplacingConnectors())
-            .module(b -> JerseyModule.extend(b).addResource(AuthApi.class).addResource(TokenApi.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(AuthApi.class).addApiResource(TokenApi.class))
             .createRuntime();
 
     static final JettyTester appTester = JettyTester.create();
@@ -64,7 +64,7 @@ public class OidcFilter_JerseyPathIT {
             .module(appTester.moduleReplacingConnectors())
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.tokenUrl", () -> tokenServerTester.getUrl() + "/token"))
             .module(b -> BQCoreModule.extend(b).setPropertyProvider("bq.shiroweboidc.oidpUrl", () -> tokenServerTester.getUrl() + "/auth"))
-            .module(b -> JerseyModule.extend(b).addResource(Api.class))
+            .module(b -> JerseyModule.extend(b).addApiResource(Api.class))
 
             // map Jersey servle to a custom path. This will affect the URLs of the user APIs as well as auth code callback
             .module(b -> BQCoreModule.extend(b).setProperty("bq.jersey.urlPattern", "/api/*"))
