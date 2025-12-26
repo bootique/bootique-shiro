@@ -8,6 +8,7 @@ import io.bootique.jetty.JettyModule;
 import io.bootique.jetty.junit5.JettyTester;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -49,12 +50,13 @@ public class OidcFilterInvalidGrantIT {
         JettyTester.assertOk(r).assertContent("invalid_grant");
     }
 
+    @Singleton
     @Path("/auth")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public static class TokenApi {
 
-        private boolean authCodeAlreadyUsed = false;
+        private boolean authCodeAlreadyUsed;
 
         @POST
         public Response authToken() {
@@ -64,7 +66,7 @@ public class OidcFilterInvalidGrantIT {
         @GET
         public Response authCode(@Context UriInfo uriInfo) {
             if (!authCodeAlreadyUsed) {
-                final String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "?code=123&state=xyz";
+                String callbackUrl = uriInfo.getQueryParameters().getFirst("redirect_uri") + "?code=123&state=xyz";
                 authCodeAlreadyUsed = true;
                 return Response.status(Response.Status.FOUND).header("Location", callbackUrl).build();
             } else {
@@ -72,7 +74,6 @@ public class OidcFilterInvalidGrantIT {
             }
         }
     }
-
 
     @Path("/")
     public static class TestApi {
