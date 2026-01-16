@@ -18,7 +18,8 @@
  */
 package io.bootique.shiro.jwt;
 
-import io.bootique.shiro.jwt.authz.AuthzReader;
+import io.bootique.shiro.jwt.authz.AuthzServer;
+import io.bootique.shiro.jwt.authz.AuthzServers;
 import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -30,58 +31,50 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 
-import java.util.Set;
-
 /**
  * @since 4.0
  */
 public class JwtRealm extends AuthorizingRealm {
 
-    private final AuthzReader rolesReader;
-    private final String audience;
+    private final AuthzServers authzServers;
 
-    public JwtRealm(AuthzReader rolesReader, String audience) {
+    public JwtRealm(AuthzServers authzServers) {
 
         setName(JwtRealm.class.getSimpleName());
         setAuthenticationTokenClass(ShiroJsonWebToken.class);
 
-        this.rolesReader = rolesReader;
-        this.audience = audience;
-    }
-
-    public String getAudience() {
-        return audience;
+        this.authzServers = authzServers;
     }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         principals
                 .byType(JwtPrincipal.class)
-                .forEach(c -> authorizationInfo.addRoles(rolesReader.readAuthz(c.claims())));
-        return authorizationInfo;
+                .forEach(p -> info.addRoles(authzServerOrThrow(p.kid()).getRoles(p.claims())));
+        return info;
     }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
         Claims claims = ((ShiroJsonWebToken) token).getClaims();
-        validateAudience(claims.getAudience());
+        String kid = ((ShiroJsonWebToken) token).getKeyId();
 
-        JwtPrincipal principal = new JwtPrincipal(claims);
+        authzServerOrThrow(kid).validateAudience(claims);
+
+        JwtPrincipal principal = new JwtPrincipal(kid, claims);
         return new SimpleAuthenticationInfo(
                 new SimplePrincipalCollection(principal, getName()),
                 token.getCredentials());
     }
 
-    private void validateAudience(Set<String> audienceJwtClaim) {
-        if (this.audience != null && !this.audience.isEmpty()) {
-            if (audienceJwtClaim == null || audienceJwtClaim.isEmpty()) {
-                throw new AuthenticationException("Token has no audience");
-            }
 
-            if (!audienceJwtClaim.contains(this.audience)) {
-                throw new AuthenticationException("Token has invalid audience: " + audienceJwtClaim);
-            }
+    private AuthzServer authzServerOrThrow(String keyId) {
+        AuthzServer server = authzServers.getServer(keyId);
+        if (server == null) {
+            throw new AuthenticationException("Unknown JWT authorization server: " + keyId);
         }
+
+        return server;
     }
 }

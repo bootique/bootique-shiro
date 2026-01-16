@@ -16,16 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.shiro.jwt;
+package io.bootique.shiro.jwt.authz;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.resource.ResourceFactory;
-import io.bootique.shiro.jwt.authz.AuthzReaderFactory;
-import io.bootique.shiro.jwt.authz.JsonListAuthzReaderFactory;
-import io.bootique.shiro.jwt.jjwt.JwtParserMaker;
-import io.bootique.value.Duration;
-import io.jsonwebtoken.JwtParser;
 
 import java.net.URL;
 import java.util.Objects;
@@ -33,48 +28,37 @@ import java.util.Objects;
 /**
  * @since 4.0
  */
-@BQConfig("JWT Configuration")
-public class ShiroJwtModuleFactory {
-
-    private static final java.time.Duration DEFAULT_JWK_EXPIRES_IN = java.time.Duration.ofDays(100 * 365);
+@BQConfig("""
+        Configuration of a token-issuing authorization server including location of public keys, token audiences, role \
+        parsing mechanisms.""")
+public class AuthzServerFactory {
 
     private ResourceFactory jwkLocation;
-    private Duration jwkExpiresIn;
-    private AuthzReaderFactory roles;
     private String audience;
+    private AuthzReaderFactory roles;
 
     @BQConfigProperty("""
             An optional audience. If specified, it will be compared with the 'aud' JWT claim, and fail authentication \
             if the two do not match""")
-    public ShiroJwtModuleFactory setAudience(String audience) {
+    public AuthzServerFactory setAudience(String audience) {
         this.audience = audience;
         return this;
     }
 
     @BQConfigProperty("JWKS key file location")
-    public ShiroJwtModuleFactory setJwkLocation(ResourceFactory jwkLocation) {
+    public AuthzServerFactory setJwkLocation(ResourceFactory jwkLocation) {
         this.jwkLocation = jwkLocation;
         return this;
     }
 
-    @BQConfigProperty("Expiration interval when JWKS must be reloaded")
-    public ShiroJwtModuleFactory setJwkExpiresIn(Duration jwkExpiresIn) {
-        this.jwkExpiresIn = jwkExpiresIn;
-        return this;
-    }
-
     @BQConfigProperty("JWT-originated roles parser configuration")
-    public ShiroJwtModuleFactory setRoles(AuthzReaderFactory roles) {
+    public AuthzServerFactory setRoles(AuthzReaderFactory roles) {
         this.roles = roles;
         return this;
     }
 
-    public JwtParser createTokenParser() {
-        return JwtParserMaker.createParser(getJwkLocation(), getJwkExpiresIn());
-    }
-
-    public JwtRealm createRealm() {
-        return new JwtRealm(getRoles().createReader(), this.audience);
+    public AuthzServer createAuthzServer() {
+        return new AuthzServer(this.audience, getRoles().createReader(), getJwkLocation());
     }
 
     private AuthzReaderFactory getRoles() {
@@ -82,10 +66,6 @@ public class ShiroJwtModuleFactory {
     }
 
     private URL getJwkLocation() {
-        return Objects.requireNonNull(jwkLocation, "JWKS 'keyLocation' is not specified").getUrl();
-    }
-
-    private java.time.Duration getJwkExpiresIn() {
-        return jwkExpiresIn != null ? jwkExpiresIn.getDuration() : DEFAULT_JWK_EXPIRES_IN;
+        return Objects.requireNonNull(jwkLocation, "'jwkLocation' is not specified").getUrl();
     }
 }

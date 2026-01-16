@@ -13,8 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 shirojwt:
-  jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
   jwkExpiresIn: "100 sec"
+  trustedServers:
+    default:
+      jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
 
 shiroweb:
   urls:

@@ -13,9 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 shirojwt:
-  audience: "aud-1"
-  jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
   jwkExpiresIn: "100 sec"
+  trustedServers:
+    default:
+      audience: "aud-1"
+      jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
+
 
 shiroweb:
   urls:

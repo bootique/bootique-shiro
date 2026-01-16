@@ -1,5 +1,6 @@
 package io.bootique.shiro.jwt;
 
+import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
 import io.bootique.junit5.BQApp;
@@ -16,35 +17,38 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class JwtRealmAudiencesIT {
 
     @BQApp(skipRun = true)
-    static final BQRuntime app = Bootique
-            .app("-c", "classpath:io/bootique/shiro/jwt/jwt-audience.yml")
+    static final BQRuntime app = Bootique.app()
             .autoLoadModules()
+            .module(b -> BQCoreModule.extend(b)
+                    .setProperty("bq.shirojwt.trustedServers.default.jwkLocation", JwtTests.AUTHZ1.jwksLocation())
+                    .setProperty("bq.shirojwt.trustedServers.default.audience", "aud-1")
+            )
             .createRuntime();
 
     @Test
     public void singleAudience() {
         JwtRealm realm = app.getInstance(JwtRealm.class);
 
-        realm.doGetAuthenticationInfo(JwtTests.token(Map.of(), List.of("aud-1"), null));
-        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.token(Map.of(), List.of("aud-2"), null)));
-        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.token(Map.of(), List.of("aud-3"), null)));
+        realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of(), List.of("aud-1"), null));
+        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of(), List.of("aud-2"), null)));
+        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of(), List.of("aud-3"), null)));
     }
 
     @Test
     public void multipleAudiences() {
         JwtRealm realm = app.getInstance(JwtRealm.class);
 
-        realm.doGetAuthenticationInfo(JwtTests.token(Map.of(), List.of("aud-1", "aud-2"), null));
-        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.token(Map.of(), List.of("aud-2", "aud-3"), null)));
-        realm.doGetAuthenticationInfo(JwtTests.token(Map.of(), List.of("aud-1", "aud-3"), null));
+        realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of(), List.of("aud-1", "aud-2"), null));
+        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of(), List.of("aud-2", "aud-3"), null)));
+        realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of(), List.of("aud-1", "aud-3"), null));
     }
 
     @Test
     public void noAudience() {
         JwtRealm realm = app.getInstance(JwtRealm.class);
 
-        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.token(Map.of(), List.of(), null)));
-        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.token(Map.of(), null, null)));
+        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of(), List.of(), null)));
+        assertThrows(AuthenticationException.class, () -> realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of(), null, null)));
     }
 }
 

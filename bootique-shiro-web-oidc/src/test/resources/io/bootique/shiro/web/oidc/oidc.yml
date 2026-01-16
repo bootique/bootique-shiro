@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 shirojwt:
-  jwkLocation: "classpath:io/bootique/shiro/web/oidc/jwks.json"
+  trustedServers:
+    default:
+      jwkLocation: "classpath:io/bootique/shiro/web/oidc/jwks.json"
 
 shiroweb:
   urls:

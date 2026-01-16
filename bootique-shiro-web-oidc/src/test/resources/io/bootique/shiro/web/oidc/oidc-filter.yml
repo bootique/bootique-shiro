@@ -14,7 +14,9 @@
 # limitations under the License.
 
 shirojwt:
-  jwkLocation: "classpath:io/bootique/shiro/web/oidc/jwks.json"
+  trustedServers:
+    default:
+      jwkLocation: "classpath:io/bootique/shiro/web/oidc/jwks.json"
 
 shiroweb:
   urls:

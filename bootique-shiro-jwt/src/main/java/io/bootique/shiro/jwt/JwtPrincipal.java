@@ -27,9 +27,10 @@ import java.util.Objects;
  *
  * @since 4.0
  */
-public record JwtPrincipal(Claims claims) {
+public record JwtPrincipal(String kid, Claims claims) {
 
     public JwtPrincipal {
+        Objects.requireNonNull(kid, "Null 'kid' (key id)");
         Objects.requireNonNull(claims, "Null JWT Claims");
     }
 

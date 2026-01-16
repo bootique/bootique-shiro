@@ -18,6 +18,7 @@
  */
 package io.bootique.shiro.jwt;
 
+import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
 import io.bootique.junit5.BQApp;
@@ -37,10 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @BQTest
 public class JwtRealmRolesIT {
 
+
     @BQApp(skipRun = true)
     static final BQRuntime app = Bootique
             .app()
             .autoLoadModules()
+            .module(b -> BQCoreModule.extend(b).setProperty(
+                    "bq.shirojwt.trustedServers.default.jwkLocation",
+                    JwtTests.AUTHZ1.jwksLocation()))
             .createRuntime();
 
     @ParameterizedTest
@@ -49,7 +54,7 @@ public class JwtRealmRolesIT {
         JwtRealm realm = app.getInstance(JwtRealm.class);
         List<String> rl = Stream.of(roles.split(",")).toList();
 
-        AuthenticationInfo auth = realm.doGetAuthenticationInfo(JwtTests.token(Map.of("roles", rl), null, null));
+        AuthenticationInfo auth = realm.doGetAuthenticationInfo(JwtTests.AUTHZ1.token(Map.of("roles", rl), null, null));
 
         AuthorizationInfo authz = realm.doGetAuthorizationInfo(auth.getPrincipals());
         assertEquals(new HashSet<>(rl), authz.getRoles());

@@ -19,8 +19,8 @@
 package io.bootique.shiro.web.oidc;
 
 import io.bootique.shiro.jwt.ShiroJsonWebToken;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Provider;
@@ -77,11 +77,12 @@ public class OidcFilter extends AuthenticatingFilter {
                 .orElse(null);
 
         String token = authz != null && !authz.isEmpty() ? authz : "";
-        Claims claims = tokenParser.get().parse(token).accept(Jws.CLAIMS).getPayload();
+        Jwt<?, ?> jwt = tokenParser.get().parse(token);
 
         return new ShiroJsonWebToken(
                 token,
-                claims);
+                (String) jwt.getHeader().get("kid"),
+                jwt.accept(Jws.CLAIMS).getPayload());
     }
 
     @Override
