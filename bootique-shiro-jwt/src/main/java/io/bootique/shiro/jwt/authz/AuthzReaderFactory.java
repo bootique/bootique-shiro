@@ -34,7 +34,7 @@ public abstract class AuthzReaderFactory implements PolymorphicConfiguration {
 
     @BQConfigProperty("""
             JWT claim name that will provide authorization information. If not set and the parser is reading roles, it \
-            will 'roles' as the claim name""")
+            will use "roles" as the claim name""")
     public void setClaim(String claim) {
         this.claim = claim;
     }
