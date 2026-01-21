@@ -31,7 +31,6 @@ import java.util.Map;
 class JwtTests {
 
     static final TestAuthority AUTHZ1 = new TestAuthority("test_jwk1", "classpath:io/bootique/shiro/jwt/jwks1.json");
-    static final TestAuthority AUTHZ2 = new TestAuthority("test_jwk2", "classpath:io/bootique/shiro/jwt/jwks2.json");
 
     static Claims claims(Map<String, ?> claims, List<String> audience, LocalDateTime expiresAt) {
 
