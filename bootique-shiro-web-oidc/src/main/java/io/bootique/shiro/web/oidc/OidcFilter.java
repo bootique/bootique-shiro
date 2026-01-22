@@ -41,16 +41,10 @@ import java.util.stream.Stream;
  */
 public class OidcFilter extends AuthenticatingFilter {
 
-    private final Provider<JwtParser> tokenParser;
     private final OidpRouter oidpRouter;
     private final String tokenCookie;
 
-    public OidcFilter(
-            Provider<JwtParser> tokenParser,
-            OidpRouter oidpRouter,
-            String tokenCookie) {
-
-        this.tokenParser = tokenParser;
+    public OidcFilter(OidpRouter oidpRouter, String tokenCookie) {
         this.oidpRouter = oidpRouter;
         this.tokenCookie = tokenCookie;
     }
@@ -77,12 +71,7 @@ public class OidcFilter extends AuthenticatingFilter {
                 .orElse(null);
 
         String token = authz != null && !authz.isEmpty() ? authz : "";
-        Jwt<?, ?> jwt = tokenParser.get().parse(token);
-
-        return new ShiroJsonWebToken(
-                token,
-                (String) jwt.getHeader().get("kid"),
-                jwt.accept(Jws.CLAIMS).getPayload());
+        return new ShiroJsonWebToken(token);
     }
 
     @Override

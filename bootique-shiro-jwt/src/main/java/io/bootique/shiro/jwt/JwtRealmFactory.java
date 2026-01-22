@@ -22,7 +22,6 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.shiro.jwt.authz.AuthzServer;
 import io.bootique.shiro.jwt.authz.AuthzServerFactory;
-import io.bootique.shiro.jwt.authz.AuthzServers;
 import io.bootique.value.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +33,9 @@ import java.util.Map;
  * @since 4.0
  */
 @BQConfig("Configuration of one or more token-issuing trusted authorization servers.")
-public class AuthzServersFactory {
+public class JwtRealmFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthzServersFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtRealmFactory.class);
 
     private static final java.time.Duration DEFAULT_JWK_EXPIRES_IN = java.time.Duration.ofDays(100 * 365);
 
@@ -44,18 +43,18 @@ public class AuthzServersFactory {
     private Map<String, AuthzServerFactory> trustedServers;
 
     @BQConfigProperty("A map of authorization servers whose tokens will be trusted by the app")
-    public AuthzServersFactory setTrustedServers(Map<String, AuthzServerFactory> trustedServers) {
+    public JwtRealmFactory setTrustedServers(Map<String, AuthzServerFactory> trustedServers) {
         this.trustedServers = trustedServers;
         return this;
     }
 
     @BQConfigProperty("Expiration interval when JWKS must be reloaded")
-    public AuthzServersFactory setJwkExpiresIn(Duration jwkExpiresIn) {
+    public JwtRealmFactory setJwkExpiresIn(Duration jwkExpiresIn) {
         this.jwkExpiresIn = jwkExpiresIn;
         return this;
     }
 
-    public AuthzServers createAuthzServers() {
+    public JwtRealm createRealm() {
         java.time.Duration expiresIn = jwkExpiresIn != null ? jwkExpiresIn.getDuration() : DEFAULT_JWK_EXPIRES_IN;
 
         List<AuthzServer> servers;
@@ -72,6 +71,6 @@ public class AuthzServersFactory {
             servers = trustedServers.values().stream().map(AuthzServerFactory::createAuthzServer).toList();
         }
 
-        return new AuthzServers(servers, expiresIn);
+        return new JwtRealm(servers, expiresIn);
     }
 }

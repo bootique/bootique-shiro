@@ -18,23 +18,37 @@
  */
 package io.bootique.shiro.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ClaimsBuilder;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 class JwtTests {
 
-    static final TestAuthority AUTHZ1 = new TestAuthority("test_jwk1", "classpath:io/bootique/shiro/jwt/jwks1.json");
+    public static final String KEY_ID = "test_jwk1";
 
-    static Claims claims(Map<String, ?> claims, List<String> audience, LocalDateTime expiresAt) {
+    public static String jwksLocation() {
+        return "classpath:io/bootique/shiro/jwt/jwks1.json";
+    }
 
-        ClaimsBuilder builder = Jwts.claims().add(claims);
+    public static ShiroJsonWebToken token(Map<String, ?> claims, List<String> audience, LocalDateTime expiresAt) {
+        PrivateKey privateKey = privateKey();
+
+        JwtBuilder builder = Jwts.builder()
+                .header().add("kid", KEY_ID)
+                .and()
+                .claims(claims)
+                .signWith(privateKey, Jwts.SIG.RS256);
 
         if (expiresAt != null) {
             builder.expiration(Date.from(expiresAt.atZone(ZoneId.systemDefault()).toInstant()));
@@ -44,13 +58,24 @@ class JwtTests {
             builder.audience().add(audience);
         }
 
-        return builder.build();
+        return new ShiroJsonWebToken(builder.compact());
     }
 
-    record TestAuthority(String keyId, String jwksLocation) {
+    private static PrivateKey privateKey() {
+        try (InputStream keyIn = JwtTests.class.getResourceAsStream("jwks-private-key.pem")) {
+            String privateKeyPEM = new String(keyIn.readAllBytes(), StandardCharsets.UTF_8)
+                    .replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replaceAll(System.lineSeparator(), "")
+                    .replace("-----END PRIVATE KEY-----", "");
 
-        public ShiroJsonWebToken token(Map<String, ?> claims, List<String> audience, LocalDateTime expiresAt) {
-            return new ShiroJsonWebToken("--", keyId, claims(claims, audience, expiresAt));
+            byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);
+
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+
+            return keyFactory.generatePrivate(keySpec);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

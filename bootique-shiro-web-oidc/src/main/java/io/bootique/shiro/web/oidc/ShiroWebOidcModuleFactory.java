@@ -24,8 +24,6 @@ import io.bootique.jackson.JacksonService;
 import io.bootique.jersey.MappedResource;
 import io.bootique.jetty.MappedServlet;
 import io.bootique.jetty.servlet.ServletEnvironment;
-import io.bootique.shiro.jwt.JwtRealm;
-import io.jsonwebtoken.JwtParser;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -49,18 +47,15 @@ public class ShiroWebOidcModuleFactory {
 
     private final ServletEnvironment servletEnv;
     private final Provider<MappedServlet<ServletContainer>> jerseyServlet;
-    private final Provider<JwtParser> tokenParser;
     private final JacksonService jacksonService;
+
     @Inject
     public ShiroWebOidcModuleFactory(
             ServletEnvironment servletEnv,
             Provider<MappedServlet<ServletContainer>> jerseyServlet,
-            JwtRealm realm,
-            Provider<JwtParser> tokenParser,
             JacksonService jacksonService) {
         this.servletEnv = servletEnv;
         this.jerseyServlet = jerseyServlet;
-        this.tokenParser = tokenParser;
         this.jacksonService = jacksonService;
     }
 
@@ -115,7 +110,7 @@ public class ShiroWebOidcModuleFactory {
     }
 
     public OidcFilter createFilter(OidpRouter oidpRouter) {
-        return new OidcFilter(tokenParser, oidpRouter, getTokenCookie());
+        return new OidcFilter(oidpRouter, getTokenCookie());
     }
 
     public MappedResource<AuthorizationCodeHandlerApi> createAuthorizationCodeHandler(OidpRouter oidpRouter) {

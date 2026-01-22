@@ -25,8 +25,6 @@ import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.shiro.web.ShiroWebModule;
-import io.jsonwebtoken.JwtParser;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 /**
@@ -50,7 +48,7 @@ public class ShiroWebJwtModule implements BQModule {
 
     @Provides
     @Singleton
-    public JwtBearerAuthenticationFilter provideBearerFilter(ConfigurationFactory configFactory, Provider<JwtParser> jwtParser) {
-        return new JwtBearerAuthenticationFilter(jwtParser);
+    public JwtBearerAuthenticationFilter provideBearerFilter(ConfigurationFactory configFactory) {
+        return new JwtBearerAuthenticationFilter();
     }
 }

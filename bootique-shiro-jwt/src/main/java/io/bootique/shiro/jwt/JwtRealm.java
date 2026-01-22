@@ -19,8 +19,16 @@
 package io.bootique.shiro.jwt;
 
 import io.bootique.shiro.jwt.authz.AuthzServer;
-import io.bootique.shiro.jwt.authz.AuthzServers;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.IOException;
+import io.jsonwebtoken.io.Parser;
+import io.jsonwebtoken.security.Jwk;
+import io.jsonwebtoken.security.JwkSet;
+import io.jsonwebtoken.security.Jwks;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -30,20 +38,43 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.security.Key;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @since 4.0
  */
 public class JwtRealm extends AuthorizingRealm {
 
-    private final AuthzServers authzServers;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtRealm.class);
 
-    public JwtRealm(AuthzServers authzServers) {
+    private final JwtParser tokenParser;
+    private final Duration expiresIn;
+    private final List<AuthzServer> authzServers;
+
+    private volatile Map<Object, KeyAndServer> keyServerIndex;
+    private volatile LocalDateTime loadTime;
+
+    public JwtRealm(List<AuthzServer> authzServers, Duration expiresIn) {
 
         setName(JwtRealm.class.getSimpleName());
         setAuthenticationTokenClass(ShiroJsonWebToken.class);
 
         this.authzServers = authzServers;
+        this.expiresIn = expiresIn;
+        this.tokenParser = Jwts.parser()
+                .keyLocator(h -> getKey(h.getOrDefault("kid", "")))
+                .build();
     }
 
     @Override
@@ -57,8 +88,12 @@ public class JwtRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
-        Claims claims = ((ShiroJsonWebToken) token).getClaims();
-        String kid = ((ShiroJsonWebToken) token).getKeyId();
+
+        String jwtPayload = ((ShiroJsonWebToken) token).getToken();
+
+        Jwt<?, ?> jwt = tokenParser.parse(jwtPayload);
+        Claims claims = jwt.accept(Jws.CLAIMS).getPayload();
+        String kid = (String) jwt.getHeader().get("kid");
 
         authzServerOrThrow(kid).validateAudience(claims);
 
@@ -68,13 +103,64 @@ public class JwtRealm extends AuthorizingRealm {
                 token.getCredentials());
     }
 
-
-    private AuthzServer authzServerOrThrow(String keyId) {
-        AuthzServer server = authzServers.getServer(keyId);
-        if (server == null) {
-            throw new AuthenticationException("Unknown JWT authorization server: " + keyId);
+    private AuthzServer authzServerOrThrow(String kid) {
+        // Must call "keyServerRefs()" every time for this request instead of checking the map directly.
+        // This way we can refresh the key map as defined by the expiration policy
+        KeyAndServer ref = keysAndServers().get(kid);
+        if (ref == null) {
+            throw new AuthenticationException("Unknown JWT authorization ref: " + kid);
         }
 
-        return server;
+        return ref.server();
+    }
+
+    private Key getKey(Object kid) {
+        // Must call "keysAndServers()" every time for this request instead of checking the map directly.
+        // This way we can refresh the key map as defined by the expiration policy
+        KeyAndServer ref = keysAndServers().get(kid);
+        return ref != null ? ref.key().toKey() : null;
+    }
+
+    private Map<Object, KeyAndServer> keysAndServers() {
+        if (shouldRefreshIndex()) {
+            synchronized (this) {
+                if (shouldRefreshIndex()) {
+                    this.keyServerIndex = refreshIndex();
+                    this.loadTime = LocalDateTime.now();
+                }
+            }
+        }
+
+        return this.keyServerIndex;
+    }
+
+    private boolean shouldRefreshIndex() {
+        return keyServerIndex == null || LocalDateTime.now().isAfter(loadTime.plus(expiresIn));
+    }
+
+    private Map<Object, KeyAndServer> refreshIndex() {
+
+        Map<Object, KeyAndServer> index = new HashMap<>();
+        Parser<JwkSet> parser = Jwks.setParser().build();
+
+        for (AuthzServer s : authzServers) {
+            // TODO: does it make sense to check for duplicate key ids across multiple authz servers?
+            loadKeys(parser, s.getJwkLocation()).forEach(k -> index.put(k.getId(), new KeyAndServer(k, s)));
+        }
+
+        return index;
+    }
+
+    private static Set<Jwk<?>> loadKeys(Parser<JwkSet> parser, URL location) {
+        try (InputStream is = location.openStream()) {
+            Set<Jwk<?>> keys = parser.parse(is).getKeys();
+            LOGGER.info("JWKS (re)loaded from {}", location);
+            return keys;
+        } catch (Exception e) {
+            throw new IOException("Unable to load JWKS from " + location, e);
+        }
+    }
+
+    record KeyAndServer(Jwk<?> key, AuthzServer server) {
     }
 }

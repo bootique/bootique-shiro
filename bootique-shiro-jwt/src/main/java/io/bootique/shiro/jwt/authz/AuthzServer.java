@@ -37,7 +37,7 @@ public class AuthzServer {
         this.jwkLocation = jwkLocation;
     }
 
-    URL getJwkLocation() {
+    public URL getJwkLocation() {
         return jwkLocation;
     }
 

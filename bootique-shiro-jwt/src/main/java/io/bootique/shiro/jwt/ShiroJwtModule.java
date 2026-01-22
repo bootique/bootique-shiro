@@ -25,9 +25,6 @@ import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.shiro.ShiroModule;
-import io.bootique.shiro.jwt.authz.AuthzServers;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
 import jakarta.inject.Singleton;
 
 /**
@@ -41,7 +38,7 @@ public class ShiroJwtModule implements BQModule {
     public ModuleCrate crate() {
         return ModuleCrate.of(this)
                 .description("Provides JWT parser and JWT realm for the Shiro environment")
-                .config(CONFIG_PREFIX, AuthzServersFactory.class)
+                .config(CONFIG_PREFIX, JwtRealmFactory.class)
                 .build();
     }
 
@@ -52,23 +49,9 @@ public class ShiroJwtModule implements BQModule {
 
     @Provides
     @Singleton
-    public AuthzServers provideAuthzServers(ConfigurationFactory configFactory) {
+    public JwtRealm provideRealm(ConfigurationFactory configFactory) {
         return configFactory
-                .config(AuthzServersFactory.class, CONFIG_PREFIX)
-                .createAuthzServers();
-    }
-
-    @Provides
-    @Singleton
-    public JwtParser provideJwtParser(AuthzServers servers) {
-        return Jwts.parser()
-                .keyLocator(h -> servers.getKey(h.getOrDefault("kid", "")))
-                .build();
-    }
-
-    @Provides
-    @Singleton
-    public JwtRealm provideRealm(AuthzServers servers) {
-        return new JwtRealm(servers);
+                .config(JwtRealmFactory.class, CONFIG_PREFIX)
+                .createRealm();
     }
 }

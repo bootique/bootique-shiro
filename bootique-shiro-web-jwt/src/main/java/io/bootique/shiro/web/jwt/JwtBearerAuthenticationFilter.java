@@ -39,19 +39,9 @@ import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
  */
 public class JwtBearerAuthenticationFilter extends BearerHttpAuthenticationFilter {
 
-    private final Provider<JwtParser> tokenParser;
-
-    public JwtBearerAuthenticationFilter(Provider<JwtParser> tokenParser) {
-        this.tokenParser = tokenParser;
-    }
-
     @Override
     protected AuthenticationToken createBearerToken(String token, ServletRequest request) {
-        Jwt<?, ?> jwt = tokenParser.get().parse(token);
-        return new ShiroJsonWebToken(
-                token,
-                (String) jwt.getHeader().get("kid"),
-                jwt.accept(Jws.CLAIMS).getPayload());
+        return new ShiroJsonWebToken(token);
     }
 
     @Override

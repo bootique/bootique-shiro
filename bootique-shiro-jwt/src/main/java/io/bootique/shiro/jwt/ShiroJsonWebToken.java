@@ -29,21 +29,13 @@ import java.util.Objects;
 public class ShiroJsonWebToken implements AuthenticationToken {
 
     private final String token;
-    private final String keyId;
-    private final Claims claims;
 
-    public ShiroJsonWebToken(String token, String keyId, Claims claims) {
+    public ShiroJsonWebToken(String token) {
         this.token = Objects.requireNonNull(token, "Null token");
-        this.keyId = Objects.requireNonNull(keyId, "Null keyId");
-        this.claims = Objects.requireNonNull(claims, "Null claims");
     }
 
-    public Claims getClaims() {
-        return claims;
-    }
-
-    public String getKeyId() {
-        return keyId;
+    public String getToken() {
+        return token;
     }
 
     @Override
