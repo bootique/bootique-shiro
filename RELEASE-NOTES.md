@@ -1,3 +1,7 @@
+## 4.0-M3
+
+#50 "shirojwt" config to support multiple token authorities
+
 ## 4.0-M2
 
 * #46 OidcFilter - a filter for OpenID Connect flow
