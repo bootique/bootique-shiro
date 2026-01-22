@@ -17,8 +17,6 @@ shirojwt:
   trustedServers:
     default:
       audience: "aud-1"
-      jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
-
 
 shiroweb:
   urls:

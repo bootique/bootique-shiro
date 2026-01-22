@@ -14,9 +14,6 @@
 # limitations under the License.
 shirojwt:
   jwkExpiresIn: "100 sec"
-  trustedServers:
-    default:
-      jwkLocation: "classpath:io/bootique/shiro/web/jwt/jwks.json"
 
 shiroweb:
   urls:

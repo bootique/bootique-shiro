@@ -24,6 +24,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.IOException;
 import io.jsonwebtoken.io.Parser;
 import io.jsonwebtoken.security.Jwk;
@@ -91,7 +92,15 @@ public class JwtRealm extends AuthorizingRealm {
 
         String jwtPayload = ((ShiroJsonWebToken) token).getToken();
 
-        Jwt<?, ?> jwt = tokenParser.parse(jwtPayload);
+        Jwt<?, ?> jwt;
+        try {
+            jwt = tokenParser.parse(jwtPayload);
+        }
+        // not a trusted authority
+        catch (UnsupportedJwtException e) {
+            throw new AuthenticationException(e.getMessage());
+        }
+
         Claims claims = jwt.accept(Jws.CLAIMS).getPayload();
         String kid = (String) jwt.getHeader().get("kid");
 
