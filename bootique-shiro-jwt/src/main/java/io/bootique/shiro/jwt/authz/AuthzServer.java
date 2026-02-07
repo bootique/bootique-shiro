@@ -19,7 +19,6 @@
 package io.bootique.shiro.jwt.authz;
 
 import io.jsonwebtoken.Claims;
-import org.apache.shiro.authc.AuthenticationException;
 
 import java.net.URL;
 import java.util.List;
@@ -45,18 +44,12 @@ public class AuthzServer {
         return rolesReader.readAuthz(claims);
     }
 
-    public void validateAudience(Claims claims) {
-        if (this.audience != null && !this.audience.isEmpty()) {
-
-            Set<String> claimedAudience = claims.getAudience();
-
-            if (claimedAudience == null || claimedAudience.isEmpty()) {
-                throw new AuthenticationException("Token has no audience");
-            }
-
-            if (!claimedAudience.contains(this.audience)) {
-                throw new AuthenticationException("Token has invalid audience: " + claimedAudience);
-            }
+    public boolean matchesAudience(Claims claims) {
+        if (this.audience == null || this.audience.isEmpty()) {
+            return true;
         }
+
+        Set<String> claimedAudience = claims.getAudience();
+        return claimedAudience != null && claimedAudience.contains(this.audience);
     }
 }

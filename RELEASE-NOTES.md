@@ -1,3 +1,7 @@
+## 4.0-M4
+
+* #51 JwtRealm: handle duplicate key ids
+
 ## 4.0-M3
 
 #50 "shirojwt" config to support multiple token authorities

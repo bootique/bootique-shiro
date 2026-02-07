@@ -47,6 +47,7 @@ import java.net.URL;
 import java.security.Key;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class JwtRealm extends AuthorizingRealm {
     private final Duration expiresIn;
     private final List<AuthzServer> authzServers;
 
-    private volatile Map<Object, KeyAndServer> keyServerIndex;
+    private volatile Map<Object, KeyAndServers> keyServerIndex;
     private volatile LocalDateTime loadTime;
 
     public JwtRealm(List<AuthzServer> authzServers, Duration expiresIn) {
@@ -83,7 +84,7 @@ public class JwtRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         principals
                 .byType(JwtPrincipal.class)
-                .forEach(p -> info.addRoles(authzServerOrThrow(p.kid()).getRoles(p.claims())));
+                .forEach(p -> info.addRoles(authzServerOrThrow(p.kid(), p.claims()).getRoles(p.claims())));
         return info;
     }
 
@@ -104,7 +105,8 @@ public class JwtRealm extends AuthorizingRealm {
         Claims claims = jwt.accept(Jws.CLAIMS).getPayload();
         String kid = (String) jwt.getHeader().get("kid");
 
-        authzServerOrThrow(kid).validateAudience(claims);
+        // Find and validate the server that matches this token's audience
+        authzServerOrThrow(kid, claims);
 
         JwtPrincipal principal = new JwtPrincipal(kid, claims);
         return new SimpleAuthenticationInfo(
@@ -112,25 +114,37 @@ public class JwtRealm extends AuthorizingRealm {
                 token.getCredentials());
     }
 
-    private AuthzServer authzServerOrThrow(String kid) {
-        // Must call "keyServerRefs()" every time for this request instead of checking the map directly.
+    private AuthzServer authzServerOrThrow(String kid, Claims claims) {
+        // Must call "keysAndServers()" every time for this request instead of checking the map directly.
         // This way we can refresh the key map as defined by the expiration policy
-        KeyAndServer ref = keysAndServers().get(kid);
+        KeyAndServers ref = keysAndServers().get(kid);
         if (ref == null) {
-            throw new AuthenticationException("Unknown JWT authorization ref: " + kid);
+            throw new AuthenticationException("JWT 'kid' does not match any known authorization server: " + kid);
         }
 
-        return ref.server();
+        // Try to find a server that accepts this token's audience
+        for (AuthzServer server : ref.servers()) {
+            if (server.matchesAudience(claims)) {
+                return server;
+            }
+        }
+
+        // No server accepted the audience
+        Set<String> claimedAudience = claims.getAudience();
+        if (claimedAudience == null || claimedAudience.isEmpty()) {
+            throw new AuthenticationException("Token has no audience");
+        }
+        throw new AuthenticationException("Token has invalid audience: " + claimedAudience);
     }
 
     private Key getKey(Object kid) {
         // Must call "keysAndServers()" every time for this request instead of checking the map directly.
         // This way we can refresh the key map as defined by the expiration policy
-        KeyAndServer ref = keysAndServers().get(kid);
+        KeyAndServers ref = keysAndServers().get(kid);
         return ref != null ? ref.key().toKey() : null;
     }
 
-    private Map<Object, KeyAndServer> keysAndServers() {
+    private Map<Object, KeyAndServers> keysAndServers() {
         if (shouldRefreshIndex()) {
             synchronized (this) {
                 if (shouldRefreshIndex()) {
@@ -147,17 +161,36 @@ public class JwtRealm extends AuthorizingRealm {
         return keyServerIndex == null || LocalDateTime.now().isAfter(loadTime.plus(expiresIn));
     }
 
-    private Map<Object, KeyAndServer> refreshIndex() {
+    private Map<Object, KeyAndServers> refreshIndex() {
 
-        Map<Object, KeyAndServer> index = new HashMap<>();
+        Map<Object, KeyAndServers> index = new HashMap<>();
         Parser<JwkSet> parser = Jwks.setParser().build();
 
         for (AuthzServer s : authzServers) {
-            // TODO: does it make sense to check for duplicate key ids across multiple authz servers?
-            loadKeys(parser, s.getJwkLocation()).forEach(k -> index.put(k.getId(), new KeyAndServer(k, s)));
+            for (Jwk<?> k : loadKeys(parser, s.getJwkLocation())) {
+                KeyAndServers existing = index.get(k.getId());
+
+                if (existing == null) {
+                    List<AuthzServer> servers = new ArrayList<>();
+                    servers.add(s);
+                    index.put(k.getId(), new KeyAndServers(k, servers));
+                } else {
+                    // All servers with the same kid must have the same actual key
+                    if (!keysAreEqual(existing.key(), k)) {
+                        throw new IllegalStateException(
+                                "Multiple servers share key ID '" + k.getId() + "' but have different cryptographic keys");
+                    }
+
+                    existing.servers().add(s);
+                }
+            }
         }
 
         return index;
+    }
+
+    static boolean keysAreEqual(Jwk<?> key1, Jwk<?> key2) {
+        return key1.toKey().equals(key2.toKey());
     }
 
     private static Set<Jwk<?>> loadKeys(Parser<JwkSet> parser, URL location) {
@@ -170,6 +203,6 @@ public class JwtRealm extends AuthorizingRealm {
         }
     }
 
-    record KeyAndServer(Jwk<?> key, AuthzServer server) {
+    record KeyAndServers(Jwk<?> key, List<AuthzServer> servers) {
     }
 }

@@ -37,8 +37,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TestAuthzServer {
+
+    private static final Map<String, KeyPair> KEY_PAIR_CACHE = new ConcurrentHashMap<>();
 
     private final String keyId;
     private final PrivateKey privateKey;
@@ -46,8 +49,19 @@ public class TestAuthzServer {
     private final Path jwksPath;
 
     public TestAuthzServer(Path jwksPath) {
-        this.keyId = "test_jwk_" + UUID.randomUUID().toString().replace("-", "");
-        KeyPair keyPair = generateKeyPair();
+        this(jwksPath, "test_jwk_" + UUID.randomUUID().toString().replace("-", ""));
+    }
+
+    public TestAuthzServer(Path jwksPath, String keyId) {
+        this(jwksPath, keyId, true);
+    }
+
+    public TestAuthzServer(Path jwksPath, String keyId, boolean reuseKeys) {
+        this.keyId = keyId;
+        KeyPair keyPair = reuseKeys
+                ? KEY_PAIR_CACHE.computeIfAbsent(keyId, k -> generateKeyPair())
+                : generateKeyPair();
+
         this.privateKey = keyPair.getPrivate();
         this.publicKey = (RSAPublicKey) keyPair.getPublic();
         this.jwksPath = jwksPath;
