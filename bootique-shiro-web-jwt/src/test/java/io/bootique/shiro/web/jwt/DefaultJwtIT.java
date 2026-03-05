@@ -61,23 +61,23 @@ public class DefaultJwtIT {
     public void role1() {
         Map<String, ?> map = Map.of("roles", List.of("role1"));
         JettyTester.assertOk(requestWithToken("/private-one", map, null, null)).assertContent("private-one");
-        JettyTester.assertUnauthorized(requestWithToken("/private-two", map, null, null));
-        JettyTester.assertUnauthorized(requestWithToken("/private-three", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-two", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-three", map, null, null));
     }
 
     @Test
     public void role2() {
         Map<String, ?> map = Map.of("roles", List.of("role2"));
-        JettyTester.assertUnauthorized(requestWithToken("/private-one", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-one", map, null, null));
         JettyTester.assertOk(requestWithToken("/private-two", map, null, null)).assertContent("private-two");
-        JettyTester.assertUnauthorized(requestWithToken("/private-three", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-three", map, null, null));
     }
 
     @Test
     public void role3() {
         Map<String, ?> map = Map.of("roles", List.of("role3"));
-        JettyTester.assertUnauthorized(requestWithToken("/private-one", map, null, null));
-        JettyTester.assertUnauthorized(requestWithToken("/private-two", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-one", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-two", map, null, null));
         JettyTester.assertOk(requestWithToken("/private-three", map, null, null)).assertContent("private-three");
     }
 
@@ -85,7 +85,7 @@ public class DefaultJwtIT {
     public void role1And3() {
         Map<String, ?> map = Map.of("roles", List.of("role1", "role3"));
         JettyTester.assertOk(requestWithToken("/private-one", map, null, null)).assertContent("private-one");
-        JettyTester.assertUnauthorized(requestWithToken("/private-two", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-two", map, null, null));
         JettyTester.assertOk(requestWithToken("/private-three", map, null, null)).assertContent("private-three");
     }
 
@@ -98,9 +98,9 @@ public class DefaultJwtIT {
     @Test
     public void noRolesClaim() {
         Map<String, ?> map = Map.of("no-roles", List.of("role1"));
-        JettyTester.assertUnauthorized(requestWithToken("/private-one", map, null, null));
-        JettyTester.assertUnauthorized(requestWithToken("/private-two", map, null, null));
-        JettyTester.assertUnauthorized(requestWithToken("/private-three", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-one", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-two", map, null, null));
+        JettyTester.assertForbidden(requestWithToken("/private-three", map, null, null));
     }
 
     @Test
@@ -108,8 +108,8 @@ public class DefaultJwtIT {
         Map<String, ?> map = Map.of("roles", List.of("role1"));
         List<String> audience = List.of("aud-1", "aud-2");
         JettyTester.assertOk(requestWithToken("/private-one", map, audience, null)).assertContent("private-one");
-        JettyTester.assertUnauthorized(requestWithToken("/private-two", map, audience, null));
-        JettyTester.assertUnauthorized(requestWithToken("/private-three", map, audience, null));
+        JettyTester.assertForbidden(requestWithToken("/private-two", map, audience, null));
+        JettyTester.assertForbidden(requestWithToken("/private-three", map, audience, null));
     }
 
     private Response requestWithToken(String path, Map<String, ?> rolesClaim, List<String> audience, LocalDateTime expiresAt) {

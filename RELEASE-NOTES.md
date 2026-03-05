@@ -1,6 +1,7 @@
 ## 4.0-M4
 
 * #51 JwtRealm: handle duplicate key ids
+* #53 Upgrade to Shiro 2.1.0
 
 ## 4.0-M3
 

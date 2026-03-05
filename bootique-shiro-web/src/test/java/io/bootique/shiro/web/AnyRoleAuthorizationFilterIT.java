@@ -58,7 +58,7 @@ public class AnyRoleAuthorizationFilterIT {
                 .request()
                 .header("Authorization", basicAuth())
                 .get();
-        JettyTester.assertUnauthorized(r);
+        JettyTester.assertForbidden(r);
     }
 
     @Test
