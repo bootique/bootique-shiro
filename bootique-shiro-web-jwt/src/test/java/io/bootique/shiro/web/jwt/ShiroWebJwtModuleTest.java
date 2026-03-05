@@ -19,8 +19,7 @@
 
 package io.bootique.shiro.web.jwt;
 
-import io.bootique.junit5.BQModuleTester;
-import io.bootique.shiro.web.jwt.ShiroWebJwtModule;
+import io.bootique.junit.BQModuleTester;
 import org.junit.jupiter.api.Test;
 
 public class ShiroWebJwtModuleTest {

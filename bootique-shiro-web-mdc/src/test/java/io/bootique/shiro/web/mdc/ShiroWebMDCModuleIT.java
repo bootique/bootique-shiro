@@ -20,9 +20,9 @@
 package io.bootique.shiro.web.mdc;
 
 import io.bootique.BQRuntime;
-import io.bootique.junit5.BQTest;
-import io.bootique.junit5.BQTestFactory;
-import io.bootique.junit5.BQTestTool;
+import io.bootique.junit.BQTest;
+import io.bootique.junit.BQTestFactory;
+import io.bootique.junit.BQTestTool;
 import io.bootique.shiro.ShiroModule;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.mgt.DefaultSecurityManager;

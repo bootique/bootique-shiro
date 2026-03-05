@@ -3,7 +3,7 @@ package io.bootique.shiro.jwt;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
-import io.bootique.junit5.BQTest;
+import io.bootique.junit.BQTest;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.junit.jupiter.api.BeforeAll;

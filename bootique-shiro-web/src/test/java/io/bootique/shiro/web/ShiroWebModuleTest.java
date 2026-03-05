@@ -19,7 +19,7 @@
 
 package io.bootique.shiro.web;
 
-import io.bootique.junit5.BQModuleTester;
+import io.bootique.junit.BQModuleTester;
 import org.junit.jupiter.api.Test;
 
 public class ShiroWebModuleTest {

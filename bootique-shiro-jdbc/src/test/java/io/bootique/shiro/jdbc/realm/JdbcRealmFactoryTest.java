@@ -20,7 +20,7 @@
 package io.bootique.shiro.jdbc.realm;
 
 import io.bootique.jdbc.DataSourceFactory;
-import io.bootique.junit5.PolymorphicConfigurationChecker;
+import io.bootique.junit.PolymorphicConfigurationChecker;
 import io.bootique.shiro.realm.ActiveDirectoryRealmFactory;
 import io.bootique.shiro.realm.IniRealmFactory;
 import io.bootique.shiro.realm.RealmFactory;
