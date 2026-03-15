@@ -71,16 +71,13 @@ create a `.yml` file similar to this (you may recognize some of the configs belo
 shiro:
   realms:
     - users:
-        adminuser: "password, admin, user"
-        user: "password, user"
-      roles:
-        admin: "admin"
+        user1: "password, user"
+        user2: "password, user, admin"
 ```
 
 _Hint: use `-H` flag to run your app to see configuration docs in details._
 
-
-Finally you are ready to use Shiro:
+Finally, you are ready to use Shiro:
 
 ```java
 
@@ -92,9 +89,9 @@ public void doSomething() {
         
         // within 'execute' you can access current Subject using Shiro API
         Subject subject = SecurityUtils.subject();
-        subject.checkPermission("A");
-        subject.checkPermission("B");
-        ...
+        subject.hasRole("user");
+        subject.hasRole("admin");
+        // ...
     });
 }
 
@@ -115,31 +112,26 @@ Configuring of a web environment includes configuring realms (as described above
 shiro:
   realms:
     - users:
-        adminuser: "password, admin, user"
-        user: "password, user"
-      roles:
-        admin: "admin"
+        user1: "password, user"
+        user2: "password, user, admin"
         
 shiroweb:
-  # These URLs are resolved within ShiroFilter that routes 
-  # them to the corresponding internal security filters.
   urls:
-    "/admin" : perms[\"admin\"]
-    "/pub"   : anon
+    "/pub" : anon
+    "/user" : "noSessionCreation, authcBasic, roles[user]"
+    "/admin" : "noSessionCreation, authcBasic, roles[admin]"
 ```
 Using Shiro within a servlet request or a JAX-RS endpoint is even easier than a standalone app, as all the environment 
 is already initialized for you:
-
 
 ```java
 @GET
 public Response get() {
     Subject subject = SecurityUtils.getSubject();
-    subject.checkPermission("A");
-    subject.checkPermission("B");
-    ...
+    subject.hasRole("user");
+    subject.hasRole("admin");
+    // ...
 }
-
 ```
 
 ## Logging and Integration with MDC
@@ -175,3 +167,7 @@ shiroweb:
     "/admin" : perms[\"admin\"], mdc
     "/pub"   : anon
 ```
+
+## JWT and OIDC
+
+_TODO_
