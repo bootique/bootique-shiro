@@ -36,7 +36,7 @@
     <description>Parent POM of Apache Shiro / Bootique integration modules.</description>
 
     <properties>
-        <shiro.version>2.1.0</shiro.version>
+        <shiro.version>2.2.1</shiro.version>
         <jjwt.version>0.12.6</jjwt.version>
     </properties>
 
