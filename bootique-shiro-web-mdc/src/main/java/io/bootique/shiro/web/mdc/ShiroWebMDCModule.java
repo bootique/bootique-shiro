@@ -55,8 +55,7 @@ public class ShiroWebMDCModule implements BQModule {
     @Singleton
     @Provides
     ShiroWebPrincipalMDCItem providePrincipalMDCCleaner(PrincipalMDC principalMDC) {
-        ShiroWebPrincipalMDCItem cleaner = new ShiroWebPrincipalMDCItem(principalMDC);
-        return cleaner;
+        return new ShiroWebPrincipalMDCItem(principalMDC);
     }
 
     @Singleton
