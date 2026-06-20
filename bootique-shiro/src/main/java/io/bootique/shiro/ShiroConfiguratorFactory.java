@@ -82,7 +82,7 @@ public class ShiroConfiguratorFactory {
 
         } else if (!diRealms.isEmpty() && LOGGER.isInfoEnabled()) {
             String realmNames = diRealms.stream().map(this::realmName).collect(joining(", "));
-            LOGGER.info("Ignoring DI-originated Realms: " + realmNames + ". Using Realms from configuration instead.");
+            LOGGER.info("Ignoring DI-originated Realms: {}. Using Realms from configuration instead.", realmNames);
         }
 
         if (allRealms.isEmpty()) {
