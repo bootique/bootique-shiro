@@ -41,8 +41,14 @@ public class ShiroWebMDCModule implements BQModule {
 
     @Override
     public void configure(Binder binder) {
+
+        // this is to *reset* the MDC state around Jetty requests. Doesn't initialize MDC on its own
         JettyModule.extend(binder).addRequestMDCItem(PrincipalMDC.MDC_KEY, ShiroWebPrincipalMDCItem.class);
+
+        // initializes MDC on fresh login
         ShiroModule.extend(binder).addAuthListener(ShiroWebPrincipalMDCItem.class);
+
+        // initializes MDC as a part of auth filter chain
         ShiroWebModule.extend(binder).setFilter("mdc", SubjectMDCInitializer.class);
     }
 
