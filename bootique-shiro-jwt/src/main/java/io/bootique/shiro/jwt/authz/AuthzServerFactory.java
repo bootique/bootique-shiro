@@ -36,12 +36,22 @@ public class AuthzServerFactory {
     private ResourceFactory jwkLocation;
     private String audience;
     private AuthzReaderFactory roles;
+    private String mdcClaim;
 
     @BQConfigProperty("""
             An optional audience. If specified, it will be compared with the 'aud' JWT claim, and fail authentication \
             if the two do not match""")
     public AuthzServerFactory setAudience(String audience) {
         this.audience = audience;
+        return this;
+    }
+
+    @BQConfigProperty("""
+            Name of the JWT claim used to identify the principal in the logging MDC. If not set, the standard "sub" \
+            (subject) claim is used. Setting it to a more human-readable claim (e.g. "upn") often makes logs easier \
+            to trace back to a specific account""")
+    public AuthzServerFactory setMdcClaim(String mdcClaim) {
+        this.mdcClaim = mdcClaim;
         return this;
     }
 
@@ -58,11 +68,15 @@ public class AuthzServerFactory {
     }
 
     public AuthzServer createAuthzServer() {
-        return new AuthzServer(this.audience, getRoles().createReader(), getJwkLocation());
+        return new AuthzServer(this.audience, getRoles().createReader(), getJwkLocation(), getMdcClaim());
     }
 
     private AuthzReaderFactory getRoles() {
         return roles != null ? roles : new JsonListAuthzReaderFactory();
+    }
+
+    private String getMdcClaim() {
+        return mdcClaim != null ? mdcClaim : "sub";
     }
 
     private URL getJwkLocation() {

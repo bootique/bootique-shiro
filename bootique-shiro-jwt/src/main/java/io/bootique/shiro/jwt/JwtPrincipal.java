@@ -18,6 +18,7 @@
  */
 package io.bootique.shiro.jwt;
 
+import io.bootique.shiro.mdc.MDCAwarePrincipal;
 import io.jsonwebtoken.Claims;
 
 import java.util.Objects;
@@ -27,17 +28,17 @@ import java.util.Objects;
  *
  * @since 4.0
  */
-public record JwtPrincipal(String kid, Claims claims) {
+public record JwtPrincipal(String kid, Claims claims, String mdcClaim) implements MDCAwarePrincipal {
 
     public JwtPrincipal {
         Objects.requireNonNull(kid, "Null 'kid' (key id)");
         Objects.requireNonNull(claims, "Null JWT Claims");
+        Objects.requireNonNull(mdcClaim, "Null 'mdcClaim'");
     }
 
-    // defined primarily for MDC logging purposes to expose the token subject if present
     @Override
-    public String toString() {
-        String subject = claims.getSubject();
-        return subject != null ? subject : "JwtPrincipal(?)";
+    public String mdcLabel() {
+        Object label = claims.get(mdcClaim);
+        return label != null ? label.toString() : "JwtPrincipal(?)";
     }
 }

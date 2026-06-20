@@ -24,16 +24,21 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @since 4.0
+ */
 public class AuthzServer {
 
     private final String audience;
     private final AuthzReader rolesReader;
     private final URL jwkLocation;
+    private final String mdcClaim;
 
-    public AuthzServer(String audience, AuthzReader rolesReader, URL jwkLocation) {
+    public AuthzServer(String audience, AuthzReader rolesReader, URL jwkLocation, String mdcClaim) {
         this.audience = audience;
         this.rolesReader = rolesReader;
         this.jwkLocation = jwkLocation;
+        this.mdcClaim = mdcClaim;
     }
 
     public URL getJwkLocation() {
@@ -42,6 +47,13 @@ public class AuthzServer {
 
     public List<String> getRoles(Claims claims) {
         return rolesReader.readAuthz(claims);
+    }
+
+    /**
+     * Returns the name of the JWT claim used to identify the principal in the logging MDC.
+     */
+    public String getMdcClaim() {
+        return mdcClaim;
     }
 
     public boolean matchesAudience(Claims claims) {

@@ -106,9 +106,9 @@ public class JwtRealm extends AuthorizingRealm {
         String kid = (String) jwt.getHeader().get("kid");
 
         // Find and validate the server that matches this token's audience
-        authzServerOrThrow(kid, claims);
+        AuthzServer server = authzServerOrThrow(kid, claims);
 
-        JwtPrincipal principal = new JwtPrincipal(kid, claims);
+        JwtPrincipal principal = new JwtPrincipal(kid, claims, server.getMdcClaim());
         return new SimpleAuthenticationInfo(
                 new SimplePrincipalCollection(principal, getName()),
                 token.getCredentials());

@@ -2,6 +2,7 @@
 
 * #51 JwtRealm: handle duplicate key ids
 * #53 Upgrade to Shiro 2.1.0
+* #54 Traceable MDC display of JwtPrincipal
 * #55 Upgrade to Shiro 2.2.1
 
 ## 4.0-M3

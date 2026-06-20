@@ -16,35 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package io.bootique.shiro.mdc;
 
-import org.slf4j.MDC;
-
 /**
- * A wrapper around SLF4J MDC (Mapped Diagnostic Context) class that allows to expose current principal name in the
- * logging context.
+ * An optional interface for a Shiro principal to expose its internals to MDC.
+ *
+ * @since 4.0
  */
-public class PrincipalMDC {
+public interface MDCAwarePrincipal {
 
-    public static final String MDC_KEY = "principal";
-
-    /**
-     * Initializes SLF4J MDC with the current principal name.
-     */
-    public void reset(Object principal) {
-        if (principal == null) {
-            MDC.remove(MDC_KEY);
-        } else {
-            String label = principal instanceof MDCAwarePrincipal map ? map.mdcLabel() : String.valueOf(principal);
-            MDC.put(MDC_KEY, label);
-        }
-    }
-
-    /**
-     * Removes principal name from the logging MDC.
-     */
-    public void clear() {
-        MDC.remove(MDC_KEY);
-    }
+    String mdcLabel();
 }
