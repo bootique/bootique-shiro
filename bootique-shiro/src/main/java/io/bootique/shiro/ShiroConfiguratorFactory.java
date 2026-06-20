@@ -21,8 +21,8 @@ package io.bootique.shiro;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.di.Injector;
 import io.bootique.shiro.realm.RealmFactory;
+import jakarta.inject.Inject;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -31,7 +31,6 @@ import org.apache.shiro.realm.Realm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -68,7 +67,7 @@ public class ShiroConfiguratorFactory {
     }
 
     public ShiroConfigurator create() {
-        return new ShiroConfigurator(createRealms(), sessionStorageDisabled);
+        return new ShiroConfigurator(createRealms(), !sessionStorageDisabled);
     }
 
     protected List<Realm> createRealms() {

@@ -62,7 +62,7 @@ public class ShiroModule implements BQModule {
 
     @Provides
     @Singleton
-    ShiroConfigurator provideRealms(ConfigurationFactory configFactory) {
+    ShiroConfigurator provideShiroConfigurator(ConfigurationFactory configFactory) {
         return configFactory.config(ShiroConfiguratorFactory.class, CONFIG_PREFIX).create();
     }
 
@@ -81,7 +81,7 @@ public class ShiroModule implements BQModule {
             ShiroConfigurator configurator,
             Set<AuthenticationListener> authListeners) {
 
-        DefaultSecurityManager manager = new DefaultSecurityManager(configurator.getRealms());
+        DefaultSecurityManager manager = new DefaultSecurityManager(configurator.realms());
         ((AbstractAuthenticator) manager.getAuthenticator()).setAuthenticationListeners(authListeners);
         manager.setSessionManager(sessionManager);
         manager.setRememberMeManager(rememberMeManager);
@@ -114,7 +114,7 @@ public class ShiroModule implements BQModule {
     @Singleton
     SessionStorageEvaluator provideSessionStorageEvaluator(ShiroConfigurator configurator) {
         DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
-        sessionStorageEvaluator.setSessionStorageEnabled(!configurator.isSessionStorageDisabled());
+        sessionStorageEvaluator.setSessionStorageEnabled(configurator.sessionStorage());
         return sessionStorageEvaluator;
     }
 }

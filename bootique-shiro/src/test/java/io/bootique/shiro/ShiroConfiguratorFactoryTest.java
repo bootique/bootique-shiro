@@ -45,9 +45,9 @@ public class ShiroConfiguratorFactoryTest {
 
         ShiroConfigurator configurator = shiroConfiguratorFactory.create();
         assertNotNull(configurator);
-        assertEquals(2, configurator.getRealms().size());
-        assertTrue(configurator.getRealms().contains(r1));
-        assertTrue(configurator.getRealms().contains(r2));
+        assertEquals(2, configurator.realms().size());
+        assertTrue(configurator.realms().contains(r1));
+        assertTrue(configurator.realms().contains(r2));
     }
 
     @Test
@@ -77,9 +77,9 @@ public class ShiroConfiguratorFactoryTest {
 
         ShiroConfigurator configurator = shiroConfiguratorFactory.create();
         assertNotNull(configurator);
-        assertEquals(2, configurator.getRealms().size());
-        assertEquals(r1, configurator.getRealms().get(0), "Realm ordering got lost");
-        assertEquals(r2, configurator.getRealms().get(1), "Realm ordering got lost");
+        assertEquals(2, configurator.realms().size());
+        assertEquals(r1, configurator.realms().get(0), "Realm ordering got lost");
+        assertEquals(r2, configurator.realms().get(1), "Realm ordering got lost");
     }
 
     @Test
@@ -114,8 +114,8 @@ public class ShiroConfiguratorFactoryTest {
 
         ShiroConfigurator configurator = shiroConfiguratorFactory.create();
         assertNotNull(configurator);
-        assertEquals(2, configurator.getRealms().size());
-        assertEquals(r1, configurator.getRealms().get(0), "Wrong Realms or Realm ordering got lost");
-        assertEquals(r2, configurator.getRealms().get(1), "Wrong Realms or Realm ordering got lost");
+        assertEquals(2, configurator.realms().size());
+        assertEquals(r1, configurator.realms().get(0), "Wrong Realms or Realm ordering got lost");
+        assertEquals(r2, configurator.realms().get(1), "Wrong Realms or Realm ordering got lost");
     }
 }

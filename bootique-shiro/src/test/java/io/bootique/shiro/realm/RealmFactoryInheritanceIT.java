@@ -44,7 +44,7 @@ public class RealmFactoryInheritanceIT {
     @Test
     public void createRealms() {
 
-        Object[] names = app.getInstance(ShiroConfigurator.class).getRealms().stream().map(Realm::getName).toArray();
+        Object[] names = app.getInstance(ShiroConfigurator.class).realms().stream().map(Realm::getName).toArray();
         assertEquals(3, names.length);
         assertEquals("Created by RealmFactory2", names[0]);
         assertEquals("Created by RealmFactory1", names[1]);

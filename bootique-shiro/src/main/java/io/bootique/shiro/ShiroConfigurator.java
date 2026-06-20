@@ -24,26 +24,10 @@ import org.apache.shiro.realm.Realm;
 import java.util.List;
 
 /**
- * An injectable immutable holder of Shiro configuration (realms, session storage policy).
+ * An injectable immutable holder of Shiro configuration (realms, session storage policy). It is an intermediate holder
+ * used by module-specific SecurityManager and SessionStorageEvaluator factory code.
  *
  * @since 2.0
  */
-public class ShiroConfigurator {
-
-    // the collection is ordered...
-    private List<Realm> realms;
-    private boolean sessionStorageDisabled;
-
-    public ShiroConfigurator(List<Realm> realms, boolean sessionStorageDisabled) {
-        this.realms = realms;
-        this.sessionStorageDisabled = sessionStorageDisabled;
-    }
-
-    public List<Realm> getRealms() {
-        return realms;
-    }
-
-    public boolean isSessionStorageDisabled() {
-        return sessionStorageDisabled;
-    }
+public record ShiroConfigurator(List<Realm> realms, boolean sessionStorage) {
 }

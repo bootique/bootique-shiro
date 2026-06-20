@@ -88,7 +88,7 @@ public class ShiroWebModule implements BQModule {
             SubjectDAO subjectDAO,
             ShiroConfigurator realms,
             Set<AuthenticationListener> authListeners) {
-        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms.getRealms());
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms.realms());
 
         // TODO: from here the code is copied from ShiroModule ... error prone... use factory or something
         ((AbstractAuthenticator) securityManager.getAuthenticator()).setAuthenticationListeners(authListeners);
@@ -122,7 +122,7 @@ public class ShiroWebModule implements BQModule {
     @Singleton
     SessionStorageEvaluator provideSessionStorageEvaluator(ShiroConfigurator configurator) {
         DefaultWebSessionStorageEvaluator sessionStorageEvaluator = new DefaultWebSessionStorageEvaluator();
-        sessionStorageEvaluator.setSessionStorageEnabled(!configurator.isSessionStorageDisabled());
+        sessionStorageEvaluator.setSessionStorageEnabled(configurator.sessionStorage());
         return sessionStorageEvaluator;
     }
 }
