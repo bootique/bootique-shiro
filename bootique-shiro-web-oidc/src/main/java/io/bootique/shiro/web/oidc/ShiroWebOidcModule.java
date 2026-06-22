@@ -54,7 +54,7 @@ public class ShiroWebOidcModule implements BQModule {
 
     @Provides
     @Singleton
-    OidpRouter provideOidpClient(ConfigurationFactory configFactory) {
+    OidpRouter provideOidpRouter(ConfigurationFactory configFactory) {
         return configFactory.config(ShiroWebOidcModuleFactory.class, CONFIG_PREFIX).createOidpRouter();
     }
 
