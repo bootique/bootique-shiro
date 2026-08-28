@@ -85,6 +85,11 @@
                         <groupId>org.apache.shiro</groupId>
                         <artifactId>shiro-config-ogdl</artifactId>
                     </exclusion>
+                    <!-- slf4j is managed centrally by Bootique -->
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
